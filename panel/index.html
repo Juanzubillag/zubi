@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel — China al por mayor</title>
+<style>
+  :root {
+    --bg: #fbfaf8; --panel: #fff; --ink: #1a1a19; --muted: #6b6a66;
+    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed; --on-accent: #fff;
+    --warn: #a8541c; --warn-soft: #fdf1e6; --crit: #c0392b; --crit-soft: #fcecea;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
+      --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25; --on-accent: #0f1a14;
+      --warn: #e0a06a; --warn-soft: #2e2419; --crit: #f08a80; --crit-soft: #3a1f1c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
+    --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25; --on-accent: #0f1a14;
+    --warn: #e0a06a; --warn-soft: #2e2419; --crit: #f08a80; --crit-soft: #3a1f1c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-variant-numeric: tabular-nums; -webkit-text-size-adjust: 100%; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; }
+  h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+
+  header { background: var(--panel); border-bottom: 1px solid var(--line);
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+  .top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 12px 0; }
+  .top h1 { font-size: 19px; letter-spacing: -.01em; }
+  .top .sub { color: var(--muted); font-size: 13px; }
+  .conexion { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .conexion .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .conexion.mal .punto { background: var(--crit); }
+  .conexion.cargando .punto { background: var(--warn); }
+  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 12px;
+    cursor: pointer; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+  .btn:hover { border-color: var(--ink); }
+  .btn.primario { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.wa { background: #15803d; border-color: #15803d; color: #fff; text-decoration: none; display: inline-block; }
+  nav { display: flex; gap: 2px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+  nav button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px;
+    color: var(--muted); cursor: pointer; white-space: nowrap; font-size: 14px; }
+  nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 650; }
+
+  main { padding-block: 22px 60px; }
+  .aviso { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--warn);
+    border-radius: var(--radius); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
+  .aviso.mal { border-color: var(--crit); background: var(--crit-soft); color: var(--crit); }
+  .ok-msg { border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent);
+    border-radius: var(--radius); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
+
+  /* entrada */
+  .entrar { max-width: 380px; margin: 60px auto; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 26px 24px; display: grid; gap: 12px; }
+  .entrar h2 { font-size: 20px; }
+  .entrar p { margin: 0; color: var(--muted); font-size: 14px; }
+  .entrar input { padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 16px; }
+  .entrar .err { color: var(--crit); font-size: 14px; min-height: 20px; }
+
+  /* resumen */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+  .tile .k { font-size: 12.5px; color: var(--muted); }
+  .tile .v { font-size: 25px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; }
+  .tile .d { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .tile.grande { grid-column: 1 / -1; }
+  .tile.bien .v { color: var(--accent); } .tile.debe .v { color: var(--crit); }
+  .barra { height: 10px; background: var(--accent-soft); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+  .barra i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+  h2.sec { font-size: 16px; margin: 26px 0 10px; }
+
+  /* tablas */
+  .tabla { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; background: var(--bg); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.n, th.n { text-align: right; }
+  td.cero { color: var(--muted); }
+  td.neg { color: var(--crit); font-weight: 700; }
+  td.hay { color: var(--accent); font-weight: 650; }
+  tr.grupo td { background: var(--bg); font-weight: 650; font-size: 13px; }
+  tfoot td { font-weight: 700; background: var(--accent-soft); }
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .filtros input, .filtros select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); min-width: 0; }
+  .filtros input { flex: 1 1 220px; }
+  .acciones { display: flex; gap: 6px; }
+  .vacio { color: var(--muted); padding: 30px; text-align: center; }
+  .suave { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+  /* reparto */
+  .vendedores { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .vend { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+  .vend h3 { font-size: 16px; display: flex; justify-content: space-between; gap: 10px; }
+  .vend h3 span { color: var(--muted); font-weight: 500; font-size: 13.5px; }
+  .vend ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+  .vend li { display: flex; justify-content: space-between; gap: 10px; }
+
+  /* apuntar */
+  .form { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px;
+    display: grid; gap: 14px; max-width: 640px; }
+  .campo { display: grid; gap: 5px; }
+  .campo label { font-weight: 600; font-size: 14px; }
+  .campo .ayuda { color: var(--muted); font-size: 12.5px; }
+  .campo input, .campo select, .campo textarea { padding: 10px 11px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg); font-size: 16px; width: 100%; }
+  .fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .fila2 { grid-template-columns: 1fr; } .conexion { margin-left: 0; width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Panel</h1>
+        <div class="sub">China al por mayor · todo en uno, al momento</div>
+      </div>
+      <div class="conexion" id="conexion" hidden>
+        <span class="punto"></span><span id="actualizado">—</span>
+        <button class="btn" type="button" id="refrescar">Actualizar</button>
+        <button class="btn" type="button" id="salir">Salir</button>
+      </div>
+    </div>
+    <nav role="tablist" id="pestanas" hidden>
+      <button role="tab" data-vista="resumen" aria-selected="true">Resumen</button>
+      <button role="tab" data-vista="stock" aria-selected="false">Stock</button>
+      <button role="tab" data-vista="reparto" aria-selected="false">Quién tiene qué</button>
+      <button role="tab" data-vista="cuentas" aria-selected="false">Cuentas</button>
+      <button role="tab" data-vista="movimientos" aria-selected="false">Movimientos</button>
+      <button role="tab" data-vista="apuntar" aria-selected="false">Apuntar</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="aviso" class="aviso" hidden></div>
+
+  <form class="entrar" id="entrar" autocomplete="on">
+    <h2>Tu panel</h2>
+    <p>Escribe tu clave privada. Se comprueba en Google; en esta página no hay nada guardado.</p>
+    <input type="password" id="clave" autocomplete="current-password" placeholder="Clave privada" required>
+    <button class="btn primario" type="submit" id="entrar-btn">Entrar</button>
+    <div class="err" id="entrar-err" role="alert"></div>
+  </form>
+
+  <section id="v-resumen" hidden></section>
+  <section id="v-stock" hidden>
+    <div class="filtros">
+      <input type="search" id="stock-q" placeholder="Buscar: polo, arcteryx, M…" autocomplete="off">
+      <select id="stock-f">
+        <option value="">Todas las tallas</option>
+        <option value="hay">Con disponible</option>
+        <option value="agotado">Agotadas o en negativo</option>
+        <option value="calle">Con prendas en la calle</option>
+        <option value="reservado">Con reservas</option>
+      </select>
+    </div>
+    <div class="tabla"><table id="t-stock"></table></div>
+  </section>
+  <section id="v-reparto" hidden></section>
+  <section id="v-cuentas" hidden></section>
+  <section id="v-movimientos" hidden>
+    <div class="filtros">
+      <select id="mov-tipo"><option value="">Todos los tipos</option></select>
+      <select id="mov-vend"><option value="">Todos los vendedores</option></select>
+    </div>
+    <div class="tabla"><table id="t-mov"></table></div>
+  </section>
+  <section id="v-apuntar" hidden>
+    <div id="apuntar-msg" hidden></div>
+    <form class="form" id="f-apuntar" novalidate>
+      <div class="fila2">
+        <div class="campo"><label for="a-tipo">Qué ha pasado</label>
+          <select id="a-tipo">
+            <option value="VENTA">VENTA — cobrada</option>
+            <option value="CONSIGNA">CONSIGNA — se la lleva un amigo</option>
+            <option value="DEVOLUCION">DEVOLUCION — te la devuelve</option>
+            <option value="RESERVA">RESERVA — la quieren, sin pagar</option>
+            <option value="QUITA_RESERVA">QUITA_RESERVA — se cae la reserva</option>
+            <option value="PAGO">PAGO — un amigo te da dinero</option>
+          </select></div>
+        <div class="campo"><label for="a-vend">Quién</label><select id="a-vend"></select></div>
+      </div>
+      <div class="campo" id="c-prenda"><label for="a-sku">Prenda y talla</label>
+        <select id="a-sku"></select>
+        <div class="ayuda" id="a-sku-ayuda"></div></div>
+      <div class="fila2">
+        <div class="campo" id="c-cant"><label for="a-cant">Cantidad</label>
+          <input type="number" id="a-cant" min="1" step="1" value="1" inputmode="numeric"></div>
+        <div class="campo" id="c-precio"><label for="a-precio" id="a-precio-l">Precio cobrado (€)</label>
+          <input type="text" id="a-precio" inputmode="decimal" placeholder="0,00"></div>
+      </div>
+      <div class="campo" id="c-canal"><label for="a-canal">Dónde</label>
+        <select id="a-canal"><option>Vinted</option><option>Wallapop</option><option>En mano</option>
+          <option>Tienda ZUBI</option><option>Instagram</option><option>Otro</option></select></div>
+      <div class="campo"><label for="a-notas">Notas (opcional)</label>
+        <textarea id="a-notas" rows="2" maxlength="300"></textarea></div>
+      <div><button class="btn primario" type="submit" id="a-enviar">Apuntar</button></div>
+    </form>
+  </section>
+</main>
+
+<script src="../vendedores/config.js"></script>
+<script src="../vendedores/calculo.js"></script>
+<script src="logica.js"></script>
+<script>
+(() => {
+  'use strict';
+  const CFG = window.CONFIG_WEB || {};
+  const el = (id) => document.getElementById(id);
+  const eur = Panel.eur;
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+  const VISTAS = ['resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar'];
+
+  // ---- Google, con reintentos: a veces contesta «No se puede abrir el archivo» ----
+  async function google(opciones) {
+    if (!CFG.registroUrl) throw new Error('Falta el enlace de Google (registroUrl) en config.js.');
+    let ultimo = null;
+    for (let intento = 0; intento < 3; intento++) {
+      if (intento) await espera(intento === 1 ? 1500 : 4000);
+      try {
+        const r = opciones.cuerpo
+          ? await fetch(CFG.registroUrl, { method: 'POST', body: JSON.stringify(opciones.cuerpo) })
+          : await fetch(CFG.registroUrl + '?' + new URLSearchParams(opciones.params).toString());
+        return JSON.parse(await r.text());   // la página de error de Google no es JSON: se reintenta
+      } catch (e) { ultimo = e; }
+    }
+    throw new Error('Google no responde ahora mismo (' + ((ultimo && ultimo.message) || 'sin respuesta') + '). Vuelve a intentarlo en un momento.');
+  }
+
+  // ---- Estado ----
+  let CLAVE = null, DATOS = null, cargando = false, ultimaCarga = 0;
+  const S = {};   // calc, cuentas, resumen, nombre, contactos
+
+  function aviso(texto, tipo) {
+    const a = el('aviso');
+    a.textContent = texto || '';
+    a.className = 'aviso' + (tipo === 'mal' ? ' mal' : '');
+    a.hidden = !texto;
+  }
+  function conexion(tipo, texto) {
+    el('conexion').className = 'conexion' + (tipo ? ' ' + tipo : '');
+    el('actualizado').textContent = texto;
+  }
+
+  async function cargar() {
+    if (cargando || !CLAVE) return;
+    cargando = true;
+    conexion('cargando', 'Actualizando…');
+    try {
+      const j = await google({ params: { modo: 'privado', clave: CLAVE } });
+      if (!j.ok) {
+        if (/clave/i.test(j.error || '')) { salir(j.error); return; }
+        throw new Error(j.error || 'Google ha contestado algo inesperado.');
+      }
+      DATOS = j;
+      S.calc = Calculo.calcular(j.productos, j.movimientos, { tramos: j.tramos, propio: j.propio });
+      S.cuentas = [...Calculo.cuentas(S.calc).values()];
+      S.resumen = Panel.resumen(S.calc, S.cuentas, j.config);
+      S.nombre = new Map((j.vendedores || []).map((v) => [String(v.id).toUpperCase(), v.nombre || v.id]));
+      S.contactos = j.contactos || {};
+      ultimaCarga = Date.now();
+      aviso('');
+      pintarTodo();
+      conexion('', 'Actualizado ahora');
+    } catch (e) {
+      conexion('mal', 'Sin conexión con Google');
+      aviso(e.message, 'mal');
+    } finally {
+      cargando = false;
+    }
+  }
+  const nombreDe = (vid) => S.nombre.get(vid) || vid || '—';
+
+  // ---- Resumen ----
+  function pintarResumen() {
+    const r = S.resumen;
+    const pct = Math.round(r.recuperado * 100);
+    el('v-resumen').innerHTML = `
+      ${r.ventasSinPrecio ? `<div class="aviso">Hay ${r.ventasSinPrecio} ${r.ventasSinPrecio === 1 ? 'venta' : 'ventas'} sin precio: cuentan 0 € hasta que lo pongas en la hoja.</div>` : ''}
+      <div class="tiles">
+        <div class="tile grande"><div class="k">Recuperado del pedido</div>
+          <div class="v">${pct} %</div>
+          <div class="d">${eur(r.neto)} de ${eur(r.desembolso)} · ${r.faltaRecuperar > 0 ? 'faltan ' + eur(r.faltaRecuperar) : 'recuperado del todo'}</div>
+          <div class="barra" role="img" aria-label="${pct} % recuperado"><i style="width:${pct}%"></i></div></div>
+        <div class="tile bien"><div class="k">Neto para ti</div><div class="v">${eur(r.neto)}</div>
+          <div class="d">vendido ${eur(r.ingresado)} − comisiones ${eur(r.comisiones)}</div></div>
+        <div class="tile ${r.teDeben > 0.005 ? 'debe' : ''}"><div class="k">Te deben tus amigos</div><div class="v">${eur(r.teDeben)}</div>
+          <div class="d">ya te han pagado ${eur(r.cobrado)}</div></div>
+        <div class="tile"><div class="k">Si se vende todo lo que queda</div><div class="v">${eur(r.beneficioSiTodo)}</div>
+          <div class="d">de beneficio, a precio de tus amigos</div></div>
+      </div>
+      <h2 class="sec">Prendas</h2>
+      <div class="tiles">
+        <div class="tile"><div class="k">Disponibles</div><div class="v">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
+        <div class="tile"><div class="k">Vendidas</div><div class="v">${r.vendidas}</div></div>
+        <div class="tile"><div class="k">En casa de tus amigos</div><div class="v">${r.enLaCalle}</div></div>
+        <div class="tile"><div class="k">Reservadas</div><div class="v">${r.reservadas}</div></div>
+      </div>`;
+  }
+
+  // ---- Stock ----
+  function pintarStock() {
+    const q = el('stock-q').value.trim().toLowerCase();
+    const f = el('stock-f').value;
+    const filas = S.calc.prods.filter((p) => {
+      if (q && !`${p.producto} ${p.modelo} ${p.talla} ${p.sku}`.toLowerCase().includes(q)) return false;
+      if (f === 'hay') return p.disponible > 0;
+      if (f === 'agotado') return p.disponible <= 0;
+      if (f === 'calle') return p.enVendedores > 0;
+      if (f === 'reservado') return p.reservado > 0;
+      return true;
+    });
+    const celda = (n, marcar) => `<td class="n ${n < 0 ? 'neg' : n === 0 ? 'cero' : marcar ? 'hay' : ''}">${n}</td>`;
+    let grupo = '';
+    el('t-stock').innerHTML = filas.length ? `<thead><tr><th>Prenda</th><th>Talla</th><th class="n">Inicial</th>
+      <th class="n">Vendido</th><th class="n">Reservado</th><th class="n">En la calle</th><th class="n">Disponible</th>
+      <th class="n">En tu casa</th><th class="n">PVP</th></tr></thead><tbody>${filas.map((p) => {
+        const g = p.producto + ' — ' + p.modelo;
+        const cab = g !== grupo ? `<tr class="grupo"><td colspan="9">${esc(g)}</td></tr>` : '';
+        grupo = g;
+        return cab + `<tr><td class="mono">${esc(p.sku)}</td><td>${esc(p.talla)}</td>${celda(p.inicial)}${celda(p.vendido)}
+          ${celda(p.reservado)}${celda(p.enVendedores)}${celda(p.disponible, true)}${celda(p.enAlmacen)}<td class="n">${eur(p.pvp)}</td></tr>`;
+      }).join('')}</tbody>` : '<tbody><tr><td class="vacio">Nada coincide.</td></tr></tbody>';
+  }
+
+  // ---- Quién tiene qué ----
+  function pintarReparto() {
+    const bloques = [];
+    for (const [vid, suyo] of S.calc.mano) {
+      const cosas = [...suyo].filter(([, n]) => n > 0).map(([sku, n]) => ({ p: S.calc.porSku.get(sku.toUpperCase()), n }));
+      if (!cosas.length) continue;
+      const uds = cosas.reduce((a, x) => a + x.n, 0);
+      const valor = cosas.reduce((a, x) => a + x.n * x.p.pvp, 0);
+      bloques.push(`<div class="vend"><h3>${esc(nombreDe(vid))}<span>${uds} prendas · ${eur(valor)}</span></h3><ul>${
+        cosas.map((x) => `<li><span>${esc(x.p.producto)} — ${esc(x.p.modelo)} (${esc(x.p.talla)})</span><b>${x.n}</b></li>`).join('')}</ul></div>`);
+    }
+    el('v-reparto').innerHTML = bloques.length ? `<div class="vendedores">${bloques.join('')}</div>`
+      : '<div class="vacio">Nadie tiene prendas en su casa: todo está en la tuya.</div>';
+  }
+
+  // ---- Cuentas con cada vendedor ----
+  function pintarCuentas() {
+    const filas = S.cuentas.slice().sort((a, b) => (a.propio - b.propio) || (b.pendiente - a.pendiente));
+    el('v-cuentas').innerHTML = filas.length ? `<div class="tabla"><table><thead><tr><th>Vendedor</th><th class="n">Uds</th>
+      <th class="n">Vendido</th><th class="n">Su comisión</th><th class="n">Tu parte</th><th class="n">Te ha pagado</th>
+      <th class="n">Falta</th><th></th></tr></thead><tbody>${filas.map((c) => {
+        const nombre = nombreDe(c.vendedor);
+        const falta = c.propio ? '<td class="n cero">—</td>'
+          : `<td class="n ${c.pendiente > 0.005 ? 'neg' : 'hay'}">${eur(Math.max(0, c.pendiente))}</td>`;
+        const acc = c.propio ? '<span class="suave">tus ventas</span>'
+          : c.pendiente > 0.005 ? `<div class="acciones">
+              <button class="btn primario" type="button" data-pago="${esc(c.vendedor)}" data-importe="${c.pendiente.toFixed(2)}">Registrar pago</button>
+              <a class="btn wa" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(S.contactos[c.vendedor],
+                Panel.mensajeDeuda(nombre, c, S.calc.ventas)))}">Recordar por WhatsApp</a></div>`
+            : (c.pendiente < -0.005 ? `<span class="suave">al día · +${eur(-c.pendiente)} a favor</span>` : '<span class="suave">al día</span>');
+        return `<tr><td>${esc(nombre)}</td><td class="n">${c.uds}</td><td class="n">${eur(c.bruto)}</td>
+          <td class="n">${eur(c.comision)}</td><td class="n">${eur(c.tuParte)}</td><td class="n">${eur(c.liquidado)}</td>${falta}<td>${acc}</td></tr>`;
+      }).join('')}</tbody></table></div>`
+      : '<div class="vacio">Aún no hay ventas ni pagos.</div>';
+  }
+
+  // ---- Movimientos (el más reciente arriba) ----
+  function pintarMovimientos() {
+    const tipo = el('mov-tipo').value, vend = el('mov-vend').value;
+    const lista = (DATOS.movimientos || []).map((m, i) => ({ ...m, i })).reverse().filter((m) =>
+      (!tipo || String(m.tipo).toUpperCase() === tipo) && (!vend || String(m.vendedor_id).toUpperCase() === vend)).slice(0, 200);
+    el('t-mov').innerHTML = lista.length ? `<thead><tr><th>Fecha</th><th>Tipo</th><th>Prenda</th><th>Quién</th>
+      <th class="n">Cant.</th><th class="n">Precio</th><th>Dónde</th><th>Notas</th></tr></thead><tbody>${lista.map((m) => {
+        const p = S.calc.porSku.get(String(m.sku || '').toUpperCase());
+        return `<tr><td>${esc(m.fecha)}</td><td class="mono">${esc(m.tipo)}</td>
+          <td>${p ? esc(p.producto + ' — ' + p.modelo + ' (' + p.talla + ')') : esc(m.sku || '—')}</td>
+          <td>${esc(nombreDe(String(m.vendedor_id).toUpperCase()))}</td><td class="n">${esc(m.cantidad)}</td>
+          <td class="n">${m.precio_venta_eur !== '' ? eur(Calculo.num(m.precio_venta_eur)) : ''}</td>
+          <td>${esc(m.canal)}</td><td>${esc(m.notas)}</td></tr>`;
+      }).join('')}</tbody>` : '<tbody><tr><td class="vacio">Aún no hay movimientos.</td></tr></tbody>';
+  }
+
+  // ---- Apuntar ----
+  function opcionesFormulario() {
+    const vend = el('a-vend'), sku = el('a-sku');
+    const vv = vend.value, sv = sku.value;
+    vend.innerHTML = (DATOS.vendedores || []).map((v) =>
+      `<option value="${esc(String(v.id).toUpperCase())}">${esc(v.nombre || v.id)}</option>`).join('');
+    const grupos = new Map();
+    for (const p of S.calc.prods) {
+      const g = p.producto + ' — ' + p.modelo;
+      if (!grupos.has(g)) grupos.set(g, []);
+      grupos.get(g).push(p);
+    }
+    sku.innerHTML = '<option value="">— Elige prenda y talla —</option>' + [...grupos].map(([g, ps]) =>
+      `<optgroup label="${esc(g)}">${ps.map((p) =>
+        `<option value="${esc(p.sku)}">${esc(p.talla)} · quedan ${p.disponible}${p.enVendedores ? ' · ' + p.enVendedores + ' en la calle' : ''}</option>`).join('')}</optgroup>`).join('');
+    if (vv) vend.value = vv;
+    if (sv) sku.value = sv;
+    segunTipo();
+  }
+  function segunTipo() {
+    const t = el('a-tipo').value;
+    const pago = t === 'PAGO';
+    el('c-cant').hidden = pago;
+    el('c-precio').hidden = !(t === 'VENTA' || pago);
+    el('c-canal').hidden = t !== 'VENTA';
+    el('a-precio-l').textContent = pago ? 'Importe recibido (€)' : 'Precio cobrado (€)';
+    el('a-sku-ayuda').textContent = pago ? 'Opcional: la venta que te paga. Déjalo vacío si es un pago de varias.' : '';
+    const p = S.calc && S.calc.porSku.get(String(el('a-sku').value).toUpperCase());
+    if (t === 'VENTA' && p && !el('a-precio').value) el('a-precio').value = String(p.pvp).replace('.', ',');
+  }
+  function mensajeApuntar(texto, bien) {
+    const m = el('apuntar-msg');
+    m.className = bien ? 'ok-msg' : 'aviso mal';
+    m.textContent = texto;
+    m.hidden = false;
+  }
+  async function enviarApunte(e) {
+    if (e) e.preventDefault();
+    const t = el('a-tipo').value;
+    const cuerpo = {
+      accion: 'movimiento', clave: CLAVE, idPeticion: Panel.idPeticion(),
+      tipo: t, vendedor: el('a-vend').value, sku: el('a-sku').value,
+      cantidad: t === 'PAGO' ? '' : el('a-cant').value,
+      precio: t === 'VENTA' || t === 'PAGO' ? el('a-precio').value : '',
+      canal: t === 'VENTA' ? el('a-canal').value : '', notas: el('a-notas').value,
+    };
+    if (t !== 'PAGO' && !cuerpo.sku) { mensajeApuntar('Elige la prenda y la talla.'); return; }
+    const b = el('a-enviar');
+    b.disabled = true; b.textContent = 'Apuntando…';
+    try {
+      const r = await google({ cuerpo });
+      if (r.ok) {
+        mensajeApuntar('✓ Apuntado: ' + r.resumen, true);
+        el('a-notas').value = ''; el('a-precio').value = ''; el('a-cant').value = '1';
+        await cargar();
+      } else {
+        mensajeApuntar(r.error || 'No se ha podido apuntar.');
+      }
+    } catch (err) {
+      mensajeApuntar(err.message + ' Si lo repites, no se apuntará dos veces.');
+    } finally {
+      b.disabled = false; b.textContent = 'Apuntar';
+    }
+    return true;
+  }
+
+  function pintarTodo() {
+    pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas();
+    const tipos = [...new Set((DATOS.movimientos || []).map((m) => String(m.tipo).toUpperCase()).filter(Boolean))];
+    const mt = el('mov-tipo').value, mv = el('mov-vend').value;
+    el('mov-tipo').innerHTML = '<option value="">Todos los tipos</option>' + tipos.map((x) => `<option>${esc(x)}</option>`).join('');
+    el('mov-vend').innerHTML = '<option value="">Todos los vendedores</option>' +
+      (DATOS.vendedores || []).map((v) => `<option value="${esc(String(v.id).toUpperCase())}">${esc(v.nombre || v.id)}</option>`).join('');
+    el('mov-tipo').value = mt; el('mov-vend').value = mv;
+    pintarMovimientos();
+    opcionesFormulario();
+  }
+
+  // ---- Navegación, entrada y salida ----
+  function verVista(v) {
+    document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
+    VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
+  }
+  function mostrarPanel(si) {
+    el('entrar').hidden = si;
+    el('pestanas').hidden = !si;
+    el('conexion').hidden = !si;
+    if (si) verVista('resumen'); else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
+  }
+  async function entrar(clave) {
+    CLAVE = clave;
+    el('entrar-err').textContent = '';
+    el('entrar-btn').disabled = true;
+    try {
+      const j = await google({ params: { modo: 'privado', clave } });
+      if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
+      try { sessionStorage.setItem('clave_privada', clave); } catch (e) { /* sin almacenamiento */ }
+      mostrarPanel(true);
+      await cargar();
+      return true;
+    } catch (e) {
+      CLAVE = null;
+      el('entrar-err').textContent = e.message;
+      return false;
+    } finally {
+      el('entrar-btn').disabled = false;
+    }
+  }
+  function salir(motivo) {
+    CLAVE = null; DATOS = null;
+    try { sessionStorage.removeItem('clave_privada'); } catch (e) { /* nada */ }
+    mostrarPanel(false);
+    el('entrar-err').textContent = motivo || '';
+    aviso('');
+  }
+
+  el('entrar').addEventListener('submit', (e) => { e.preventDefault(); entrar(el('clave').value); });
+  el('salir').addEventListener('click', () => salir());
+  el('refrescar').addEventListener('click', () => cargar());
+  document.querySelectorAll('#pestanas button').forEach((b) => b.addEventListener('click', () => verVista(b.dataset.vista)));
+  el('stock-q').addEventListener('input', () => S.calc && pintarStock());
+  el('stock-f').addEventListener('change', () => S.calc && pintarStock());
+  el('mov-tipo').addEventListener('change', () => DATOS && pintarMovimientos());
+  el('mov-vend').addEventListener('change', () => DATOS && pintarMovimientos());
+  el('a-tipo').addEventListener('change', segunTipo);
+  el('a-sku').addEventListener('change', segunTipo);
+  el('f-apuntar').addEventListener('submit', enviarApunte);
+  // «Registrar pago» en Cuentas: abre Apuntar con el pago ya preparado.
+  el('v-cuentas').addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('[data-pago]');
+    if (!b) return;
+    el('a-tipo').value = 'PAGO';
+    el('a-vend').value = b.dataset.pago;
+    el('a-sku').value = '';
+    el('a-precio').value = String(b.dataset.importe).replace('.', ',');
+    segunTipo();
+    verVista('apuntar');
+  });
+
+  // Al momento: se pide a Google cada minuto mientras la página está a la vista, y al volver a ella.
+  setInterval(() => { if (CLAVE && document.visibilityState !== 'hidden') cargar(); }, 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (CLAVE && document.visibilityState === 'visible' && Date.now() - ultimaCarga > 30000) cargar();
+  });
+  setInterval(() => {
+    if (!ultimaCarga || cargando || el('conexion').className.includes('mal')) return;
+    const s = Math.round((Date.now() - ultimaCarga) / 1000);
+    el('actualizado').textContent = s < 10 ? 'Actualizado ahora' : 'Actualizado hace ' + (s < 60 ? s + ' s' : Math.round(s / 60) + ' min');
+  }, 5000);
+
+  let guardada = null;
+  try { guardada = sessionStorage.getItem('clave_privada'); } catch (e) { /* sin almacenamiento */ }
+  const listo = guardada ? entrar(guardada) : Promise.resolve(false);
+
+  // Para las pruebas (scripts/test-panel.js).
+  window.PANEL = { listo, entrar, cargar, enviarApunte, estado: () => ({ CLAVE, DATOS, S }) };
+})();
+</script>
+</body>
+</html>

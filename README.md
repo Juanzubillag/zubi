@@ -1,2 +1,0 @@
-# zubi
-Tienda ZUBI

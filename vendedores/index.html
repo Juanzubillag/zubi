@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Catálogo — China al por mayor</title>
+<style>
+  :root {
+    --bg: #fbfaf8; --panel: #fff; --ink: #1a1a19; --muted: #6b6a66;
+    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed;
+    --warn: #a8541c; --warn-soft: #fdf1e6; --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
+      --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25;
+      --warn: #e0a06a; --warn-soft: #2e2419;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #fbfaf8; --panel: #fff; --ink: #1a1a19; --muted: #6b6a66;
+    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed;
+    --warn: #a8541c; --warn-soft: #fdf1e6;
+  }
+  :root[data-theme="dark"] {
+    --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
+    --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25;
+    --warn: #e0a06a; --warn-soft: #2e2419;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px 64px; }
+
+  header { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .head-in { max-width: 1100px; margin: 0 auto; padding: 18px 16px 0; }
+  h1 { font-size: 20px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+
+  nav { display: flex; gap: 4px; overflow-x: auto; }
+  nav button {
+    appearance: none; background: none; border: 0; border-bottom: 2px solid transparent;
+    color: var(--muted); font: inherit; font-size: 14px; padding: 9px 12px;
+    cursor: pointer; white-space: nowrap;
+  }
+  nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 20px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .stat .v { font-size: 21px; font-weight: 650; margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; align-items: center; }
+  input[type=search], select {
+    font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 8px; background: var(--panel); color: var(--ink); min-width: 0;
+  }
+  input[type=search] { flex: 1 1 200px; }
+  label.chk { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; cursor: pointer; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .card.agotado { opacity: .5; }
+  .foto {
+    aspect-ratio: 4/3; background: var(--accent-soft); display: grid; place-items: center;
+    color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line);
+  }
+  .foto img { width: 100%; height: 100%; object-fit: cover; }
+  .card-body { padding: 12px 13px 13px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .cat { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); font-weight: 650; }
+  .nom { font-weight: 620; line-height: 1.3; }
+  .mod { color: var(--muted); font-size: 13px; margin-top: -4px; }
+  .precio { font-size: 19px; font-weight: 680; font-variant-numeric: tabular-nums; }
+  .precio small { font-size: 12px; font-weight: 450; color: var(--muted); }
+
+  .tallas { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; padding-top: 4px; }
+  .talla {
+    border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px;
+    font-size: 12px; font-variant-numeric: tabular-nums; background: var(--bg);
+  }
+  .talla.hay { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .talla.no { color: var(--muted); text-decoration: line-through; }
+  .talla b { font-weight: 700; }
+  .acciones { display: flex; gap: 6px; margin-top: 10px; }
+  .acciones a {
+    flex: 1; padding: 9px; text-align: center; border-radius: 8px; font-size: 13px;
+    font-weight: 620; text-decoration: none;
+  }
+  .acciones a:hover { filter: brightness(1.05); }
+  .vender { background: var(--accent); color: #fff; }
+  .compartir { background: #25d366; color: #063d1e; }
+  .foto img { cursor: zoom-in; }
+  #lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 100;
+    display: grid; place-items: center; padding: 20px; cursor: zoom-out;
+  }
+  #lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 12px 44px rgba(0,0,0,.5); }
+  #lightbox button {
+    position: absolute; background: rgba(255,255,255,.15); color: #fff; border: 0;
+    cursor: pointer; border-radius: 50%; width: 48px; height: 48px; font-size: 26px;
+    line-height: 1; display: grid; place-items: center;
+  }
+  #lightbox button:hover { background: rgba(255,255,255,.3); }
+  #lb-close { top: 16px; right: 16px; width: 42px; height: 42px; font-size: 20px; }
+  .lb-nav { top: 50%; transform: translateY(-50%); }
+  #lb-prev { left: 12px; } #lb-next { right: 12px; }
+  #lb-count {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    color: #fff; background: rgba(0,0,0,.5); padding: 4px 12px; border-radius: 20px;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+  }
+
+  td.pend { color: #c0392b; font-weight: 700; }
+  td.ok { color: var(--accent); }
+  .falta-precio { color: #c0392b; font-weight: 650; }
+  .propia { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .aldia { color: var(--accent); font-weight: 650; font-size: 13px; white-space: nowrap; }
+  .resumen-deudas { font-size: 15px; margin: 0 0 12px; color: var(--muted); }
+  .resumen-deudas .grande { font-size: 20px; font-variant-numeric: tabular-nums; }
+  .resumen-deudas .rojo { color: #c0392b; }
+  .resumen-deudas .verde { color: var(--accent); }
+  .pago-btn {
+    display: inline-block; padding: 5px 11px; background: var(--accent); color: #fff;
+    border-radius: 7px; font-size: 12px; font-weight: 620; text-decoration: none; white-space: nowrap;
+  }
+  .pago-btn:hover { filter: brightness(1.05); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tabla-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tfoot td { font-weight: 680; background: var(--accent-soft); }
+
+  .aviso {
+    background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn);
+    border-radius: var(--radius); padding: 11px 14px; font-size: 13.5px; margin: 16px 0;
+  }
+  .vacio { color: var(--muted); text-align: center; padding: 48px 0; }
+  h2 { font-size: 16px; margin: 26px 0 10px; }
+  .nota { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+  .lock { max-width: 340px; margin: 30px auto; text-align: center; }
+  .lock h2 { margin: 0 0 4px; }
+  .lock p { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .lock-row { display: flex; gap: 8px; }
+  .lock input { flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; }
+  .lock button { padding: 10px 16px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 620; cursor: pointer; }
+  .lock .err { color: #c0392b; font-size: 13px; margin-top: 10px; min-height: 16px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-in">
+    <h1 id="titulo">Catálogo</h1>
+    <p class="sub" id="subtitulo">Cargando…</p>
+    <nav role="tablist">
+      <button role="tab" data-vista="catalogo" aria-selected="true">Catálogo</button>
+      <button role="tab" data-vista="comisiones" aria-selected="false">Comisiones</button>
+      <button role="tab" data-vista="reparto" aria-selected="false">Quién tiene qué</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="aviso-fuente" class="aviso" hidden></div>
+
+  <div id="lightbox" hidden>
+    <button id="lb-close" aria-label="Cerrar">✕</button>
+    <button id="lb-prev" class="lb-nav" aria-label="Anterior" hidden>‹</button>
+    <img id="lightbox-img" alt="">
+    <button id="lb-next" class="lb-nav" aria-label="Siguiente" hidden>›</button>
+    <div id="lb-count" hidden></div>
+  </div>
+
+  <!-- ---------------- CATÁLOGO ---------------- -->
+  <section id="v-catalogo">
+    <div class="stats" id="stats"></div>
+    <div class="filtros">
+      <input type="search" id="q" placeholder="Buscar: ralph, arcteryx, España…" autocomplete="off">
+      <select id="f-cat"><option value="">Todas las categorías</option></select>
+      <select id="f-talla"><option value="">Todas las tallas</option></select>
+      <label class="chk"><input type="checkbox" id="f-hay" checked> Solo disponible</label>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="vacio" id="sin-resultados" hidden>Nada coincide con esa búsqueda.</p>
+  </section>
+
+  <!-- ---------------- COMISIONES ---------------- -->
+  <section id="v-comisiones" hidden>
+    <div class="lock" id="lock-comisiones" hidden>
+      <h2>🔒 Sección privada</h2>
+      <p>Escribe tu clave privada para ver las comisiones.</p>
+      <div class="lock-row">
+        <input type="password" class="clave-input" placeholder="Contraseña" autocomplete="off">
+        <button type="button" class="clave-ok">Entrar</button>
+      </div>
+      <div class="err"></div>
+    </div>
+    <div id="priv-comisiones">
+      <h2>Cuentas con cada vendedor</h2>
+      <p id="resumen-deudas" class="resumen-deudas"></p>
+      <div class="tabla-wrap"><table id="t-comisiones"></table></div>
+      <p class="nota"><b>Tu parte</b> es el dinero de las ventas que te corresponde (lo vendido
+        menos su comisión). <b>Ya pagado</b> es lo que te ha dado hasta ahora (sumando todos sus
+        pagos). <b>Falta</b> es lo que aún te debe. Cuando llega a 0 aparece <b>✓ Al día</b>. Con
+        el botón <b>Registrar pago</b> apuntas cada vez que te da dinero, y baja lo que falta.
+        Lo que vendes tú no lleva comisión ni es una deuda: ese dinero ya lo tienes.</p>
+
+      <h2>Pagos registrados</h2>
+      <p class="nota">Cada dinero que te han dado. Los pagos se suman: puedes cobrar por partes.</p>
+      <div class="tabla-wrap"><table id="t-pagos"></table></div>
+
+      <h2>Ventas registradas</h2>
+      <div class="tabla-wrap"><table id="t-ventas"></table></div>
+    </div>
+  </section>
+
+  <!-- ---------------- REPARTO ---------------- -->
+  <section id="v-reparto" hidden>
+    <div class="lock" id="lock-reparto" hidden>
+      <h2>🔒 Sección privada</h2>
+      <p>Escribe tu clave privada para ver quién tiene cada prenda.</p>
+      <div class="lock-row">
+        <input type="password" class="clave-input" placeholder="Contraseña" autocomplete="off">
+        <button type="button" class="clave-ok">Entrar</button>
+      </div>
+      <div class="err"></div>
+    </div>
+    <div id="priv-reparto">
+      <h2>Prendas en poder de cada vendedor</h2>
+      <p class="nota">Entregado en consigna, menos lo devuelto y lo ya vendido. Si alguien vende
+        algo que no tenía, salió de tu almacén y no le cuenta. Lo que no aparece aquí está en
+        el almacén.</p>
+      <div class="tabla-wrap"><table id="t-reparto"></table></div>
+    </div>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script src="datos.js"></script>
+<script src="calculo.js"></script>
+<script>
+(() => {
+  'use strict';
+  const CFG = window.CONFIG_WEB || {};
+  const LOCAL = window.DATOS_LOCALES || { productos: [] };
+  const eur = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+  const el = (id) => document.getElementById(id);
+  // Todo lo que viene de la hoja (nombres, canales, notas…) se escapa antes de meterlo
+  // en la página: un texto con "<" no puede convertirse en código.
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+  // Comisión por tramos de PRECIO DE VENTA. Los tramos vienen de Google (o de datos.js).
+  let TRAMOS = LOCAL.comisionTramos;
+  let PROPIO = LOCAL.propio || 'V1';
+  const comisionPct = (precio) => Calculo.comisionPct(precio, TRAMOS);
+
+  // ---- Conexión con Google (el Apps Script de scripts/apps-script.gs) ----
+  // La hoja NO está publicada: el catálogo público (sin costes ni ventas) y tus cifras
+  // privadas los sirve el script, y las privadas solo si la clave es buena. La clave se
+  // comprueba en Google, no aquí: en esta web no hay ninguna contraseña que leer.
+  const enlace = (params) => CFG.registroUrl + (CFG.registroUrl.includes('?') ? '&' : '?') +
+    new URLSearchParams(params).toString();
+  async function pedir(params) {
+    const r = await fetch(enlace(params));
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    if (j.tramos) TRAMOS = j.tramos;
+    if (j.propio) PROPIO = j.propio;
+    return j;
+  }
+
+  function avisar(msg) {
+    const a = el('aviso-fuente');
+    a.textContent = msg.replace(/\s+/g, ' ').trim();
+    a.hidden = false;
+  }
+
+  // ---- Catálogo público: stock en directo, o el pedido inicial si no hay conexión ----
+  const prodPublico = (p) => {
+    const sku = String(p.sku || '').trim();
+    return {
+      sku, categoria: p.categoria, producto: p.producto, modelo: p.modelo, talla: String(p.talla),
+      pvp: Calculo.num(p.pvp_eur), imagen: String(p.imagen_url || '').trim(),
+      cod: sku.replace(/-[^-]+$/, ''),
+      disponible: Calculo.num(p.disponible), vendido: Calculo.num(p.vendido),
+    };
+  };
+  async function cargarCatalogo() {
+    if (CFG.registroUrl) {
+      try {
+        const j = await pedir({ modo: 'catalogo' });
+        if (!j.ok || !Array.isArray(j.productos)) throw new Error(j.error || 'respuesta inesperada');
+        return { prods: j.productos.map(prodPublico), fuente: 'directo' };
+      } catch (e) {
+        console.warn('No se pudo leer el stock de Google:', e);
+        avisar(`No se ha podido leer el stock de Google (${e.message}). Mostrando el pedido
+          inicial guardado en la web, que puede estar desactualizado.`);
+      }
+    }
+    const calc = Calculo.calcular(LOCAL.productos, [], { tramos: TRAMOS, propio: PROPIO });
+    return { prods: calc.prods, fuente: 'local', generado: LOCAL.generado };
+  }
+
+  // ---- Parte privada: solo con tu clave ----
+  let PRIV = null;   // { calc, cuentas, nombre }
+  async function desbloquear(clave) {
+    if (!CFG.registroUrl) throw new Error('Falta el enlace de Google (registroUrl) en config.js.');
+    const j = await pedir({ modo: 'privado', clave });
+    if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
+    const calc = Calculo.calcular(j.productos, j.movimientos, { tramos: TRAMOS, propio: PROPIO });
+    const nombre = new Map((j.vendedores || []).map((v) => [String(v.id).toUpperCase(), v.nombre || v.id]));
+    PRIV = { calc, cuentas: Calculo.cuentas(calc), nombre };
+    // Con tus datos, el catálogo pasa a mostrar coste y margen de cada prenda.
+    ESTADO.prods = calc.prods;
+    ESTADO.grupos = agrupar(calc.prods);
+    try { sessionStorage.setItem('clave_privada', clave); } catch (e) { /* sin almacenamiento */ }
+  }
+  const nombreDe = (vid) => (PRIV && PRIV.nombre.get(vid)) || vid || '—';
+
+  // ---- Agrupar SKUs en tarjetas (una por producto + modelo) ----
+  const ORDEN_TALLA = ['S', 'M', 'L', 'XL', '42', '43', '44', 'Única'];
+  const ordenTalla = (t) => {
+    const i = ORDEN_TALLA.indexOf(t);
+    return i === -1 ? 99 : i;
+  };
+
+  function agrupar(prods) {
+    const m = new Map();
+    for (const p of prods) {
+      const k = p.categoria + '|' + p.producto + '|' + p.modelo;
+      if (!m.has(k)) m.set(k, {
+        categoria: p.categoria, producto: p.producto, modelo: p.modelo,
+        pvp: p.pvp, coste: p.coste, imagen: p.imagen, cod: p.cod, variantes: [],
+      });
+      const g = m.get(k);
+      if (!g.imagen && p.imagen) g.imagen = p.imagen;
+      g.variantes.push(p);
+    }
+    for (const g of m.values()) {
+      g.variantes.sort((a, b) => ordenTalla(a.talla) - ordenTalla(b.talla));
+      g.disponible = g.variantes.reduce((a, v) => a + Math.max(0, v.disponible), 0);
+    }
+    return [...m.values()];
+  }
+
+  // ---- Render ----
+  let ESTADO = null;
+
+  function pintarCatalogo() {
+    const { grupos } = ESTADO;
+    const q = el('q').value.trim().toLowerCase();
+    const cat = el('f-cat').value;
+    const talla = el('f-talla').value;
+    const soloHay = el('f-hay').checked;
+
+    const vis = grupos.filter((g) => {
+      if (cat && g.categoria !== cat) return false;
+      if (q && !`${g.producto} ${g.modelo} ${g.categoria}`.toLowerCase().includes(q)) return false;
+      if (talla) {
+        const v = g.variantes.find((x) => x.talla === talla);
+        if (!v || (soloHay && v.disponible <= 0)) return false;
+      } else if (soloHay && g.disponible <= 0) return false;
+      return true;
+    });
+
+    el('sin-resultados').hidden = vis.length > 0;
+    el('grid').innerHTML = vis.map((g) => {
+      const chips = g.variantes.map((v) =>
+        `<span class="talla ${v.disponible > 0 ? 'hay' : 'no'}">${esc(v.talla)}${
+          v.disponible > 0 ? ` <b>${v.disponible}</b>` : ''}</span>`).join('');
+      // Foto: la de imagen_url si la hay; si no, se prueba web/img/<codigo>.jpg. Si ese
+      // archivo no existe, el onerror deja el hueco "sin foto". Para completar una ficha
+      // basta con guardar la foto en web/img/ con el nombre del codigo (ej. BOTA-NIK.jpg)
+      // y recargar: no hay que tocar ningun archivo ni regenerar nada.
+      const src = g.imagen || (g.cod ? `img/${g.cod}.jpg` : '');
+      const foto = src
+        ? `<img src="${esc(src)}" data-cod="${esc(g.cod)}" alt="${esc(g.producto)} ${esc(g.modelo)}" loading="lazy"
+             onerror="this.onerror=null;this.replaceWith('sin foto')">`
+        : 'sin foto';
+      const comision = g.pvp * comisionPct(g.pvp) / 100;
+      // Coste y margen solo con tu clave (vienen de Google, no de esta web).
+      // Margen antes de envío: el envío es un gasto fijo del pedido, no se reparte.
+      const margen = PRIV
+        ? `<div class="nota">Coste ${eur(g.coste)} · margen ${eur(g.pvp - comision - g.coste)}</div>`
+        : '';
+      // Botón "Lo vendí": abre el formulario (Apps Script) con este producto elegido.
+      // Solo si hay registroUrl configurada y aún queda algo disponible.
+      const primera = g.variantes.find((v) => v.disponible > 0) || g.variantes[0];
+      const vender = (CFG.registroUrl && g.disponible)
+        ? `<a class="vender" target="_blank" rel="noopener" href="${esc(enlace({ sku: primera.sku }))}">Lo vendí</a>`
+        : '';
+      // Compartir por WhatsApp: mensaje listo para mandar a un comprador. Incluye la foto
+      // (como enlace absoluto) solo si el producto tiene foto de verdad.
+      const tallasHay = g.variantes.filter((v) => v.disponible > 0).map((v) => v.talla).join(', ');
+      const linkFoto = g.imagen ? '\n' + new URL(g.imagen, location.href).href : '';
+      const msg = `👕 ${g.producto} — ${g.modelo}\nTallas: ${tallasHay || '—'}\nPrecio: ${eur(g.pvp)}${linkFoto}`;
+      const compartir = `<a class="compartir" target="_blank" rel="noopener"
+             href="https://wa.me/?text=${encodeURIComponent(msg)}">Compartir</a>`;
+      return `<article class="card ${g.disponible ? '' : 'agotado'}">
+        <div class="foto">${foto}</div>
+        <div class="card-body">
+          <div class="cat">${esc(g.categoria)}</div>
+          <div class="nom">${esc(g.producto)}</div>
+          <div class="mod">${esc(g.modelo)}</div>
+          <div class="precio">${eur(g.pvp)}
+            <small>· tu comisión ${eur(comision)}</small></div>
+          ${margen}
+          <div class="tallas">${chips}</div>
+          <div class="acciones">${compartir}${vender}</div>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  function pintarStats() {
+    const { prods } = ESTADO;
+    const s = (f) => prods.reduce((a, p) => a + f(p), 0);
+    const tiles = [
+      ['Disponible', s((p) => Math.max(0, p.disponible)) + ' uds'],
+      ['Vendido', s((p) => p.vendido) + ' uds'],
+    ];
+    // Ingresado, stock a PVP y deudas son cifras del negocio: solo con tu clave.
+    if (PRIV) {
+      const ingresado = PRIV.calc.ventas.reduce((a, v) => a + v.importe, 0);
+      let teDeben = 0;
+      PRIV.cuentas.forEach((x) => { teDeben += Math.max(0, x.pendiente); });
+      tiles.push(['Ingresado', eur(ingresado)],
+        ['Stock a PVP', eur(s((p) => Math.max(0, p.disponible) * p.pvp))],
+        ['Te deben', eur(teDeben)]);
+    }
+    el('stats').innerHTML = tiles.map(([k, v]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  }
+
+  function pintarComisiones() {
+    const { calc, cuentas } = PRIV;
+    const { ventas, pagos } = calc;
+    const filas = [...cuentas.values()].sort((a, b) =>
+      (a.propio - b.propio) || (b.pendiente - a.pendiente));
+    const tot = filas.reduce((a, x) => ({
+      uds: a.uds + x.uds, bruto: a.bruto + x.bruto, comision: a.comision + x.comision,
+      liquidado: a.liquidado + x.liquidado, pendiente: a.pendiente + Math.max(0, x.pendiente),
+    }), { uds: 0, bruto: 0, comision: 0, liquidado: 0, pendiente: 0 });
+
+    // Botón de pago: abre el formulario en modo pago con el vendedor puesto Y el importe
+    // que debe ya escrito, para saldar de un toque (o cambiarlo si es un pago parcial).
+    const btnPago = (id, falta) => CFG.registroUrl
+      ? `<a class="pago-btn" target="_blank" rel="noopener" href="${esc(enlace({
+        modo: 'pago', vendedor: id, ...(falta > 0.005 ? { importe: falta.toFixed(2) } : {}) }))}">Registrar pago</a>`
+      : '';
+    const celFalta = (x) => x.propio
+      ? '<td class="num">—</td>'
+      : `<td class="num ${x.pendiente > 0.005 ? 'pend' : 'ok'}">${eur(Math.max(0, x.pendiente))}</td>`;
+    const accion = (x) => {
+      if (x.propio) return '<span class="propia">Tus ventas: el dinero ya es tuyo</span>';
+      if (x.pendiente > 0.005) return btnPago(x.vendedor, x.pendiente);
+      return x.pendiente < -0.005
+        ? `<span class="aldia">✓ Al día · +${eur(-x.pendiente)} a favor</span>`
+        : '<span class="aldia">✓ Al día</span>';
+    };
+
+    // Titular: cuánto te deben en total, cuánto llevas cobrado y si falta algún precio.
+    const sinPrecio = ventas.filter((v) => v.sinPrecio).length;
+    el('resumen-deudas').innerHTML = (filas.length
+      ? `Te deben en total <b class="grande ${tot.pendiente > 0.005 ? 'rojo' : 'verde'}">${eur(tot.pendiente)}</b>
+         · ya has cobrado <b>${eur(tot.liquidado)}</b>`
+      : '') + (sinPrecio
+      ? `<br><span class="falta-precio">Hay ${sinPrecio} ${sinPrecio === 1 ? 'venta' : 'ventas'} sin precio
+         en MOVIMIENTOS: cuentan como 0 € hasta que lo pongas.</span>`
+      : '');
+
+    el('t-comisiones').innerHTML = filas.length ? `
+      <thead><tr><th>Vendedor</th><th class="num">Uds</th><th class="num">Vendido</th>
+        <th class="num">Su comisión</th><th class="num">Tu parte</th>
+        <th class="num">Ya pagado</th><th class="num">Falta</th><th></th></tr></thead>
+      <tbody>${filas.map((x) => `<tr>
+        <td>${esc(nombreDe(x.vendedor))}</td><td class="num">${x.uds}</td>
+        <td class="num">${eur(x.bruto)}</td><td class="num">${eur(x.comision)}</td>
+        <td class="num">${eur(x.tuParte)}</td><td class="num">${eur(x.liquidado)}</td>
+        ${celFalta(x)}<td>${accion(x)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td>Total</td><td class="num">${tot.uds}</td>
+        <td class="num">${eur(tot.bruto)}</td><td class="num">${eur(tot.comision)}</td>
+        <td class="num">${eur(tot.bruto - tot.comision)}</td><td class="num">${eur(tot.liquidado)}</td>
+        <td class="num">${eur(tot.pendiente)}</td><td></td></tr></tfoot>`
+      : `<tbody><tr><td>Aún no hay ventas registradas en la hoja MOVIMIENTOS.</td></tr></tbody>`;
+
+    // Historial de pagos: cada liquidación, la más reciente arriba, con la venta a la
+    // que pertenece (o "general" si fue un pago por varias).
+    const concepto = (pg) => {
+      const p = pg.sku && calc.porSku.get(pg.sku.toUpperCase());
+      return p ? `${p.producto} — ${p.modelo} (${p.talla})` : 'Pago general';
+    };
+    el('t-pagos').innerHTML = pagos.length ? `
+      <thead><tr><th>Fecha</th><th>Vendedor</th><th>De qué venta</th><th class="num">Importe</th></tr></thead>
+      <tbody>${pagos.slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).map((pg) => `<tr>
+        <td>${esc(pg.fecha || '—')}</td><td>${esc(nombreDe(pg.vendedor))}</td>
+        <td>${esc(concepto(pg))}</td><td class="num">${eur(pg.importe)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="3">Total cobrado</td>
+        <td class="num">${eur(pagos.reduce((a, pg) => a + pg.importe, 0))}</td></tr></tfoot>`
+      : `<tbody><tr><td>Aún no hay pagos registrados.</td></tr></tbody>`;
+
+    el('t-ventas').innerHTML = ventas.length ? `
+      <thead><tr><th>Fecha</th><th>Producto</th><th>Talla</th><th>Vendedor</th>
+        <th>Canal</th><th class="num">Uds</th><th class="num">Precio</th></tr></thead>
+      <tbody>${ventas.slice().reverse().map((v) => `<tr>
+        <td>${esc(v.fecha)}</td><td>${esc(v.prod.producto)} — ${esc(v.prod.modelo)}</td>
+        <td>${esc(v.prod.talla)}</td><td>${esc(nombreDe(v.vendedor))}</td>
+        <td>${esc(v.canal || '—')}</td><td class="num">${v.cantidad}</td>
+        <td class="num">${v.sinPrecio ? '<span class="falta-precio">falta precio</span>' : eur(v.precio)}</td>
+        </tr>`).join('')}</tbody>`
+      : `<tbody><tr><td>Sin ventas todavía.</td></tr></tbody>`;
+  }
+
+  function pintarReparto() {
+    const { mano, porSku } = PRIV.calc;
+    const filas = [];
+    for (const [vid, suyo] of mano) {
+      for (const [sku, c] of suyo) {
+        if (c <= 0) continue;
+        filas.push({ v: nombreDe(vid), p: porSku.get(sku.toUpperCase()), c });
+      }
+    }
+    filas.sort((a, b) => a.v.localeCompare(b.v) || a.p.producto.localeCompare(b.p.producto));
+
+    el('t-reparto').innerHTML = filas.length ? `
+      <thead><tr><th>Vendedor</th><th>Producto</th><th>Talla</th>
+        <th class="num">Uds</th><th class="num">Valor a PVP</th></tr></thead>
+      <tbody>${filas.map((f) => `<tr><td>${esc(f.v)}</td>
+        <td>${esc(f.p.producto)} — ${esc(f.p.modelo)}</td><td>${esc(f.p.talla)}</td>
+        <td class="num">${f.c}</td><td class="num">${eur(f.c * f.p.pvp)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="3">Total en la calle</td>
+        <td class="num">${filas.reduce((a, f) => a + f.c, 0)}</td>
+        <td class="num">${eur(filas.reduce((a, f) => a + f.c * f.p.pvp, 0))}</td></tr></tfoot>`
+      : `<tbody><tr><td>Nadie tiene prendas en consigna. Todo está en el almacén.</td></tr></tbody>`;
+  }
+
+  function pintarTodo() {
+    pintarStats();
+    pintarCatalogo();
+    if (PRIV) { pintarComisiones(); pintarReparto(); }
+  }
+
+  // ---- Arranque ----
+  const listo = (async () => {
+    document.title = CFG.titulo || document.title;
+    el('titulo').textContent = CFG.titulo || 'Catálogo';
+
+    const datos = await cargarCatalogo();
+    ESTADO = { prods: datos.prods, grupos: agrupar(datos.prods) };
+
+    el('subtitulo').textContent = datos.fuente === 'directo'
+      ? `Stock en directo · ${CFG.ciudad || ''}`.replace(/ · $/, '')
+      : `Pedido inicial${datos.generado ? ' del ' + datos.generado : ''} · sin conexión con Google`;
+
+    const cats = [...new Set(ESTADO.prods.map((p) => p.categoria))].sort();
+    el('f-cat').insertAdjacentHTML('beforeend',
+      cats.map((c) => `<option>${esc(c)}</option>`).join(''));
+    const tallas = [...new Set(ESTADO.prods.map((p) => p.talla))]
+      .sort((a, b) => ordenTalla(a) - ordenTalla(b));
+    el('f-talla').insertAdjacentHTML('beforeend',
+      tallas.map((t) => `<option>${esc(t)}</option>`).join(''));
+
+    for (const id of ['q', 'f-cat', 'f-talla', 'f-hay']) {
+      el(id).addEventListener('input', pintarCatalogo);
+    }
+
+    // ---- Candado de las secciones privadas (Comisiones y Quién tiene qué) ----
+    const PRIVADAS = ['comisiones', 'reparto'];
+    const aplicarCandado = () => {
+      for (const v of PRIVADAS) {
+        el('lock-' + v).hidden = !!PRIV;
+        el('priv-' + v).hidden = !PRIV;
+      }
+    };
+    async function intentarClave(input) {
+      const lock = input.closest('.lock');
+      const err = lock.querySelector('.err');
+      const boton = lock.querySelector('.clave-ok');
+      err.textContent = '';
+      boton.disabled = true;
+      try {
+        await desbloquear(input.value);
+        aplicarCandado();
+        pintarTodo();
+      } catch (e) {
+        err.textContent = e.message;
+        input.value = '';
+      } finally {
+        boton.disabled = false;
+      }
+    }
+    document.querySelectorAll('.clave-ok').forEach((b) =>
+      b.addEventListener('click', () => intentarClave(b.closest('.lock').querySelector('.clave-input'))));
+    document.querySelectorAll('.clave-input').forEach((i) =>
+      i.addEventListener('keydown', (e) => { if (e.key === 'Enter') intentarClave(i); }));
+
+    // Si ya entraste en esta pestaña del navegador, no vuelve a pedir la clave.
+    let guardada = null;
+    try { guardada = sessionStorage.getItem('clave_privada'); } catch (e) { /* sin almacenamiento */ }
+    if (guardada) {
+      try { await desbloquear(guardada); } catch (e) {
+        try { sessionStorage.removeItem('clave_privada'); } catch (e2) { /* nada */ }
+      }
+    }
+    aplicarCandado();
+
+    document.querySelectorAll('nav button').forEach((b) => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('nav button').forEach((x) =>
+          x.setAttribute('aria-selected', String(x === b)));
+        for (const v of ['catalogo', 'comisiones', 'reparto']) {
+          el('v-' + v).hidden = v !== b.dataset.vista;
+        }
+      });
+    });
+
+    // Galería a pantalla completa. La portada es COD.jpg; las demás fotos del mismo
+    // producto son COD-2.jpg, COD-3.jpg… Se buscan al abrir (solo del producto que miras)
+    // y se pasan con flechas, teclado o deslizando. Suelta más fotos y aparecen solas.
+    let galeria = { fotos: [], idx: 0 };
+    const renderGaleria = () => {
+      const { fotos, idx } = galeria;
+      el('lightbox-img').src = fotos[idx];
+      const multi = fotos.length > 1;
+      el('lb-prev').hidden = !multi;
+      el('lb-next').hidden = !multi;
+      el('lb-count').hidden = !multi;
+      el('lb-count').textContent = `${idx + 1} / ${fotos.length}`;
+    };
+    const moverGaleria = (d) => {
+      const n = galeria.fotos.length;
+      if (n < 2) return;
+      galeria.idx = (galeria.idx + d + n) % n;
+      renderGaleria();
+    };
+    const buscarMas = (cod, n) => {
+      if (!cod) return;
+      const url = `img/${cod}-${n}.jpg`;
+      const im = new Image();
+      im.onload = () => { galeria.fotos.push(url); renderGaleria(); buscarMas(cod, n + 1); };
+      im.src = url;   // si da error (no existe), paramos y no se añade
+    };
+    el('grid').addEventListener('click', (e) => {
+      if (e.target.tagName !== 'IMG') return;
+      galeria = { fotos: [e.target.src], idx: 0 };
+      renderGaleria();
+      el('lightbox').hidden = false;
+      buscarMas(e.target.dataset.cod, 2);
+    });
+    const cerrarLb = () => { el('lightbox').hidden = true; };
+    el('lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') cerrarLb(); });
+    el('lb-close').addEventListener('click', cerrarLb);
+    el('lb-prev').addEventListener('click', () => moverGaleria(-1));
+    el('lb-next').addEventListener('click', () => moverGaleria(1));
+    document.addEventListener('keydown', (e) => {
+      if (el('lightbox').hidden) return;
+      if (e.key === 'Escape') cerrarLb();
+      else if (e.key === 'ArrowLeft') moverGaleria(-1);
+      else if (e.key === 'ArrowRight') moverGaleria(1);
+    });
+    let xTouch = null;
+    el('lightbox').addEventListener('touchstart', (e) => { xTouch = e.touches[0].clientX; });
+    el('lightbox').addEventListener('touchend', (e) => {
+      if (xTouch === null) return;
+      const dx = e.changedTouches[0].clientX - xTouch;
+      xTouch = null;
+      if (Math.abs(dx) > 40) moverGaleria(dx < 0 ? 1 : -1);
+    });
+
+    pintarTodo();
+  })();
+
+  // Para las pruebas (scripts/test.js): esperar a que cargue y mirar el estado.
+  window.CATALOGO = { listo, estado: () => ESTADO, privado: () => PRIV, intentarClave: desbloquear };
+})();
+</script>
+</body>
+</html>
