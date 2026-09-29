@@ -114,8 +114,156 @@ var Panel = (function () {
     return Array.from(m.values()).sort(function (a, b) { return b.total - a.total; });
   }
 
+  // ---- Fechas del tipo 2026-08-20 ----
+  var aFecha = function (s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || ''));
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  };
+  // Días desde la fecha `s` hasta `hoy` (0 si es hoy; null si no hay fecha).
+  var diasDesde = function (s, hoy) {
+    var f = aFecha(s);
+    if (!f) return null;
+    return Math.round((new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()) - f) / 864e5);
+  };
+  var mayus = function (v) { return String(v == null ? '' : v).trim().toUpperCase(); };
+
+  // ---- La ficha de cada amigo ----
+  // Una prenda que lleva tanto tiempo en casa de un amigo sin venderse se marca como parada.
+  var DIAS_PARADA = 21;
+  function fichas(calc, cuentas, movimientos, vendedores, contactos, hoy) {
+    var porId = new Map();
+    var ficha = function (id) {
+      if (!porId.has(id)) {
+        porId.set(id, { id: id, nombre: id, contacto: '', propio: id === calc.propio,
+          uds: 0, bruto: 0, comision: 0, liquidado: 0, pendiente: 0,
+          enCasa: [], udsEnCasa: 0, valorEnCasa: 0, paradas: 0,
+          ultimaVenta: '', diasSinVender: null, ultimoMovimiento: '', ventas: [], canales: [] });
+      }
+      return porId.get(id);
+    };
+    (vendedores || []).forEach(function (v) {
+      var id = mayus(v.id);
+      if (id) ficha(id).nombre = String(v.nombre || '').trim() || id;
+    });
+    cuentas.forEach(function (c) {
+      var f = ficha(c.vendedor);
+      f.uds = c.uds; f.bruto = c.bruto; f.comision = c.comision; f.liquidado = c.liquidado; f.pendiente = c.pendiente;
+    });
+    // Desde cuándo tiene cada prenda: la última vez que se le dio esa talla.
+    var desde = {};
+    (movimientos || []).forEach(function (m) {
+      var id = mayus(m.vendedor_id), fe = String(m.fecha || '').slice(0, 10);
+      if (!id) return;
+      var f = ficha(id);
+      if (fe > f.ultimoMovimiento) f.ultimoMovimiento = fe;
+      if (mayus(m.tipo) === 'CONSIGNA') desde[id + '|' + mayus(m.sku)] = fe;
+    });
+    calc.mano.forEach(function (suyo, id) {
+      var f = ficha(id);
+      suyo.forEach(function (n, sku) {
+        if (n <= 0) return;
+        var p = calc.porSku.get(sku.toUpperCase());
+        var d = desde[id + '|' + sku.toUpperCase()] || '';
+        f.enCasa.push({ sku: sku, prod: p, n: n, desde: d, dias: diasDesde(d, hoy) });
+        f.udsEnCasa += n;
+        f.valorEnCasa += n * p.pvp;
+      });
+    });
+    calc.ventas.forEach(function (v) {
+      var f = ficha(v.vendedor);
+      f.ventas.push(v);
+      if (v.fecha > f.ultimaVenta) f.ultimaVenta = v.fecha;
+    });
+    porId.forEach(function (f) {
+      f.contacto = String((contactos || {})[f.id] || '');
+      f.diasSinVender = f.ultimaVenta ? diasDesde(f.ultimaVenta, hoy) : null;
+      f.canales = ventasPor(f.ventas, function (v) { return v.canal; });
+      f.enCasa.sort(function (a, b) { return (b.dias || 0) - (a.dias || 0); });
+      f.paradas = f.enCasa.filter(function (x) { return x.dias != null && x.dias >= DIAS_PARADA; })
+        .reduce(function (a, x) { return a + x.n; }, 0);
+      f.ventas = f.ventas.slice().reverse();   // la última primero
+    });
+    // Primero quien te debe más; tú, al final.
+    return Array.from(porId.values()).sort(function (a, b) {
+      return (a.propio - b.propio) || (b.pendiente - a.pendiente) || (b.udsEnCasa - a.udsEnCasa) || (a.id < b.id ? -1 : 1);
+    });
+  }
+
+  // ---- Segundo pedido: qué se vende, a qué ritmo y cuánto volver a pedir ----
+  // El ritmo se cuenta desde el primer apunte (cuando empezó a moverse la mercancía). Lo
+  // sugerido es lo que se vendería en `semanasACubrir` semanas a ese ritmo, menos lo que queda.
+  function rotacion(calc, movimientos, config, hoy, semanasACubrir) {
+    var inicio = '';
+    (movimientos || []).forEach(function (m) {
+      var f = String(m.fecha || '').slice(0, 10);
+      if (aFecha(f) && f <= dia(hoy) && (!inicio || f < inicio)) inicio = f;
+    });
+    var semanas = inicio ? Math.max(1, (diasDesde(inicio, hoy) + 1) / 7) : 0;
+    var compradasTodo = calc.prods.reduce(function (a, p) { return a + p.inicial; }, 0);
+    // La parte del envío que toca a cada prenda.
+    var envioUd = compradasTodo ? num(config && config.envio_total_usd) * num(config && config.tipo_cambio_usd_eur) / compradasTodo : 0;
+    var m = new Map();
+    calc.prods.forEach(function (p) {
+      if (!m.has(p.cod)) {
+        m.set(p.cod, { cod: p.cod, categoria: p.categoria, producto: p.producto, modelo: p.modelo, coste: p.coste,
+          compradas: 0, vendidas: 0, quedan: 0, cobrado: 0, comision: 0, tallas: [] });
+      }
+      var x = m.get(p.cod);
+      x.compradas += p.inicial; x.vendidas += p.vendido; x.quedan += Math.max(0, p.inicial - p.vendido);
+      x.tallas.push({ talla: p.talla, vendidas: p.vendido, quedan: Math.max(0, p.inicial - p.vendido) });
+    });
+    calc.ventas.forEach(function (v) {
+      var x = m.get(v.prod.cod);
+      x.cobrado += v.importe; x.comision += v.comision;
+    });
+    var productos = Array.from(m.values()).map(function (x) {
+      x.pctVendido = x.compradas ? x.vendidas / x.compradas : 0;
+      x.ritmo = semanas ? x.vendidas / semanas : 0;                       // prendas por semana
+      x.semanasDeStock = x.ritmo > 0 ? x.quedan / x.ritmo : null;
+      x.gananciaUd = x.vendidas ? (x.cobrado - x.comision) / x.vendidas - x.coste - envioUd : null;
+      x.sugerido = x.ritmo > 0 ? Math.max(0, Math.ceil(x.ritmo * semanasACubrir - x.quedan)) : 0;
+      x.tallasTop = x.tallas.filter(function (t) { return t.vendidas > 0; })
+        .sort(function (a, b) { return b.vendidas - a.vendidas; });
+      return x;
+    }).sort(function (a, b) { return b.ritmo - a.ritmo || b.pctVendido - a.pctVendido || b.compradas - a.compradas; });
+    return { inicio: inicio, semanas: semanas, envioUd: envioUd, productos: productos };
+  }
+
+  // ---- Contar la caja ----
+  // `contados`: {sku: unidades contadas}. Devuelve las tallas contadas que no cuadran.
+  function recuento(prods, contados) {
+    var r = { contadas: 0, total: prods.length, faltan: 0, sobran: 0, diferencias: [] };
+    prods.forEach(function (p) {
+      var c = contados[p.sku];
+      if (c === '' || c == null || !isFinite(Number(c))) return;
+      c = Math.max(0, Math.floor(Number(c)));
+      r.contadas++;
+      if (c !== p.inicial) {
+        r.diferencias.push({ sku: p.sku, prod: p, esperado: p.inicial, contado: c, diferencia: c - p.inicial });
+        if (c < p.inicial) r.faltan += p.inicial - c; else r.sobran += c - p.inicial;
+      }
+    });
+    return r;
+  }
+  // El mensaje para el proveedor con lo que falta y lo que sobra.
+  function textoRecuento(r) {
+    var linea = function (d) { return '· ' + d.prod.producto + ' ' + d.prod.modelo + ', talla ' + d.prod.talla + ' (' + d.sku + '): '; };
+    var faltan = r.diferencias.filter(function (d) { return d.diferencia < 0; });
+    var sobran = r.diferencias.filter(function (d) { return d.diferencia > 0; });
+    if (!faltan.length && !sobran.length) return 'Hola. He contado la caja y ha llegado todo. ¡Gracias!';
+    return 'Hola. He contado la caja y no cuadra con el pedido:\n' +
+      (faltan.length ? '\nFaltan (' + r.faltan + '):\n' + faltan.map(function (d) {
+        return linea(d) + 'pedí ' + d.esperado + ', han llegado ' + d.contado;
+      }).join('\n') + '\n' : '') +
+      (sobran.length ? '\nSobran (' + r.sobran + '):\n' + sobran.map(function (d) {
+        return linea(d) + 'pedí ' + d.esperado + ', han llegado ' + d.contado;
+      }).join('\n') + '\n' : '') +
+      '\n¿Cómo lo arreglamos?';
+  }
+
   return { resumen: resumen, mensajeDeuda: mensajeDeuda, enlaceWhatsApp: enlaceWhatsApp, idPeticion: idPeticion, eur: eur,
-    ventasPorDia: ventasPorDia, ventasPor: ventasPor, stockPorCategoria: stockPorCategoria };
+    ventasPorDia: ventasPorDia, ventasPor: ventasPor, stockPorCategoria: stockPorCategoria,
+    fichas: fichas, rotacion: rotacion, recuento: recuento, textoRecuento: textoRecuento, diasDesde: diasDesde, DIAS_PARADA: DIAS_PARADA };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Panel;

@@ -147,6 +147,36 @@
   .vend ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
   .vend li { display: flex; justify-content: space-between; gap: 10px; }
 
+  .vend .cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 10px; }
+  .vend .cab h3 { display: block; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; align-content: flex-start; }
+  .chip { font-family: var(--hud); font-size: 12px; padding: 1px 9px; border-radius: 999px; border: 1px solid var(--linea-2); color: var(--suave); white-space: nowrap; }
+  .chip.mal { color: var(--mal); border-color: rgba(255, 138, 128, .5); }
+  .chip.bien { color: var(--bien); border-color: rgba(65, 211, 154, .45); }
+  .chip.aviso { color: var(--aviso); border-color: rgba(240, 180, 90, .5); }
+  .datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 12px 0 4px; }
+  .datos div { min-width: 0; }
+  .datos .etq { font-size: 10.5px; }
+  .datos b { display: block; font-family: var(--hud); font-weight: 600; font-size: 14.5px; }
+  .vend h4 { font-family: var(--hud); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--suave); margin: 14px 0 2px; font-weight: 600; }
+  .vend li .parada { color: var(--aviso); font-weight: 600; white-space: nowrap; }
+  .vend li .suave { white-space: nowrap; }
+  .vend .acciones { flex-wrap: wrap; margin-top: 14px; }
+
+  /* ---- contar la caja y segundo pedido ---- */
+  .rec-cab { padding: 16px 18px; margin-bottom: 12px; display: grid; gap: 12px; }
+  .rec-cab p { margin: 0; color: var(--suave); font-size: 14px; }
+  .progreso { height: 8px; border-radius: 999px; background: rgba(53, 201, 238, .12); overflow: hidden; }
+  .progreso i { display: block; height: 100%; background: var(--cian); border-radius: 999px; }
+  .rec-cifras { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--hud); font-size: 14px; }
+  .rec-cifras .mal { color: var(--mal); } .rec-cifras .bien { color: var(--bien); }
+  .contar { width: 76px; padding: 3px 8px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--fondo); font-size: 16px; text-align: right; }
+  td.dif-mal { color: var(--mal); font-weight: 700; } td.dif-mas { color: var(--aviso); font-weight: 700; } td.dif-ok { color: var(--bien); }
+  tr.grupo .btn { padding: 2px 9px; font-size: 12px; margin-left: 10px; }
+  .barrita { display: inline-block; width: 60px; height: 6px; border-radius: 3px; background: rgba(53, 201, 238, .12); vertical-align: middle; margin-right: 6px; overflow: hidden; }
+  .barrita i { display: block; height: 100%; background: var(--serie); }
+  .ped-cab select { padding: 4px 8px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--panel); }
+
   /* ---- apuntar ---- */
   .form { padding: 18px; display: grid; gap: 14px; max-width: 660px; }
   .campo { display: grid; gap: 5px; }
@@ -236,10 +266,12 @@
     <nav role="tablist" id="pestanas" hidden>
       <button role="tab" data-vista="resumen" aria-selected="true">Mando</button>
       <button role="tab" data-vista="stock" aria-selected="false">Stock</button>
-      <button role="tab" data-vista="reparto" aria-selected="false">Quién tiene qué</button>
+      <button role="tab" data-vista="reparto" aria-selected="false">Amigos</button>
       <button role="tab" data-vista="cuentas" aria-selected="false">Cuentas</button>
       <button role="tab" data-vista="movimientos" aria-selected="false">Movimientos</button>
       <button role="tab" data-vista="apuntar" aria-selected="false">Apuntar</button>
+      <button role="tab" data-vista="recuento" aria-selected="false">Contar la caja</button>
+      <button role="tab" data-vista="pedido" aria-selected="false">Segundo pedido</button>
       <button role="tab" data-vista="webs" aria-selected="false">Webs y hoja</button>
     </nav>
   </div>
@@ -313,6 +345,22 @@
           <div><button class="btn primario" type="submit" id="a-enviar">Apuntar</button></div>
         </form>
       </section>
+      <section id="v-recuento" hidden>
+        <div class="rec-cab caja">
+          <p>Cuando llegue la caja, cuenta cada talla y escribe cuántas han llegado. Lo que vas contando se
+            guarda en este navegador, así que puedes parar y seguir luego. Al terminar, <b>Guardar en la hoja</b>
+            pone el stock de las tallas que no cuadran y lo deja anotado en cada una.</p>
+          <div id="rec-resumen"></div>
+          <div class="acciones" style="flex-wrap:wrap">
+            <button class="btn primario" type="button" id="rec-guardar">Guardar en la hoja</button>
+            <button class="btn" type="button" id="rec-copiar">Copiar el mensaje para el proveedor</button>
+            <button class="btn" type="button" id="rec-borrar">Empezar de nuevo</button>
+          </div>
+          <div id="rec-msg" hidden></div>
+        </div>
+        <div class="tabla caja"><table id="t-rec"></table></div>
+      </section>
+      <section id="v-pedido" hidden></section>
       <section id="v-webs" hidden>
         <div class="webs-barra">
           <button class="btn web-btn" type="button" data-web="../" aria-pressed="true">Tienda ZUBI</button>
@@ -367,7 +415,7 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-  const VISTAS = ['resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'webs'];
+  const VISTAS = ['resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'recuento', 'pedido', 'webs'];
   const guardar = (k, v) => { try { window.sessionStorage.setItem(k, v); } catch (e) { /* sin almacenamiento */ } };
   const recordar = (k) => { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } };
   const olvidar = (k) => { try { window.sessionStorage.removeItem(k); } catch (e) { /* nada */ } };
@@ -593,20 +641,181 @@
       }).join('')}</tbody>` : '<tbody><tr><td class="vacio">Nada coincide.</td></tr></tbody>';
   }
 
-  // ---- Quién tiene qué ----
+  // ---- Amigos: la ficha de cada uno ----
+  const fechaCorta = (f) => String(f || '').slice(8, 10) + '/' + String(f || '').slice(5, 7);
+  const hace = (d) => (d == null ? '' : d === 0 ? 'hoy' : d === 1 ? 'ayer' : 'hace ' + d + ' días');
   function pintarReparto() {
-    const bloques = [];
-    for (const [vid, suyo] of S.calc.mano) {
-      const cosas = [...suyo].filter(([, n]) => n > 0).map(([sku, n]) => ({ p: S.calc.porSku.get(sku.toUpperCase()), n }));
-      if (!cosas.length) continue;
-      const uds = cosas.reduce((a, x) => a + x.n, 0);
-      const valor = cosas.reduce((a, x) => a + x.n * x.p.pvp, 0);
-      bloques.push(`<div class="vend caja"><h3>${esc(nombreDe(vid))}<span>${uds} prendas · ${eur(valor)}</span></h3><ul>${
-        cosas.map((x) => `<li><span>${esc(x.p.producto)} — ${esc(x.p.modelo)} (${esc(x.p.talla)})</span><b>${x.n}</b></li>`).join('')}</ul></div>`);
-    }
-    el('v-reparto').innerHTML = bloques.length ? `<div class="vendedores">${bloques.join('')}</div>`
-      : '<div class="vacio">Nadie tiene prendas en su casa: todo está en la tuya.</div>';
+    const fichas = Panel.fichas(S.calc, S.cuentas, DATOS.movimientos || [], DATOS.vendedores, S.contactos, new Date())
+      .filter((f) => !f.propio || f.uds || f.udsEnCasa);
+    el('v-reparto').innerHTML = fichas.length ? `<div class="vendedores">${fichas.map((f) => {
+      const debe = !f.propio && f.pendiente > 0.005;
+      const chips = [
+        f.propio ? '<span class="chip">tú</span>' : '',
+        debe ? `<span class="chip mal">te debe ${eur(f.pendiente)}</span>`
+          : !f.propio && f.pendiente < -0.005 ? `<span class="chip">+${eur(-f.pendiente)} a su favor</span>`
+          : !f.propio && f.uds ? '<span class="chip bien">al día</span>' : '',
+        f.paradas ? `<span class="chip aviso">${f.paradas} ${f.paradas === 1 ? 'prenda parada' : 'prendas paradas'}</span>` : '',
+      ].join('');
+      const datos = [
+        ['Ha vendido', f.uds ? `${f.uds} · ${eur(f.bruto)}` : 'nada aún'],
+        f.propio ? ['Para ti', eur(f.bruto)] : ['Su comisión', eur(f.comision)],
+        f.propio ? null : ['Te ha pagado', eur(f.liquidado)],
+        f.propio ? null : ['Tiene en casa', f.udsEnCasa ? `${f.udsEnCasa} · ${eur(f.valorEnCasa)}` : 'nada'],
+        ['Última venta', f.ultimaVenta ? `${fechaCorta(f.ultimaVenta)} (${hace(f.diasSinVender)})` : 'ninguna'],
+        ['Vende en', f.canales.map((c) => c.nombre).join(', ') || '—'],
+      ].filter(Boolean);
+      const tel = String(f.contacto || '').replace(/\D/g, '');
+      const acciones = [
+        debe ? `<button class="btn primario" type="button" data-pago="${esc(f.id)}" data-importe="${f.pendiente.toFixed(2)}">Registrar pago</button>` : '',
+        debe ? `<a class="btn wa" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto,
+          Panel.mensajeDeuda(f.nombre, { vendedor: f.id, bruto: f.bruto, comision: f.comision, liquidado: f.liquidado, pendiente: f.pendiente }, S.calc.ventas)))}">Recordar por WhatsApp</a>`
+          : !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto, 'Hola ' + f.nombre + ', '))}">WhatsApp</a>` : '',
+        f.propio ? '' : `<button class="btn" type="button" data-jarvis="${esc('¿Cómo va ' + f.nombre + '? Qué ha vendido, qué tiene en casa y qué me debe.')}">Preguntar a JARVIS</button>`,
+      ].join('');
+      return `<div class="vend caja">
+        <div class="cab"><h3>${esc(f.nombre)} <span class="suave">${esc(f.id)}${tel ? ' · ' + esc(f.contacto) : ''}</span></h3><div class="chips">${chips}</div></div>
+        <div class="datos">${datos.map(([k, v]) => `<div><div class="etq">${k}</div><b>${esc(v)}</b></div>`).join('')}</div>
+        ${f.enCasa.length ? `<h4>En su casa</h4><ul>${f.enCasa.map((x) => `<li><span>${esc(x.prod.producto)} — ${esc(x.prod.modelo)} (${esc(x.prod.talla)})${x.n > 1 ? ' ×' + x.n : ''}</span>
+          <span class="${x.dias != null && x.dias >= Panel.DIAS_PARADA ? 'parada' : 'suave'}" title="${x.desde ? 'Desde el ' + esc(x.desde) : ''}">${x.dias == null ? '' : x.dias === 0 ? 'hoy' : x.dias + ' d'}</span></li>`).join('')}</ul>` : ''}
+        ${f.ventas.length ? `<h4>Últimas ventas</h4><ul>${f.ventas.slice(0, 4).map((v) => `<li><span>${fechaCorta(v.fecha)} · ${esc(v.prod.producto)} (${esc(v.prod.talla)})${v.cantidad > 1 ? ' ×' + v.cantidad : ''}</span><b>${v.sinPrecio ? 'sin precio' : eur(v.importe)}</b></li>`).join('')}</ul>` : ''}
+        ${acciones ? `<div class="acciones">${acciones}</div>` : ''}
+      </div>`;
+    }).join('')}</div>` : '<div class="vacio">Aún no hay vendedores en la hoja.</div>';
   }
+
+  // ---- Contar la caja ----
+  let CONTADOS = {};
+  try { CONTADOS = JSON.parse(pref('recuento_caja') || '{}') || {}; } catch (e) { CONTADOS = {}; }
+  const guardarContados = () => pref('recuento_caja', JSON.stringify(CONTADOS));
+  const difCelda = (p) => {
+    const c = CONTADOS[p.sku];
+    if (c === '' || c == null) return '<td class="n cero">—</td>';
+    const d = Math.max(0, Math.floor(Number(c))) - p.inicial;
+    return d === 0 ? '<td class="n dif-ok">✓</td>' : `<td class="n ${d < 0 ? 'dif-mal' : 'dif-mas'}">${d > 0 ? '+' : ''}${d}</td>`;
+  };
+  function pintarRecResumen() {
+    const r = Panel.recuento(S.calc.prods, CONTADOS);
+    const pct = r.total ? Math.round(r.contadas / r.total * 100) : 0;
+    const hecho = DATOS.recuento;
+    el('rec-resumen').innerHTML = `<div class="progreso" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+      <div class="rec-cifras" style="margin-top:8px"><span>${r.contadas} de ${r.total} tallas contadas</span>
+        ${r.faltan ? `<span class="mal">faltan ${r.faltan}</span>` : ''}${r.sobran ? `<span>sobran ${r.sobran}</span>` : ''}
+        ${r.contadas && !r.diferencias.length ? '<span class="bien">todo lo contado cuadra</span>' : ''}
+        ${hecho ? `<span class="suave">Última vez guardado: ${esc(hecho.fecha)}</span>` : ''}</div>`;
+    el('rec-guardar').textContent = r.diferencias.length
+      ? `Guardar en la hoja (${r.diferencias.length} ${r.diferencias.length === 1 ? 'talla cambia' : 'tallas cambian'})` : 'Guardar en la hoja';
+    el('rec-guardar').disabled = !r.contadas;
+    return r;
+  }
+  function pintarRecuento() {
+    let grupo = '';
+    el('t-rec').innerHTML = `<thead><tr><th>Prenda</th><th>Talla</th><th class="n">En la hoja</th><th class="n">Han llegado</th><th class="n">Diferencia</th></tr></thead><tbody>${
+      S.calc.prods.map((p) => {
+        const g = p.producto + ' — ' + p.modelo;
+        const cab = g !== grupo ? `<tr class="grupo"><td colspan="5">${esc(g)}<button class="btn" type="button" data-cuadra="${esc(p.cod)}">Todo cuadra</button></td></tr>` : '';
+        grupo = g;
+        const v = CONTADOS[p.sku];
+        return cab + `<tr><td class="mono">${esc(p.sku)}</td><td>${esc(p.talla)}</td><td class="n">${p.inicial}</td>
+          <td class="n"><input class="contar" type="number" min="0" step="1" inputmode="numeric" data-sku="${esc(p.sku)}"
+            value="${v === '' || v == null ? '' : esc(v)}" aria-label="Han llegado de ${esc(p.sku)}"></td>${difCelda(p)}</tr>`;
+      }).join('')}</tbody>`;
+    pintarRecResumen();
+  }
+  function contar(sku, n) {
+    if (n === '' || n == null) delete CONTADOS[sku]; else CONTADOS[sku] = String(n);
+    guardarContados();
+  }
+  function recMensaje(texto, bien) {
+    const m = el('rec-msg');
+    m.className = bien ? 'ok-msg' : 'aviso mal';
+    m.textContent = texto;
+    m.hidden = !texto;
+  }
+  async function guardarRecuento() {
+    const r = Panel.recuento(S.calc.prods, CONTADOS);
+    if (!r.contadas) { recMensaje('Aún no has contado nada.'); return false; }
+    const b = el('rec-guardar');
+    b.disabled = true; b.textContent = 'Guardando…';
+    try {
+      const j = await google({ cuerpo: { accion: 'recuento', clave: CLAVE, idPeticion: Panel.idPeticion(),
+        cambios: r.diferencias.map((d) => ({ sku: d.sku, contado: d.contado })) } });
+      if (!j.ok) { recMensaje(j.error || 'No se ha podido guardar.'); return false; }
+      const sinContar = r.total - r.contadas;
+      recMensaje('✓ ' + j.resumen + (sinContar ? ` Las ${sinContar} tallas sin contar se quedan como estaban.` : ''), true);
+      CONTADOS = {}; guardarContados();
+      await cargar();
+      return true;
+    } catch (e) {
+      recMensaje(e.message + ' Si lo repites, no se guarda dos veces.');
+      return false;
+    } finally {
+      pintarRecResumen();
+    }
+  }
+  el('v-recuento').addEventListener('input', (e) => {
+    const t = e.target;
+    if (!t || !t.dataset || !t.dataset.sku) return;
+    contar(t.dataset.sku, t.value);
+    const fila = t.closest && t.closest('tr');
+    const p = S.calc.porSku.get(t.dataset.sku.toUpperCase());
+    if (fila && p && fila.lastElementChild) fila.lastElementChild.outerHTML = difCelda(p);
+    pintarRecResumen();
+  });
+  el('v-recuento').addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('[data-cuadra]');
+    if (!b) return;
+    S.calc.prods.filter((p) => p.cod === b.dataset.cuadra).forEach((p) => {
+      if (CONTADOS[p.sku] === '' || CONTADOS[p.sku] == null) CONTADOS[p.sku] = String(p.inicial);
+    });
+    guardarContados();
+    pintarRecuento();
+  });
+  el('rec-guardar').addEventListener('click', () => guardarRecuento());
+  el('rec-borrar').addEventListener('click', () => {
+    if (window.confirm && !window.confirm('¿Borrar todo lo contado hasta ahora?')) return;
+    CONTADOS = {}; guardarContados(); recMensaje(''); pintarRecuento();
+  });
+  el('rec-copiar').addEventListener('click', async () => {
+    const texto = Panel.textoRecuento(Panel.recuento(S.calc.prods, CONTADOS));
+    try { await navigator.clipboard.writeText(texto); recMensaje('✓ Copiado. Pégalo en el chat con el proveedor.', true); }
+    catch (e) { recMensaje(texto, true); }
+  });
+
+  // ---- Segundo pedido ----
+  let SEMANAS = 8;
+  function pintarPedido() {
+    const R = Panel.rotacion(S.calc, DATOS.movimientos || [], DATOS.config || {}, new Date(), SEMANAS);
+    const con = R.productos.filter((x) => x.vendidas > 0), sin = R.productos.filter((x) => !x.vendidas);
+    if (!con.length) {
+      el('v-pedido').innerHTML = '<div class="vacia">Cuando empiecen las ventas, aquí verás qué se vende más rápido, cuánto ganas con cada prenda y cuánto volver a pedir.</div>';
+      return;
+    }
+    const total = con.reduce((a, x) => a + x.sugerido, 0);
+    const coste = con.reduce((a, x) => a + x.sugerido * x.coste, 0);
+    const semanasTxt = R.semanas.toLocaleString('es-ES', { maximumFractionDigits: 1 });
+    const fila = (x) => `<tr><td>${esc(x.producto)} — ${esc(x.modelo)}</td>
+      <td class="n ${x.sugerido ? 'hay' : 'cero'}">${x.sugerido || '—'}</td><td class="n">${x.vendidas}</td>
+      <td class="n"><span class="barrita"><i style="width:${Math.round(Math.min(1, x.pctVendido) * 100)}%"></i></span>${Math.round(x.pctVendido * 100)} %</td>
+      <td class="n">${x.ritmo ? x.ritmo.toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '—'}</td><td class="n">${x.quedan}</td>
+      <td class="n">${x.semanasDeStock == null ? '—' : x.semanasDeStock >= 52 ? '+1 año' : Math.round(x.semanasDeStock) + ' sem'}</td>
+      <td class="n ${x.gananciaUd != null && x.gananciaUd < 0 ? 'neg' : ''}">${x.gananciaUd == null ? '—' : eur(x.gananciaUd)}</td>
+      <td>${esc(x.tallasTop.slice(0, 4).map((t) => t.talla + ' (' + t.vendidas + ')').join(', ')) || '—'}</td></tr>`;
+    const cab = '<thead><tr><th>Prenda</th><th class="n">Pedir</th><th class="n">Vendidas</th><th class="n">Del lote</th><th class="n">Por semana</th><th class="n">Quedan</th><th class="n">Te dura</th><th class="n">Ganas por prenda</th><th>Tallas que más salen</th></tr></thead>';
+    el('v-pedido').innerHTML = `<div class="rec-cab caja ped-cab">
+        <p>Llevas ${semanasTxt} semanas vendiendo (desde el ${fechaCorta(R.inicio)}). Para tener prenda
+          <select id="ped-semanas" aria-label="Semanas">${[4, 8, 12].map((n) => `<option value="${n}"${n === SEMANAS ? ' selected' : ''}>${n} semanas</option>`).join('')}</select>
+          más al ritmo de ahora, pedirías <b>${total} prendas</b> (unos ${eur(coste)} de fábrica, sin envío).</p>
+        <p>«Ganas por prenda» es lo cobrado menos la comisión, lo que costó en fábrica y su parte del envío
+          (${eur(R.envioUd)}). Es una guía: pregúntale a JARVIS antes de decidir.</p>
+        <div class="acciones"><button class="btn" type="button" data-jarvis="Ayúdame con el segundo pedido: ¿qué se vende mejor, qué tallas y qué no volvería a pedir?">Preguntar a JARVIS</button></div>
+      </div>
+      <div class="tabla caja"><table>${cab}<tbody>${con.map(fila).join('')}</tbody></table></div>
+      ${sin.length ? `<details style="margin-top:12px"><summary class="suave" style="cursor:pointer">Sin ventas todavía (${sin.length})</summary>
+        <div class="tabla caja" style="margin-top:8px"><table>${cab}<tbody>${sin.map(fila).join('')}</tbody></table></div></details>` : ''}`;
+  }
+  el('v-pedido').addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'ped-semanas') { SEMANAS = Number(e.target.value) || 8; pintarPedido(); }
+  });
 
   // ---- Cuentas con cada vendedor ----
   function pintarCuentas() {
@@ -840,7 +1049,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
 
   // ---- Pintar, navegar, entrar y salir ----
   function pintarTodo() {
-    pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas();
+    pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas(); pintarRecuento(); pintarPedido();
     const tipos = [...new Set((DATOS.movimientos || []).map((m) => String(m.tipo).toUpperCase()).filter(Boolean))];
     const mt = el('mov-tipo').value, mv = el('mov-vend').value;
     el('mov-tipo').innerHTML = '<option value="">Todos los tipos</option>' + tipos.map((x) => `<option>${esc(x)}</option>`).join('');
@@ -905,8 +1114,8 @@ te lo preparo y tú lo confirmas.</div>` : '';
   el('a-tipo').addEventListener('change', segunTipo);
   el('a-sku').addEventListener('change', segunTipo);
   el('f-apuntar').addEventListener('submit', enviarApunte);
-  // «Registrar pago» en Cuentas: abre Apuntar con el pago ya preparado.
-  el('v-cuentas').addEventListener('click', (e) => {
+  // «Registrar pago» en Cuentas y en Amigos: abre Apuntar con el pago ya preparado.
+  const alPagar = (e) => {
     const b = e.target.closest && e.target.closest('[data-pago]');
     if (!b) return;
     el('a-tipo').value = 'PAGO';
@@ -915,6 +1124,15 @@ te lo preparo y tú lo confirmas.</div>` : '';
     el('a-precio').value = String(b.dataset.importe).replace('.', ',');
     segunTipo();
     verVista('apuntar');
+  };
+  el('v-cuentas').addEventListener('click', alPagar);
+  el('v-reparto').addEventListener('click', alPagar);
+  // «Preguntar a JARVIS» desde una ficha o desde el segundo pedido.
+  el('rejilla').addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('[data-jarvis]');
+    if (!b) return;
+    abrirConsola(true);
+    preguntar(b.dataset.jarvis);
   });
   // Detalle de las gráficas al pasar por encima.
   el('v-resumen').addEventListener('mousemove', (e) => {
@@ -949,7 +1167,8 @@ te lo preparo y tú lo confirmas.</div>` : '';
   const listo = guardada ? entrar(guardada) : Promise.resolve(false);
 
   // Para las pruebas (scripts/test-panel.js).
-  window.PANEL = { listo, entrar, cargar, enviarApunte, preguntar, confirmar, estado: () => ({ CLAVE, DATOS, S, CHAT }) };
+  window.PANEL = { listo, entrar, cargar, enviarApunte, preguntar, confirmar, contar: (sku, n) => { contar(sku, n); pintarRecuento(); },
+    guardarRecuento, semanas: (n) => { SEMANAS = n; pintarPedido(); }, estado: () => ({ CLAVE, DATOS, S, CHAT, CONTADOS }) };
 })();
 </script>
 </body>
