@@ -72,7 +72,50 @@ var Panel = (function () {
     return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
   }
 
-  return { resumen: resumen, mensajeDeuda: mensajeDeuda, enlaceWhatsApp: enlaceWhatsApp, idPeticion: idPeticion, eur: eur };
+  // ---- Datos para las gráficas ----
+  var dia = function (d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  };
+  // Ventas de los últimos `dias` días, hasta `hoy` incluido (también los días sin ventas).
+  function ventasPorDia(ventas, dias, hoy) {
+    var fin = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    var serie = [], pos = {};
+    for (var i = dias - 1; i >= 0; i--) {
+      var d = new Date(fin); d.setDate(fin.getDate() - i);
+      pos[dia(d)] = serie.length;
+      serie.push({ fecha: dia(d), importe: 0, uds: 0 });
+    }
+    ventas.forEach(function (v) {
+      var k = pos[String(v.fecha).slice(0, 10)];
+      if (k != null) { serie[k].importe += v.importe; serie[k].uds += v.cantidad; }
+    });
+    return serie;
+  }
+  // Ventas agrupadas por lo que diga `clave(v)`, de más a menos importe.
+  function ventasPor(ventas, clave) {
+    var m = new Map();
+    ventas.forEach(function (v) {
+      var k = clave(v) || 'Sin indicar';
+      if (!m.has(k)) m.set(k, { nombre: k, importe: 0, uds: 0 });
+      var x = m.get(k); x.importe += v.importe; x.uds += v.cantidad;
+    });
+    return Array.from(m.values()).sort(function (a, b) { return b.importe - a.importe || b.uds - a.uds; });
+  }
+  // Por categoría: vendidas, en casa de tus amigos y en tu casa (suman lo comprado). Si se
+  // ha apuntado más de lo que había de una talla, `deMas` dice cuántas sobran.
+  function stockPorCategoria(prods) {
+    var m = new Map();
+    prods.forEach(function (p) {
+      if (!m.has(p.categoria)) m.set(p.categoria, { categoria: p.categoria, vendidas: 0, enLaCalle: 0, enCasa: 0, total: 0, deMas: 0 });
+      var x = m.get(p.categoria);
+      x.vendidas += p.vendido; x.enLaCalle += p.enVendedores; x.enCasa += Math.max(0, p.enAlmacen); x.total += p.inicial;
+      x.deMas += Math.max(0, -p.enAlmacen);
+    });
+    return Array.from(m.values()).sort(function (a, b) { return b.total - a.total; });
+  }
+
+  return { resumen: resumen, mensajeDeuda: mensajeDeuda, enlaceWhatsApp: enlaceWhatsApp, idPeticion: idPeticion, eur: eur,
+    ventasPorDia: ventasPorDia, ventasPor: ventasPor, stockPorCategoria: stockPorCategoria };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Panel;

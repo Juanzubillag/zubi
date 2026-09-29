@@ -2,136 +2,230 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Panel — China al por mayor</title>
+<title>JARVIS — China al por mayor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Chakra+Petch:wght@400;500;600;700&display=swap">
 <style>
+  /* Un solo tema, oscuro a propósito: es un centro de mando. */
   :root {
-    --bg: #fbfaf8; --panel: #fff; --ink: #1a1a19; --muted: #6b6a66;
-    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed; --on-accent: #fff;
-    --warn: #a8541c; --warn-soft: #fdf1e6; --crit: #c0392b; --crit-soft: #fcecea;
-    --radius: 10px;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
-      --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25; --on-accent: #0f1a14;
-      --warn: #e0a06a; --warn-soft: #2e2419; --crit: #f08a80; --crit-soft: #3a1f1c;
-    }
-  }
-  :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
-    --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25; --on-accent: #0f1a14;
-    --warn: #e0a06a; --warn-soft: #2e2419; --crit: #f08a80; --crit-soft: #3a1f1c;
+    --fondo: #050b10; --panel: #0b1620; --panel-2: #0f1e2b;
+    --linea: rgba(90, 200, 255, .14); --linea-2: rgba(90, 200, 255, .32);
+    --tinta: #e4f2fa; --suave: #8aa7bc; --tenue: #5c7890;
+    --cian: #35c9ee; --cian-hondo: #0f6f8f;
+    /* Gráficas: validadas contra --panel (dataviz, modo oscuro). */
+    --serie: #1b98c0; --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --bien: #41d39a; --mal: #ff8a80; --aviso: #f0b45a;
+    --hud: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
+    --display: "Orbitron", "Chakra Petch", ui-sans-serif, sans-serif;
+    --r: 12px;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-variant-numeric: tabular-nums; -webkit-text-size-adjust: 100%; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; }
+  html, body { background: var(--fondo); }
+  body { margin: 0; color: var(--tinta); font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%; min-height: 100vh; }
+  .fondo { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(1200px 600px at 75% -10%, rgba(53, 201, 238, .10), transparent 60%),
+      linear-gradient(var(--linea) 1px, transparent 1px) 0 0 / 44px 44px,
+      linear-gradient(90deg, var(--linea) 1px, transparent 1px) 0 0 / 44px 44px;
+    opacity: .55; mask-image: linear-gradient(#000, rgba(0,0,0,.25)); }
+  .wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding-inline: 16px; }
   h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
-  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
   [hidden] { display: none !important; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  :focus-visible { outline: 2px solid var(--cian); outline-offset: 2px; border-radius: 4px; }
   button, input, select, textarea { font: inherit; color: inherit; }
+  a { color: var(--cian); }
 
-  header { background: var(--panel); border-bottom: 1px solid var(--line);
-    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
-  .top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 12px 0; }
-  .top h1 { font-size: 19px; letter-spacing: -.01em; }
-  .top .sub { color: var(--muted); font-size: 13px; }
-  .conexion { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
-  .conexion .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
-  .conexion.mal .punto { background: var(--crit); }
-  .conexion.cargando .punto { background: var(--warn); }
-  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 12px;
-    cursor: pointer; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
-  .btn:hover { border-color: var(--ink); }
-  .btn.primario { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-  .btn.wa { background: #15803d; border-color: #15803d; color: #fff; text-decoration: none; display: inline-block; }
+  /* ---- cabecera ---- */
+  header.hud { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+    background: rgba(5, 11, 16, .86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--linea); }
+  .top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 12px 0; }
+  .marca { display: flex; align-items: center; gap: 12px; }
+  .reactor-mini { width: 30px; height: 30px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle, #d9f7ff 0 18%, var(--cian) 30%, rgba(53,201,238,.15) 60%, transparent 62%);
+    box-shadow: 0 0 18px rgba(53, 201, 238, .6), inset 0 0 0 2px rgba(53, 201, 238, .5); }
+  .marca h1 { font-family: var(--display); font-size: 19px; letter-spacing: .22em; font-weight: 700; }
+  .marca .sub { font-family: var(--hud); color: var(--suave); font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; }
+  .conexion { margin-left: auto; display: flex; align-items: center; gap: 10px; font-family: var(--hud); font-size: 13px; color: var(--suave); }
+  .conexion .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--bien); box-shadow: 0 0 10px var(--bien); display: inline-block; }
+  .conexion.mal .punto { background: var(--mal); box-shadow: 0 0 10px var(--mal); }
+  .conexion.cargando .punto { background: var(--aviso); box-shadow: 0 0 10px var(--aviso); }
+  .btn { border: 1px solid var(--linea-2); background: rgba(53, 201, 238, .06); border-radius: 8px; padding: 6px 12px;
+    cursor: pointer; font-family: var(--hud); font-size: 13.5px; font-weight: 600; white-space: nowrap; color: var(--tinta);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .15s, border-color .15s; }
+  .btn:hover { border-color: var(--cian); background: rgba(53, 201, 238, .14); }
+  .btn.primario { background: var(--cian); border-color: var(--cian); color: #03202b; }
+  .btn.primario:hover { background: #6fdcf6; }
+  .btn.wa { background: #15803d; border-color: #15803d; color: #fff; }
+  .btn:disabled { opacity: .5; cursor: default; }
   nav { display: flex; gap: 2px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
   nav::-webkit-scrollbar { display: none; }
-  nav button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px;
-    color: var(--muted); cursor: pointer; white-space: nowrap; font-size: 14px; }
-  nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 650; }
+  nav button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; color: var(--suave);
+    cursor: pointer; white-space: nowrap; font-family: var(--hud); font-size: 14px; letter-spacing: .04em; }
+  nav button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--cian); text-shadow: 0 0 12px rgba(53,201,238,.5); }
 
-  main { padding-block: 22px 60px; }
-  .aviso { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--warn);
-    border-radius: var(--radius); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
-  .aviso.mal { border-color: var(--crit); background: var(--crit-soft); color: var(--crit); }
-  .ok-msg { border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent);
-    border-radius: var(--radius); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
+  main { padding-block: 20px 60px; }
+  .aviso { border: 1px solid rgba(240, 180, 90, .6); background: rgba(240, 180, 90, .08); color: var(--aviso);
+    border-radius: var(--r); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
+  .aviso.mal { border-color: rgba(255, 138, 128, .6); background: rgba(255, 138, 128, .08); color: var(--mal); }
+  .ok-msg { border: 1px solid rgba(65, 211, 154, .5); background: rgba(65, 211, 154, .08); color: var(--bien);
+    border-radius: var(--r); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
+  .caja { background: linear-gradient(180deg, rgba(15, 30, 43, .92), rgba(11, 22, 32, .92)); border: 1px solid var(--linea);
+    border-radius: var(--r); position: relative; }
+  .caja::before { content: ""; position: absolute; top: -1px; left: 14px; width: 42px; height: 2px; background: var(--cian);
+    box-shadow: 0 0 10px var(--cian); border-radius: 2px; }
+  .etq { font-family: var(--hud); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--suave); }
 
-  /* entrada */
-  .entrar { max-width: 380px; margin: 60px auto; background: var(--panel); border: 1px solid var(--line);
-    border-radius: 14px; padding: 26px 24px; display: grid; gap: 12px; }
-  .entrar h2 { font-size: 20px; }
-  .entrar p { margin: 0; color: var(--muted); font-size: 14px; }
-  .entrar input { padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 16px; }
-  .entrar .err { color: var(--crit); font-size: 14px; min-height: 20px; }
+  /* ---- entrada ---- */
+  .entrar { max-width: 400px; margin: 70px auto; padding: 30px 26px; display: grid; gap: 12px; }
+  .entrar h2 { font-family: var(--display); font-size: 18px; letter-spacing: .18em; }
+  .entrar p { margin: 0; color: var(--suave); font-size: 14px; }
+  .entrar input { padding: 11px 12px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--fondo); font-size: 16px; }
+  .entrar .err { color: var(--mal); font-size: 14px; min-height: 20px; }
 
-  /* resumen */
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
-  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
-  .tile .k { font-size: 12.5px; color: var(--muted); }
-  .tile .v { font-size: 25px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; }
-  .tile .d { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
-  .tile.grande { grid-column: 1 / -1; }
-  .tile.bien .v { color: var(--accent); } .tile.debe .v { color: var(--crit); }
-  .barra { height: 10px; background: var(--accent-soft); border-radius: 999px; overflow: hidden; margin-top: 10px; }
-  .barra i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
-  h2.sec { font-size: 16px; margin: 26px 0 10px; }
+  /* ---- rejilla: vistas + consola ---- */
+  .rejilla { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 18px; align-items: start; }
+  @media (max-width: 1000px) { .rejilla { grid-template-columns: minmax(0, 1fr); } .consola { order: -1; } }
 
-  /* tablas */
-  .tabla { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  /* ---- mando ---- */
+  .mando-top { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; }
+  @media (max-width: 700px) { .mando-top { grid-template-columns: minmax(0, 1fr); } }
+  .reactor { padding: 18px; display: grid; place-items: center; gap: 6px; text-align: center; }
+  .reactor svg { width: 190px; max-width: 100%; height: auto; overflow: visible; }
+  .reactor .pct { font-family: var(--display); font-weight: 800; fill: var(--tinta); }
+  .reactor .d { color: var(--suave); font-size: 13px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .tile { padding: 14px 16px; }
+  .tile .v { font-family: var(--hud); font-size: 26px; font-weight: 700; margin-top: 2px; letter-spacing: -.01em; }
+  .tile .d { font-size: 12.5px; color: var(--suave); margin-top: 2px; }
+  .tile.bien .v { color: var(--bien); } .tile.debe .v { color: var(--mal); }
+  h2.sec { font-family: var(--hud); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--suave); margin: 22px 0 10px; font-weight: 600; }
+  .graficas { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 12px; }
+  .grafica { padding: 14px 16px 12px; min-width: 0; }
+  .grafica h3 { font-family: var(--hud); font-size: 15px; font-weight: 600; }
+  .grafica .nota { color: var(--suave); font-size: 12.5px; margin: 2px 0 8px; }
+  .grafica svg { width: 100%; height: auto; display: block; }
+  .grafica svg text { font-family: var(--hud); }
+  .grafica details { margin-top: 6px; }
+  .grafica summary { cursor: pointer; color: var(--suave); font-size: 12.5px; font-family: var(--hud); }
+  .grafica.ancha { grid-column: 1 / -1; }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--suave); margin-bottom: 6px; }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .vacia { color: var(--tenue); font-size: 13.5px; padding: 26px 8px; text-align: center; border: 1px dashed var(--linea); border-radius: 10px; }
+  #tip { position: fixed; z-index: 50; pointer-events: none; background: #02070b; border: 1px solid var(--linea-2); color: var(--tinta);
+    padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: var(--hud); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+
+  /* ---- tablas ---- */
+  .tabla { overflow-x: auto; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
-  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; background: var(--bg); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--linea); white-space: nowrap; vertical-align: middle; }
+  th { font-family: var(--hud); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--suave); font-weight: 600; }
   tbody tr:last-child td { border-bottom: 0; }
-  td.n, th.n { text-align: right; }
-  td.cero { color: var(--muted); }
-  td.neg { color: var(--crit); font-weight: 700; }
-  td.hay { color: var(--accent); font-weight: 650; }
-  tr.grupo td { background: var(--bg); font-weight: 650; font-size: 13px; }
-  tfoot td { font-weight: 700; background: var(--accent-soft); }
+  tbody tr:hover td { background: rgba(53, 201, 238, .04); }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  td.cero { color: var(--tenue); } td.neg { color: var(--mal); font-weight: 700; } td.hay { color: var(--bien); font-weight: 650; }
+  tr.grupo td { color: var(--cian); font-family: var(--hud); font-weight: 600; font-size: 13px; letter-spacing: .03em; }
   .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .filtros input, .filtros select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); min-width: 0; }
+  .filtros input, .filtros select { padding: 8px 10px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--panel); min-width: 0; }
   .filtros input { flex: 1 1 220px; }
   .acciones { display: flex; gap: 6px; }
-  .vacio { color: var(--muted); padding: 30px; text-align: center; }
-  .suave { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .vacio { color: var(--tenue); padding: 30px; text-align: center; }
+  .suave { color: var(--suave); font-size: 13px; white-space: nowrap; }
 
-  /* reparto */
-  .vendedores { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-  .vend { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
-  .vend h3 { font-size: 16px; display: flex; justify-content: space-between; gap: 10px; }
-  .vend h3 span { color: var(--muted); font-weight: 500; font-size: 13.5px; }
+  /* ---- reparto ---- */
+  .vendedores { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  .vend { padding: 14px 16px; }
+  .vend h3 { font-family: var(--hud); font-size: 16px; display: flex; justify-content: space-between; gap: 10px; }
+  .vend h3 span { color: var(--suave); font-weight: 500; font-size: 13.5px; }
   .vend ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
   .vend li { display: flex; justify-content: space-between; gap: 10px; }
 
-  /* apuntar */
-  .form { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px;
-    display: grid; gap: 14px; max-width: 640px; }
+  /* ---- apuntar ---- */
+  .form { padding: 18px; display: grid; gap: 14px; max-width: 660px; }
   .campo { display: grid; gap: 5px; }
-  .campo label { font-weight: 600; font-size: 14px; }
-  .campo .ayuda { color: var(--muted); font-size: 12.5px; }
-  .campo input, .campo select, .campo textarea { padding: 10px 11px; border: 1px solid var(--line); border-radius: 8px;
-    background: var(--bg); font-size: 16px; width: 100%; }
+  .campo label { font-family: var(--hud); font-weight: 600; font-size: 14px; }
+  .campo .ayuda { color: var(--suave); font-size: 12.5px; }
+  .campo input, .campo select, .campo textarea { padding: 10px 11px; border: 1px solid var(--linea-2); border-radius: 8px;
+    background: var(--fondo); font-size: 16px; width: 100%; }
   .fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ---- webs ---- */
+  .webs-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .webs-barra .btn[aria-pressed="true"] { border-color: var(--cian); background: rgba(53, 201, 238, .18); }
+  .marco { width: 100%; height: 72vh; border: 1px solid var(--linea-2); border-radius: var(--r); background: #fff; }
+
+  /* ---- consola JARVIS ---- */
+  .consola { position: sticky; top: 118px; display: flex; flex-direction: column; height: calc(100vh - 140px); min-height: 460px; }
+  .consola-cab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--linea); }
+  #j-cerrar, #j-abrir { display: none; }
+  /* En el móvil, JARVIS es un botón flotante que abre la consola desde abajo. */
+  @media (max-width: 1000px) {
+    .consola { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; top: auto; height: min(82vh, 640px); min-height: 0;
+      border-radius: 18px 18px 0 0; background: var(--panel); box-shadow: 0 -12px 40px rgba(0, 0, 0, .6);
+      transform: translateY(105%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s;
+      padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .consola.abierta { transform: none; visibility: visible; transition: transform .25s ease; }
+    #j-cerrar { display: inline-flex; margin-left: 6px; }
+    #j-voz { margin-left: auto; }
+    #j-abrir { display: flex; position: fixed; z-index: 35; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      align-items: center; gap: 10px; padding: 10px 16px 10px 10px; border-radius: 999px; border: 1px solid var(--cian);
+      background: rgba(5, 11, 16, .92); color: var(--tinta); font-family: var(--display); letter-spacing: .18em; font-size: 13px;
+      cursor: pointer; box-shadow: 0 0 22px rgba(53, 201, 238, .35); }
+    #j-abrir .reactor-mini { width: 26px; height: 26px; }
+    main { padding-bottom: 96px; }
+  }
+  .ojo { width: 14px; height: 14px; border-radius: 50%; background: var(--cian); box-shadow: 0 0 14px var(--cian); flex: none; }
+  .ojo.piensa { animation: late 1s ease-in-out infinite; }
+  .ojo.escucha { background: var(--mal); box-shadow: 0 0 14px var(--mal); }
+  @keyframes late { 50% { opacity: .35; transform: scale(.8); } }
+  .consola-cab b { font-family: var(--display); letter-spacing: .2em; font-size: 14px; }
+  .consola-cab .estado { color: var(--suave); font-size: 12.5px; font-family: var(--hud); }
+  .consola-cab .btn { padding: 4px 9px; font-size: 12.5px; }
+  #j-voz { margin-left: auto; }
+  #j-mic svg { width: 16px; height: 16px; display: block; }
+  .consola-cab .btn[aria-pressed="true"] { border-color: var(--cian); color: var(--cian); }
+  .j-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+  .burbuja { max-width: 92%; padding: 9px 12px; border-radius: 12px; font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .burbuja.usuario { align-self: flex-end; background: rgba(53, 201, 238, .16); border: 1px solid var(--linea-2); border-bottom-right-radius: 4px; }
+  .burbuja.asistente { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--linea); border-bottom-left-radius: 4px; }
+  .burbuja.sistema { align-self: center; background: none; color: var(--suave); font-size: 13px; text-align: center; }
+  .burbuja.error { align-self: flex-start; color: var(--mal); border: 1px solid rgba(255, 138, 128, .4); }
+  .propuesta { margin-top: 8px; padding: 10px; border: 1px solid var(--linea-2); border-radius: 10px; background: rgba(53, 201, 238, .05); white-space: normal; }
+  .propuesta .que { font-size: 14px; }
+  .propuesta .acciones { margin-top: 8px; }
+  .propuesta.hecha { border-color: rgba(65, 211, 154, .5); } .propuesta.hecha .estado { color: var(--bien); }
+  .propuesta.descartada { opacity: .55; } .propuesta.error .estado { color: var(--mal); }
+  .propuesta .estado { font-family: var(--hud); font-size: 13px; margin-top: 6px; }
+  .puntos::after { content: "…"; animation: late 1s infinite; }
+  .j-sug { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
+  .j-sug button { border: 1px solid var(--linea-2); background: none; border-radius: 999px; padding: 5px 11px; font-size: 12.5px;
+    cursor: pointer; font-family: var(--hud); color: var(--suave); }
+  .j-sug button:hover { color: var(--tinta); border-color: var(--cian); }
+  .j-form { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--linea); }
+  .j-form input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--linea-2); border-radius: 10px; background: var(--fondo); font-size: 16px; }
+  .j-form .btn { padding: 8px 12px; }
+  #j-mic.escuchando { border-color: var(--mal); color: var(--mal); }
+  .j-pie { padding: 0 14px 10px; color: var(--tenue); font-size: 12px; font-family: var(--hud); }
   @media (max-width: 560px) { .fila2 { grid-template-columns: 1fr; } .conexion { margin-left: 0; width: 100%; } }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
+<div class="fondo" aria-hidden="true"></div>
 
-<header>
+<header class="hud">
   <div class="wrap">
     <div class="top">
-      <div>
-        <h1>Panel</h1>
-        <div class="sub">China al por mayor · todo en uno, al momento</div>
+      <div class="marca">
+        <div class="reactor-mini" aria-hidden="true"></div>
+        <div><h1>J.A.R.V.I.S.</h1><div class="sub">China al por mayor · centro de mando</div></div>
       </div>
       <div class="conexion" id="conexion" hidden>
         <span class="punto"></span><span id="actualizado">—</span>
@@ -140,12 +234,13 @@
       </div>
     </div>
     <nav role="tablist" id="pestanas" hidden>
-      <button role="tab" data-vista="resumen" aria-selected="true">Resumen</button>
+      <button role="tab" data-vista="resumen" aria-selected="true">Mando</button>
       <button role="tab" data-vista="stock" aria-selected="false">Stock</button>
       <button role="tab" data-vista="reparto" aria-selected="false">Quién tiene qué</button>
       <button role="tab" data-vista="cuentas" aria-selected="false">Cuentas</button>
       <button role="tab" data-vista="movimientos" aria-selected="false">Movimientos</button>
       <button role="tab" data-vista="apuntar" aria-selected="false">Apuntar</button>
+      <button role="tab" data-vista="webs" aria-selected="false">Webs y hoja</button>
     </nav>
   </div>
 </header>
@@ -153,70 +248,112 @@
 <main class="wrap">
   <div id="aviso" class="aviso" hidden></div>
 
-  <form class="entrar" id="entrar" autocomplete="on">
-    <h2>Tu panel</h2>
+  <form class="entrar caja" id="entrar" autocomplete="on">
+    <h2>IDENTIFÍCATE</h2>
     <p>Escribe tu clave privada. Se comprueba en Google; en esta página no hay nada guardado.</p>
     <input type="password" id="clave" autocomplete="current-password" placeholder="Clave privada" required>
     <button class="btn primario" type="submit" id="entrar-btn">Entrar</button>
     <div class="err" id="entrar-err" role="alert"></div>
   </form>
 
-  <section id="v-resumen" hidden></section>
-  <section id="v-stock" hidden>
-    <div class="filtros">
-      <input type="search" id="stock-q" placeholder="Buscar: polo, arcteryx, M…" autocomplete="off">
-      <select id="stock-f">
-        <option value="">Todas las tallas</option>
-        <option value="hay">Con disponible</option>
-        <option value="agotado">Agotadas o en negativo</option>
-        <option value="calle">Con prendas en la calle</option>
-        <option value="reservado">Con reservas</option>
-      </select>
+  <div class="rejilla" id="rejilla" hidden>
+    <div class="vistas" id="vistas">
+      <section id="v-resumen" hidden></section>
+      <section id="v-stock" hidden>
+        <div class="filtros">
+          <input type="search" id="stock-q" placeholder="Buscar: polo, arcteryx, M…" autocomplete="off">
+          <select id="stock-f">
+            <option value="">Todas las tallas</option>
+            <option value="hay">Con disponible</option>
+            <option value="agotado">Agotadas o en negativo</option>
+            <option value="calle">Con prendas en la calle</option>
+            <option value="reservado">Con reservas</option>
+          </select>
+        </div>
+        <div class="tabla caja"><table id="t-stock"></table></div>
+      </section>
+      <section id="v-reparto" hidden></section>
+      <section id="v-cuentas" hidden></section>
+      <section id="v-movimientos" hidden>
+        <div class="filtros">
+          <select id="mov-tipo"><option value="">Todos los tipos</option></select>
+          <select id="mov-vend"><option value="">Todos los vendedores</option></select>
+        </div>
+        <div class="tabla caja"><table id="t-mov"></table></div>
+      </section>
+      <section id="v-apuntar" hidden>
+        <div id="apuntar-msg" hidden></div>
+        <form class="form caja" id="f-apuntar" novalidate>
+          <div class="fila2">
+            <div class="campo"><label for="a-tipo">Qué ha pasado</label>
+              <select id="a-tipo">
+                <option value="VENTA">VENTA — cobrada</option>
+                <option value="CONSIGNA">CONSIGNA — se la lleva un amigo</option>
+                <option value="DEVOLUCION">DEVOLUCION — te la devuelve</option>
+                <option value="RESERVA">RESERVA — la quieren, sin pagar</option>
+                <option value="QUITA_RESERVA">QUITA_RESERVA — se cae la reserva</option>
+                <option value="PAGO">PAGO — un amigo te da dinero</option>
+              </select></div>
+            <div class="campo"><label for="a-vend">Quién</label><select id="a-vend"></select></div>
+          </div>
+          <div class="campo" id="c-prenda"><label for="a-sku">Prenda y talla</label>
+            <select id="a-sku"></select>
+            <div class="ayuda" id="a-sku-ayuda"></div></div>
+          <div class="fila2">
+            <div class="campo" id="c-cant"><label for="a-cant">Cantidad</label>
+              <input type="number" id="a-cant" min="1" step="1" value="1" inputmode="numeric"></div>
+            <div class="campo" id="c-precio"><label for="a-precio" id="a-precio-l">Precio cobrado (€)</label>
+              <input type="text" id="a-precio" inputmode="decimal" placeholder="0,00"></div>
+          </div>
+          <div class="campo" id="c-canal"><label for="a-canal">Dónde</label>
+            <select id="a-canal"><option>Vinted</option><option>Wallapop</option><option>En mano</option>
+              <option>Tienda ZUBI</option><option>Instagram</option><option>Otro</option></select></div>
+          <div class="campo"><label for="a-notas">Notas (opcional)</label>
+            <textarea id="a-notas" rows="2" maxlength="300"></textarea></div>
+          <div><button class="btn primario" type="submit" id="a-enviar">Apuntar</button></div>
+        </form>
+      </section>
+      <section id="v-webs" hidden>
+        <div class="webs-barra">
+          <button class="btn web-btn" type="button" data-web="../" aria-pressed="true">Tienda ZUBI</button>
+          <button class="btn web-btn" type="button" data-web="../vendedores/" aria-pressed="false">Catálogo de vendedores</button>
+          <a class="btn" id="web-abrir" href="../" target="_blank" rel="noopener">Abrir en otra pestaña ↗</a>
+          <a class="btn primario" id="hoja-abrir" href="#" target="_blank" rel="noopener" hidden>Abrir tu hoja de Google ↗</a>
+        </div>
+        <iframe class="marco" id="web-marco" title="Web" loading="lazy"></iframe>
+        <p class="suave" style="white-space:normal;margin-top:8px">Google no deja meter una hoja privada dentro de otra
+          web: se abre en su pestaña, y sus datos ya los tienes en el resto del panel.</p>
+      </section>
     </div>
-    <div class="tabla"><table id="t-stock"></table></div>
-  </section>
-  <section id="v-reparto" hidden></section>
-  <section id="v-cuentas" hidden></section>
-  <section id="v-movimientos" hidden>
-    <div class="filtros">
-      <select id="mov-tipo"><option value="">Todos los tipos</option></select>
-      <select id="mov-vend"><option value="">Todos los vendedores</option></select>
-    </div>
-    <div class="tabla"><table id="t-mov"></table></div>
-  </section>
-  <section id="v-apuntar" hidden>
-    <div id="apuntar-msg" hidden></div>
-    <form class="form" id="f-apuntar" novalidate>
-      <div class="fila2">
-        <div class="campo"><label for="a-tipo">Qué ha pasado</label>
-          <select id="a-tipo">
-            <option value="VENTA">VENTA — cobrada</option>
-            <option value="CONSIGNA">CONSIGNA — se la lleva un amigo</option>
-            <option value="DEVOLUCION">DEVOLUCION — te la devuelve</option>
-            <option value="RESERVA">RESERVA — la quieren, sin pagar</option>
-            <option value="QUITA_RESERVA">QUITA_RESERVA — se cae la reserva</option>
-            <option value="PAGO">PAGO — un amigo te da dinero</option>
-          </select></div>
-        <div class="campo"><label for="a-vend">Quién</label><select id="a-vend"></select></div>
+
+    <aside class="consola caja" id="consola" aria-label="Asistente JARVIS">
+      <div class="consola-cab">
+        <span class="ojo" id="j-ojo" aria-hidden="true"></span>
+        <b>JARVIS</b><span class="estado" id="j-estado">a tu servicio</span>
+        <button class="btn" type="button" id="j-voz" aria-pressed="false" title="Que JARVIS lea sus respuestas en voz alta">Voz</button>
+        <button class="btn" type="button" id="j-cerrar" aria-label="Cerrar JARVIS">✕</button>
       </div>
-      <div class="campo" id="c-prenda"><label for="a-sku">Prenda y talla</label>
-        <select id="a-sku"></select>
-        <div class="ayuda" id="a-sku-ayuda"></div></div>
-      <div class="fila2">
-        <div class="campo" id="c-cant"><label for="a-cant">Cantidad</label>
-          <input type="number" id="a-cant" min="1" step="1" value="1" inputmode="numeric"></div>
-        <div class="campo" id="c-precio"><label for="a-precio" id="a-precio-l">Precio cobrado (€)</label>
-          <input type="text" id="a-precio" inputmode="decimal" placeholder="0,00"></div>
+      <div class="j-log" id="j-log" role="log" aria-live="polite"></div>
+      <div class="j-sug" id="j-sug">
+        <button type="button">¿Cómo vamos hoy?</button>
+        <button type="button">¿Quién me debe dinero?</button>
+        <button type="button">¿Qué tiene cada amigo?</button>
+        <button type="button">¿Qué no se está vendiendo?</button>
+        <button type="button">Apunta una venta</button>
       </div>
-      <div class="campo" id="c-canal"><label for="a-canal">Dónde</label>
-        <select id="a-canal"><option>Vinted</option><option>Wallapop</option><option>En mano</option>
-          <option>Tienda ZUBI</option><option>Instagram</option><option>Otro</option></select></div>
-      <div class="campo"><label for="a-notas">Notas (opcional)</label>
-        <textarea id="a-notas" rows="2" maxlength="300"></textarea></div>
-      <div><button class="btn primario" type="submit" id="a-enviar">Apuntar</button></div>
-    </form>
-  </section>
+      <form class="j-form" id="j-form" autocomplete="off">
+        <button class="btn" type="button" id="j-mic" title="Hablar" aria-label="Hablar" hidden><svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <input id="j-input" placeholder="Pídeme lo que quieras…" aria-label="Pregunta para JARVIS">
+        <button class="btn primario" type="submit" id="j-enviar">Enviar</button>
+      </form>
+      <div class="j-pie" id="j-gasto"></div>
+    </aside>
+  </div>
+  <button type="button" id="j-abrir" aria-controls="consola" aria-expanded="false" hidden><span class="reactor-mini" aria-hidden="true"></span>JARVIS</button>
 </main>
+<div id="tip" hidden></div>
 
 <script src="../vendedores/config.js"></script>
 <script src="../vendedores/calculo.js"></script>
@@ -230,13 +367,17 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-  const VISTAS = ['resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar'];
+  const VISTAS = ['resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'webs'];
+  const guardar = (k, v) => { try { window.sessionStorage.setItem(k, v); } catch (e) { /* sin almacenamiento */ } };
+  const recordar = (k) => { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } };
+  const olvidar = (k) => { try { window.sessionStorage.removeItem(k); } catch (e) { /* nada */ } };
+  const pref = (k, v) => { try { if (v === undefined) return window.localStorage.getItem(k); window.localStorage.setItem(k, v); } catch (e) { return null; } };
 
   // ---- Google, con reintentos: a veces contesta «No se puede abrir el archivo» ----
-  async function google(opciones) {
+  async function google(opciones, intentos = 3) {
     if (!CFG.registroUrl) throw new Error('Falta el enlace de Google (registroUrl) en config.js.');
     let ultimo = null;
-    for (let intento = 0; intento < 3; intento++) {
+    for (let intento = 0; intento < intentos; intento++) {
       if (intento) await espera(intento === 1 ? 1500 : 4000);
       try {
         const r = opciones.cuerpo
@@ -292,30 +433,138 @@
   }
   const nombreDe = (vid) => S.nombre.get(vid) || vid || '—';
 
-  // ---- Resumen ----
+  // ---- Gráficas (SVG a mano: marcas finas, extremos redondeados, huecos de 2px) ----
+  const barraV = (x, y, w, h) => {   // columna con las esquinas de arriba redondeadas
+    const r = Math.min(4, h, w / 2);
+    return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+  };
+  const barraH = (x, y, w, h, redonda) => {   // barra tumbada, redondeada solo al final
+    const r = redonda ? Math.min(4, w, h / 2) : 0;
+    return `M${x},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h - r}Q${x + w},${y + h} ${x + w - r},${y + h}H${x}Z`;
+  };
+  // Cada gráfica se dibuja al ancho real de su hueco: así la letra sale a su tamaño en el móvil y en el ordenador.
+  const anchoVistas = () => Math.max(280, Math.round(el('vistas').clientWidth || 880));
+  const corta = (texto, px) => { const n = Math.max(4, Math.floor(px / 7)); return texto.length > n ? texto.slice(0, n - 1) + '…' : texto; };
+  const tabla = (cab, filas) => `<details><summary>Ver los datos</summary><div class="tabla"><table><thead><tr>${
+    cab.map((c, i) => `<th${i ? ' class="n"' : ''}>${esc(c)}</th>`).join('')}</tr></thead><tbody>${
+    filas.map((f) => `<tr>${f.map((c, i) => `<td${i ? ' class="n"' : ''}>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
+
+  function graficaDias(serie, W) {
+    const max = Math.max(...serie.map((d) => d.importe));
+    if (!(max > 0)) return '<div class="vacia">Aún no hay ventas en estos 30 días. Aquí verás cuánto entra cada día.</div>';
+    const H = 200, iz = 8, de = 8, arriba = 22, abajo = 26, ph = H - arriba - abajo;
+    const banda = (W - iz - de) / serie.length, w = Math.min(24, banda - 2);
+    const imax = serie.findIndex((d) => d.importe === max);
+    const fecha = (f) => f.slice(8, 10) + '/' + f.slice(5, 7);
+    const barras = serie.map((d, i) => {
+      const x = iz + i * banda + (banda - w) / 2, h = d.importe > 0 ? Math.max(2, d.importe / max * ph) : 0;
+      const tip = `${fecha(d.fecha)} · ${eur(d.importe)} · ${d.uds} ${d.uds === 1 ? 'prenda' : 'prendas'}`;
+      return `<rect x="${iz + i * banda}" y="${arriba}" width="${banda}" height="${ph}" fill="transparent" data-tip="${esc(tip)}"/>` +
+        (h ? `<path d="${barraV(x, arriba + ph - h, w, h)}" fill="var(--serie)" pointer-events="none"/>` : '');
+    }).join('');
+    const xMax = iz + imax * banda + banda / 2;
+    return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Ventas de los últimos 30 días; el mejor día ${eur(max)}">
+      <line x1="${iz}" x2="${W - de}" y1="${arriba + ph}" y2="${arriba + ph}" stroke="var(--linea-2)" stroke-width="1"/>
+      ${barras}
+      <text x="${Math.min(Math.max(xMax, 40), W - 40)}" y="${arriba + ph - max / max * ph - 6}" fill="var(--tinta)" font-size="12" text-anchor="middle">${eur(max)}</text>
+      <text x="${iz}" y="${H - 8}" fill="var(--suave)" font-size="11">${fecha(serie[0].fecha)}</text>
+      <text x="${W / 2}" y="${H - 8}" fill="var(--suave)" font-size="11" text-anchor="middle">${fecha(serie[Math.floor(serie.length / 2)].fecha)}</text>
+      <text x="${W - de}" y="${H - 8}" fill="var(--suave)" font-size="11" text-anchor="end">hoy</text>
+    </svg>` + tabla(['Día', 'Importe', 'Prendas'], serie.filter((d) => d.uds).map((d) => [d.fecha, eur(d.importe), d.uds]));
+  }
+
+  function graficaBarras(filas, vacia, W) {
+    if (!filas.length) return `<div class="vacia">${vacia}</div>`;
+    const max = Math.max(...filas.map((f) => f.importe)) || 1;
+    const fila = 30, iz = Math.min(116, Math.round(W * 0.32)), de = 76, grosor = 16;
+    const H = filas.length * fila + 6;
+    const cuerpo = filas.map((f, i) => {
+      const y = 4 + i * fila, w = Math.max(f.importe > 0 ? 3 : 0, f.importe / max * (W - iz - de));
+      return `<g data-tip="${esc(`${f.nombre} · ${eur(f.importe)} · ${f.uds} ${f.uds === 1 ? 'prenda' : 'prendas'}`)}">
+        <rect x="0" y="${y}" width="${W}" height="${fila}" fill="transparent"/>
+        <text x="${iz - 10}" y="${y + fila / 2 + 4}" fill="var(--suave)" font-size="12.5" text-anchor="end">${esc(corta(f.nombre, iz - 12))}</text>
+        ${w ? `<path d="${barraH(iz, y + (fila - grosor) / 2, w, grosor, true)}" fill="var(--serie)"/>` : ''}
+        <text x="${iz + w + 8}" y="${y + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5">${eur(f.importe)}</text></g>`;
+    }).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(filas.map((f) => f.nombre + ' ' + eur(f.importe)).join(', '))}">
+      <line x1="${iz}" x2="${iz}" y1="2" y2="${H - 2}" stroke="var(--linea-2)" stroke-width="1"/>${cuerpo}</svg>` +
+      tabla(['', 'Importe', 'Prendas'], filas.map((f) => [f.nombre, eur(f.importe), f.uds]));
+  }
+
+  function graficaStock(cats, W) {
+    const SERIES = [['vendidas', 'Vendidas', 'var(--s1)'], ['enLaCalle', 'En casa de amigos', 'var(--s2)'], ['enCasa', 'En tu casa', 'var(--s3)']];
+    // Con prendas apuntadas de más, la barra es más larga que lo comprado: se dice al lado.
+    const largo = (c) => c.vendidas + c.enLaCalle + c.enCasa;
+    const max = Math.max(...cats.map(largo)) || 1;
+    const fila = 30, iz = Math.min(130, Math.round(W * 0.3)), grosor = 16, H = cats.length * fila + 6;
+    const de = cats.some((c) => c.deMas) ? 112 : 44;
+    const cuerpo = cats.map((c, i) => {
+      const y = 4 + i * fila + (fila - grosor) / 2;
+      let x = iz;
+      const partes = SERIES.map(([k], si) => [k, si, c[k]]).filter(([, , v]) => v > 0);
+      const segs = partes.map(([k, si, v], j) => {
+        const ancho = v / max * (W - iz - de), ultimo = j === partes.length - 1;
+        const w = Math.max(1, ultimo ? ancho : ancho - 2);   // 2px de hueco entre tramos
+        const d = barraH(x, y, w, grosor, ultimo);
+        x += ancho;
+        return `<path d="${d}" fill="${SERIES[si][2]}" data-tip="${esc(`${c.categoria} · ${SERIES[si][1]}: ${v}`)}"/>`;
+      }).join('');
+      return `<text x="${iz - 10}" y="${4 + i * fila + fila / 2 + 4}" fill="var(--suave)" font-size="12.5" text-anchor="end">${esc(corta(c.categoria, iz - 12))}</text>
+        ${segs}<text x="${iz + largo(c) / max * (W - iz - de) + 8}" y="${4 + i * fila + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5">${c.total}${
+          c.deMas ? `<tspan fill="var(--mal)"> · ${c.deMas} de más</tspan>` : ''}</text>`;
+    }).join('');
+    const deMas = cats.reduce((a, c) => a + c.deMas, 0);
+    return `<div class="leyenda">${SERIES.map(([, n, col]) => `<span><i style="background:${col}"></i>${n}</span>`).join('')}</div>
+      <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Prendas por categoría: vendidas, en casa de amigos y en tu casa">${cuerpo}</svg>` +
+      (deMas ? `<p class="nota" style="color:var(--mal)">⚠ Hay ${deMas} ${deMas === 1 ? 'prenda apuntada' : 'prendas apuntadas'} de más que las compradas:
+        en Stock, filtra por «Agotadas o en negativo» para ver cuál.</p>` : '') +
+      tabla(['Categoría', 'Vendidas', 'En casa de amigos', 'En tu casa', 'Compradas'],
+        cats.map((c) => [c.categoria, c.vendidas, c.enLaCalle, c.enCasa, c.total]));
+  }
+
+  // ---- Mando ----
+  let anchoPintado = 0;
   function pintarResumen() {
     const r = S.resumen;
     const pct = Math.round(r.recuperado * 100);
+    const radio = 80, vuelta = 2 * Math.PI * radio;
+    const dias = Panel.ventasPorDia(S.calc.ventas, 30, new Date());
+    const A = anchoVistas(), ancha = A - 34, media = A >= 672 ? Math.floor((A - 12) / 2) - 34 : ancha;
+    anchoPintado = A;
     el('v-resumen').innerHTML = `
-      ${r.ventasSinPrecio ? `<div class="aviso">Hay ${r.ventasSinPrecio} ${r.ventasSinPrecio === 1 ? 'venta' : 'ventas'} sin precio: cuentan 0 € hasta que lo pongas en la hoja.</div>` : ''}
-      <div class="tiles">
-        <div class="tile grande"><div class="k">Recuperado del pedido</div>
-          <div class="v">${pct} %</div>
-          <div class="d">${eur(r.neto)} de ${eur(r.desembolso)} · ${r.faltaRecuperar > 0 ? 'faltan ' + eur(r.faltaRecuperar) : 'recuperado del todo'}</div>
-          <div class="barra" role="img" aria-label="${pct} % recuperado"><i style="width:${pct}%"></i></div></div>
-        <div class="tile bien"><div class="k">Neto para ti</div><div class="v">${eur(r.neto)}</div>
-          <div class="d">vendido ${eur(r.ingresado)} − comisiones ${eur(r.comisiones)}</div></div>
-        <div class="tile ${r.teDeben > 0.005 ? 'debe' : ''}"><div class="k">Te deben tus amigos</div><div class="v">${eur(r.teDeben)}</div>
-          <div class="d">ya te han pagado ${eur(r.cobrado)}</div></div>
-        <div class="tile"><div class="k">Si se vende todo lo que queda</div><div class="v">${eur(r.beneficioSiTodo)}</div>
-          <div class="d">de beneficio, a precio de tus amigos</div></div>
+      ${r.ventasSinPrecio ? `<div class="aviso">Hay ${r.ventasSinPrecio} ${r.ventasSinPrecio === 1 ? 'venta' : 'ventas'} sin precio: cuentan 0 € hasta que lo pongas.</div>` : ''}
+      <div class="mando-top">
+        <div class="reactor caja">
+          <div class="etq">Recuperado del pedido</div>
+          <svg viewBox="0 0 200 200" role="img" aria-label="${pct} % recuperado">
+            <defs><filter id="brillo"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <circle cx="100" cy="100" r="92" fill="none" stroke="var(--linea)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="${radio}" fill="none" stroke="rgba(53,201,238,.12)" stroke-width="12"/>
+            <circle cx="100" cy="100" r="${radio}" fill="none" stroke="var(--cian)" stroke-width="12" stroke-linecap="round"
+              stroke-dasharray="${(vuelta * r.recuperado).toFixed(1)} ${vuelta.toFixed(1)}" transform="rotate(-90 100 100)" filter="url(#brillo)"/>
+            <circle cx="100" cy="100" r="56" fill="rgba(53,201,238,.05)" stroke="var(--linea-2)" stroke-width="1"/>
+            <text x="100" y="110" text-anchor="middle" class="pct" font-size="30">${pct} %</text>
+          </svg>
+          <div class="d">${eur(r.neto)} de ${eur(r.desembolso)}<br>${r.faltaRecuperar > 0 ? 'faltan ' + eur(r.faltaRecuperar) : 'pedido recuperado'}</div>
+        </div>
+        <div class="tiles">
+          <div class="tile caja bien"><div class="etq">Neto para ti</div><div class="v">${eur(r.neto)}</div>
+            <div class="d">vendido ${eur(r.ingresado)} − comisiones ${eur(r.comisiones)}</div></div>
+          <div class="tile caja ${r.teDeben > 0.005 ? 'debe' : ''}"><div class="etq">Te deben tus amigos</div><div class="v">${eur(r.teDeben)}</div>
+            <div class="d">ya te han pagado ${eur(r.cobrado)}</div></div>
+          <div class="tile caja"><div class="etq">Si se vende lo que queda</div><div class="v">${eur(r.beneficioSiTodo)}</div>
+            <div class="d">de beneficio, a precio de tus amigos</div></div>
+          <div class="tile caja"><div class="etq">Disponibles</div><div class="v">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
+          <div class="tile caja"><div class="etq">Vendidas</div><div class="v">${r.vendidas}</div><div class="d">${r.reservadas} reservadas</div></div>
+          <div class="tile caja"><div class="etq">En casa de tus amigos</div><div class="v">${r.enLaCalle}</div><div class="d">prendas en consigna</div></div>
+        </div>
       </div>
-      <h2 class="sec">Prendas</h2>
-      <div class="tiles">
-        <div class="tile"><div class="k">Disponibles</div><div class="v">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
-        <div class="tile"><div class="k">Vendidas</div><div class="v">${r.vendidas}</div></div>
-        <div class="tile"><div class="k">En casa de tus amigos</div><div class="v">${r.enLaCalle}</div></div>
-        <div class="tile"><div class="k">Reservadas</div><div class="v">${r.reservadas}</div></div>
+      <h2 class="sec">Estadísticas</h2>
+      <div class="graficas">
+        <div class="grafica caja ancha"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
+        <div class="grafica caja"><h3>Por canal</h3><p class="nota">Dónde se vende más, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', media)}</div>
+        <div class="grafica caja"><h3>Por vendedor</h3><p class="nota">Lo que ha vendido cada uno, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', media)}</div>
+        <div class="grafica caja ancha"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus amigos y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), ancha)}</div>
       </div>`;
   }
 
@@ -352,7 +601,7 @@
       if (!cosas.length) continue;
       const uds = cosas.reduce((a, x) => a + x.n, 0);
       const valor = cosas.reduce((a, x) => a + x.n * x.p.pvp, 0);
-      bloques.push(`<div class="vend"><h3>${esc(nombreDe(vid))}<span>${uds} prendas · ${eur(valor)}</span></h3><ul>${
+      bloques.push(`<div class="vend caja"><h3>${esc(nombreDe(vid))}<span>${uds} prendas · ${eur(valor)}</span></h3><ul>${
         cosas.map((x) => `<li><span>${esc(x.p.producto)} — ${esc(x.p.modelo)} (${esc(x.p.talla)})</span><b>${x.n}</b></li>`).join('')}</ul></div>`);
     }
     el('v-reparto').innerHTML = bloques.length ? `<div class="vendedores">${bloques.join('')}</div>`
@@ -362,7 +611,7 @@
   // ---- Cuentas con cada vendedor ----
   function pintarCuentas() {
     const filas = S.cuentas.slice().sort((a, b) => (a.propio - b.propio) || (b.pendiente - a.pendiente));
-    el('v-cuentas').innerHTML = filas.length ? `<div class="tabla"><table><thead><tr><th>Vendedor</th><th class="n">Uds</th>
+    el('v-cuentas').innerHTML = filas.length ? `<div class="tabla caja"><table><thead><tr><th>Vendedor</th><th class="n">Uds</th>
       <th class="n">Vendido</th><th class="n">Su comisión</th><th class="n">Tu parte</th><th class="n">Te ha pagado</th>
       <th class="n">Falta</th><th></th></tr></thead><tbody>${filas.map((c) => {
         const nombre = nombreDe(c.vendedor);
@@ -462,6 +711,134 @@
     return true;
   }
 
+  // ---- Webs y hoja ----
+  function verWeb(url) {
+    document.querySelectorAll('.web-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.web === url)));
+    el('web-marco').src = url;
+    el('web-abrir').href = url;
+  }
+
+  // ---- JARVIS ----
+  let CHAT = [];
+  try { CHAT = JSON.parse(recordar('chat_jarvis') || '[]'); } catch (e) { CHAT = []; }
+  let pensando = false;
+  const guardarChat = () => guardar('chat_jarvis', JSON.stringify(CHAT.slice(-40)));
+
+  function pintarChat() {
+    const log = el('j-log');
+    const inicio = !CHAT.length ? `<div class="burbuja asistente">Hola, Juan. Pregúntame cómo va el negocio o pídeme que apunte algo:
+te lo preparo y tú lo confirmas.</div>` : '';
+    log.innerHTML = inicio + CHAT.map((m, i) => {
+      const props = (m.propuestas || []).map((p) => `<div class="propuesta ${p.estado}">
+        <div class="que">${esc(p.descripcion)}</div>
+        ${p.estado === 'pendiente' ? `<div class="acciones"><button class="btn primario" type="button" data-confirmar="${esc(p.id)}">Confirmar</button>
+          <button class="btn" type="button" data-descartar="${esc(p.id)}">Descartar</button></div>`
+          : `<div class="estado">${p.estado === 'hecha' ? '✓ Hecho' + (p.resultado ? ': ' + esc(p.resultado) : '') :
+            p.estado === 'descartada' ? 'Descartada' : p.estado === 'confirmando' ? '<span class="puntos">Confirmando</span>' : '✗ ' + esc(p.resultado || 'No se ha podido')}</div>`}
+      </div>`).join('');
+      return `<div class="burbuja ${m.rol}">${esc(m.texto)}${props}</div>`;
+    }).join('') + (pensando ? '<div class="burbuja asistente"><span class="puntos">Pensando</span></div>' : '');
+    log.scrollTop = log.scrollHeight || 0;
+    el('j-ojo').className = 'ojo' + (pensando ? ' piensa' : '');
+    el('j-estado').textContent = pensando ? 'pensando…' : 'a tu servicio';
+  }
+  function pintarGasto(a) {
+    if (!a) return;
+    el('j-gasto').textContent = a.configurado === false
+      ? 'Sin clave de Anthropic: en tu hoja, menú China al por mayor → Configurar el asistente.'
+      : `Hoy: ${a.preguntasHoy || 0} ${a.preguntasHoy === 1 ? 'pregunta' : 'preguntas'} · ${eur(a.gastoHoy || 0)} · ${a.modelo || ''}`;
+  }
+  // Lo que ve JARVIS de la conversación: el texto y cómo acabó cada propuesta.
+  const historial = () => CHAT.filter((m) => m.rol === 'usuario' || m.rol === 'asistente').slice(-16).map((m) => ({
+    rol: m.rol,
+    texto: m.texto + (m.propuestas || []).map((p) => `\n[Propuesta: ${p.descripcion} → ${
+      p.estado === 'hecha' ? 'confirmada y hecha' : p.estado === 'descartada' ? 'descartada' : p.estado === 'error' ? 'falló: ' + (p.resultado || '') : 'pendiente'}]`).join(''),
+  }));
+
+  async function preguntar(texto) {
+    texto = String(texto || '').trim();
+    if (!texto || pensando || !CLAVE) return;
+    CHAT.push({ rol: 'usuario', texto });
+    pensando = true; pintarChat(); guardarChat();
+    try {
+      // Con su identificador, un reintento recibe la misma respuesta: Claude no se paga dos veces.
+      const r = await google({ cuerpo: { accion: 'asistente', clave: CLAVE, idPeticion: Panel.idPeticion(), mensajes: historial() } });
+      if (r.ok) {
+        CHAT.push({ rol: 'asistente', texto: r.respuesta, propuestas: (r.propuestas || []).map((p) => ({ ...p, estado: 'pendiente' })) });
+        if (DATOS && DATOS.asistente) { DATOS.asistente.gastoHoy = r.gastoHoy; DATOS.asistente.preguntasHoy = (DATOS.asistente.preguntasHoy || 0) + 1; pintarGasto(DATOS.asistente); }
+        hablar(r.respuesta);
+      } else {
+        CHAT.push({ rol: 'error', texto: r.error || 'No he podido contestar.' });
+      }
+    } catch (e) {
+      CHAT.push({ rol: 'error', texto: e.message });
+    } finally {
+      pensando = false; pintarChat(); guardarChat();
+    }
+  }
+  const buscarPropuesta = (id) => { for (const m of CHAT) for (const p of (m.propuestas || [])) if (p.id === id) return p; return null; };
+  async function confirmar(id) {
+    const p = buscarPropuesta(id);
+    if (!p || p.estado !== 'pendiente') return;
+    p.estado = 'confirmando'; pintarChat();
+    try {
+      const r = await google({ cuerpo: { accion: 'confirmar', clave: CLAVE, id } });
+      p.estado = r.ok ? 'hecha' : 'error';
+      p.resultado = r.ok ? r.resumen : r.error;
+      if (r.ok) cargar();
+    } catch (e) {
+      p.estado = 'error'; p.resultado = e.message;
+    }
+    pintarChat(); guardarChat();
+  }
+
+  // Voz: dictar (Chrome y Edge) y escuchar las respuestas.
+  const Reconocer = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let voz = pref('jarvis_voz') === '1';
+  el('j-voz').setAttribute('aria-pressed', String(voz));
+  function hablar(texto) {
+    if (!voz || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+    const u = new window.SpeechSynthesisUtterance(String(texto).replace(/\[.*?\]/g, ''));
+    u.lang = 'es-ES';
+    const v = window.speechSynthesis.getVoices().find((x) => /^es(-|_)ES/i.test(x.lang));
+    if (v) u.voice = v;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }
+  if (Reconocer) {
+    el('j-mic').hidden = false;
+    el('j-mic').addEventListener('click', () => {
+      const rec = new Reconocer();
+      rec.lang = 'es-ES'; rec.interimResults = false; rec.maxAlternatives = 1;
+      el('j-mic').className = 'btn escuchando'; el('j-ojo').className = 'ojo escucha'; el('j-estado').textContent = 'te escucho…';
+      rec.onresult = (e) => { const t = e.results[0][0].transcript; el('j-input').value = ''; preguntar(t); };
+      rec.onend = () => { el('j-mic').className = 'btn'; if (!pensando) pintarChat(); };
+      rec.onerror = () => { el('j-mic').className = 'btn'; pintarChat(); };
+      rec.start();
+    });
+  }
+  function abrirConsola(si) {
+    el('consola').className = 'consola caja' + (si ? ' abierta' : '');
+    el('j-abrir').setAttribute('aria-expanded', String(si));
+    if (si && el('j-input').focus) setTimeout(() => el('j-input').focus(), 260);
+  }
+  el('j-abrir').addEventListener('click', () => abrirConsola(true));
+  el('j-cerrar').addEventListener('click', () => abrirConsola(false));
+  el('j-voz').addEventListener('click', () => {
+    voz = !voz; pref('jarvis_voz', voz ? '1' : '0');
+    el('j-voz').setAttribute('aria-pressed', String(voz));
+    if (!voz && window.speechSynthesis) window.speechSynthesis.cancel();
+  });
+  el('j-form').addEventListener('submit', (e) => { e.preventDefault(); const t = el('j-input').value; el('j-input').value = ''; preguntar(t); });
+  el('j-sug').addEventListener('click', (e) => { if (e.target && e.target.tagName === 'BUTTON') preguntar(e.target.textContent); });
+  el('j-log').addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('[data-confirmar],[data-descartar]');
+    if (!b) return;
+    if (b.dataset.confirmar) confirmar(b.dataset.confirmar);
+    else { const p = buscarPropuesta(b.dataset.descartar); if (p) { p.estado = 'descartada'; pintarChat(); guardarChat(); } }
+  });
+
+  // ---- Pintar, navegar, entrar y salir ----
   function pintarTodo() {
     pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas();
     const tipos = [...new Set((DATOS.movimientos || []).map((m) => String(m.tipo).toUpperCase()).filter(Boolean))];
@@ -472,18 +849,22 @@
     el('mov-tipo').value = mt; el('mov-vend').value = mv;
     pintarMovimientos();
     opcionesFormulario();
+    if (DATOS.hoja) { el('hoja-abrir').href = DATOS.hoja; el('hoja-abrir').hidden = false; }
+    pintarGasto(DATOS.asistente);
   }
-
-  // ---- Navegación, entrada y salida ----
   function verVista(v) {
     document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
+    if (v === 'webs' && !el('web-marco').src) verWeb('../');
   }
   function mostrarPanel(si) {
     el('entrar').hidden = si;
     el('pestanas').hidden = !si;
     el('conexion').hidden = !si;
-    if (si) verVista('resumen'); else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
+    el('rejilla').hidden = !si;
+    el('j-abrir').hidden = !si;
+    if (!si) abrirConsola(false);
+    if (si) { verVista('resumen'); pintarChat(); } else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
   }
   async function entrar(clave) {
     CLAVE = clave;
@@ -492,7 +873,7 @@
     try {
       const j = await google({ params: { modo: 'privado', clave } });
       if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
-      try { sessionStorage.setItem('clave_privada', clave); } catch (e) { /* sin almacenamiento */ }
+      guardar('clave_privada', clave);
       mostrarPanel(true);
       await cargar();
       return true;
@@ -506,7 +887,7 @@
   }
   function salir(motivo) {
     CLAVE = null; DATOS = null;
-    try { sessionStorage.removeItem('clave_privada'); } catch (e) { /* nada */ }
+    olvidar('clave_privada');
     mostrarPanel(false);
     el('entrar-err').textContent = motivo || '';
     aviso('');
@@ -516,6 +897,7 @@
   el('salir').addEventListener('click', () => salir());
   el('refrescar').addEventListener('click', () => cargar());
   document.querySelectorAll('#pestanas button').forEach((b) => b.addEventListener('click', () => verVista(b.dataset.vista)));
+  document.querySelectorAll('.web-btn').forEach((b) => b.addEventListener('click', () => verWeb(b.dataset.web)));
   el('stock-q').addEventListener('input', () => S.calc && pintarStock());
   el('stock-f').addEventListener('change', () => S.calc && pintarStock());
   el('mov-tipo').addEventListener('change', () => DATOS && pintarMovimientos());
@@ -534,9 +916,26 @@
     segunTipo();
     verVista('apuntar');
   });
+  // Detalle de las gráficas al pasar por encima.
+  el('v-resumen').addEventListener('mousemove', (e) => {
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    const tip = el('tip');
+    if (!t) { tip.hidden = true; return; }
+    tip.textContent = t.getAttribute('data-tip');
+    tip.hidden = false;
+    tip.style.left = Math.min(e.clientX + 14, (window.innerWidth || 800) - 240) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  });
+  el('v-resumen').addEventListener('mouseleave', () => { el('tip').hidden = true; });
+
+  let redibujo = 0;
+  if (window.addEventListener) window.addEventListener('resize', () => {
+    clearTimeout(redibujo);
+    redibujo = setTimeout(() => { if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen(); }, 200);
+  });
 
   // Al momento: se pide a Google cada minuto mientras la página está a la vista, y al volver a ella.
-  setInterval(() => { if (CLAVE && document.visibilityState !== 'hidden') cargar(); }, 60000);
+  setInterval(() => { if (CLAVE && document.visibilityState !== 'hidden' && !pensando) cargar(); }, 60000);
   document.addEventListener('visibilitychange', () => {
     if (CLAVE && document.visibilityState === 'visible' && Date.now() - ultimaCarga > 30000) cargar();
   });
@@ -546,12 +945,11 @@
     el('actualizado').textContent = s < 10 ? 'Actualizado ahora' : 'Actualizado hace ' + (s < 60 ? s + ' s' : Math.round(s / 60) + ' min');
   }, 5000);
 
-  let guardada = null;
-  try { guardada = sessionStorage.getItem('clave_privada'); } catch (e) { /* sin almacenamiento */ }
+  const guardada = recordar('clave_privada');
   const listo = guardada ? entrar(guardada) : Promise.resolve(false);
 
   // Para las pruebas (scripts/test-panel.js).
-  window.PANEL = { listo, entrar, cargar, enviarApunte, estado: () => ({ CLAVE, DATOS, S }) };
+  window.PANEL = { listo, entrar, cargar, enviarApunte, preguntar, confirmar, estado: () => ({ CLAVE, DATOS, S, CHAT }) };
 })();
 </script>
 </body>
