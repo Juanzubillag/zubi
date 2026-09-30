@@ -162,7 +162,53 @@ var Calculo = (function () {
     return por;
   }
 
-  return { num: num, comisionPct: comisionPct, calcular: calcular, cuentas: cuentas };
+  // Qué ventas concretas faltan por pagar, vendedor a vendedor (para saber qué reclamar).
+  // Un PAGO que lleva prenda paga primero las ventas de esa prenda (la más antigua antes); lo
+  // que sobre, y los pagos generales, pagan las ventas más antiguas. Lo que sobre al final es
+  // a su favor. Si un PAGO de ajuste en negativo sube la deuda por encima de lo vendido, esa
+  // parte va en `extra` (no es de ninguna prenda). Siempre: debe - aFavor = la cuenta de cuentas().
+  function deudas(calc) {
+    var r2 = function (n) { return Math.round(n * 100) / 100; };
+    var por = new Map();
+    var dato = function (vid) {
+      if (!por.has(vid)) por.set(vid, { vendedor: vid, ventas: [], pagos: [], aFavor: 0, extra: 0, sinPrecio: 0 });
+      return por.get(vid);
+    };
+    calc.ventas.forEach(function (v) {
+      if (v.propia) return;
+      var d = dato(v.vendedor);
+      d.ventas.push({ venta: v, tuParte: r2(v.importe - v.comision), pagado: 0 });
+      if (v.sinPrecio) d.sinPrecio++;
+    });
+    calc.pagos.forEach(function (p) { if (p.vendedor) dato(p.vendedor).pagos.push(p); });
+    var pagar = function (lista, resto) {
+      for (var i = 0; i < lista.length && resto > 0.004; i++) {
+        var q = Math.min(r2(lista[i].tuParte - lista[i].pagado), resto);
+        if (q > 0) { lista[i].pagado = r2(lista[i].pagado + q); resto = r2(resto - q); }
+      }
+      return resto;
+    };
+    por.forEach(function (d) {
+      var total = r2(d.pagos.reduce(function (a, p) { return a + p.importe; }, 0));
+      var aplicado = 0;
+      d.pagos.forEach(function (p) {
+        if (!p.sku || !(p.importe > 0)) return;
+        var sku = p.sku.toUpperCase();
+        var suyas = d.ventas.filter(function (x) { return x.venta.sku.toUpperCase() === sku; });
+        aplicado = r2(aplicado + p.importe - pagar(suyas, p.importe));
+      });
+      var bolsa = r2(total - aplicado);
+      if (bolsa >= 0) d.aFavor = pagar(d.ventas, bolsa);
+      else d.extra = -bolsa;
+      d.ventas.forEach(function (x) { x.pendiente = r2(x.tuParte - x.pagado); });
+      d.pendientes = d.ventas.filter(function (x) { return x.pendiente > 0.004; });
+      d.pendiente = r2(d.pendientes.reduce(function (a, x) { return a + x.pendiente; }, 0));
+      d.debe = r2(d.pendiente + d.extra);
+    });
+    return por;
+  }
+
+  return { num: num, comisionPct: comisionPct, calcular: calcular, cuentas: cuentas, deudas: deudas };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Calculo;

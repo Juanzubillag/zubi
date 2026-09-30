@@ -43,20 +43,82 @@ var Panel = (function () {
     return r;
   }
 
-  // Mensaje para recordar a un amigo lo que te debe, con sus ventas.
-  function mensajeDeuda(nombre, cuenta, ventas) {
-    var suyas = ventas.filter(function (v) { return v.vendedor === cuenta.vendedor; });
-    var lineas = suyas.slice(-12).map(function (v) {
-      return '· ' + v.prod.producto + ' ' + v.prod.modelo + ' (' + v.prod.talla + ')' +
-        (v.cantidad > 1 ? ' x' + v.cantidad : '') + ': ' + eur(v.importe) + (v.fecha ? ' — ' + v.fecha : '');
+  // Una línea por venta sin pagar: «13/08 · Zapatillas New Balance (42), la vendiste a 50,00 €: …».
+  var fechaCorta = function (f) { f = String(f || ''); return f ? f.slice(8, 10) + '/' + f.slice(5, 7) : ''; };
+  function lineaDeuda(x) {
+    var v = x.venta, p = v.prod;
+    return fechaCorta(v.fecha) + ' · ' + p.producto + ' ' + p.modelo + ' (' + p.talla + ')' + (v.cantidad > 1 ? ' ×' + v.cantidad : '') +
+      ', vendida a ' + eur(v.importe) + ': ' + (x.pagado > 0.004
+        ? 'me tocan ' + eur(x.tuParte) + ', ya me diste ' + eur(x.pagado) + ', faltan ' + eur(x.pendiente)
+        : 'me tocan ' + eur(x.pendiente));
+  }
+
+  // Mensaje para reclamar a un amigo lo que te debe: prenda a prenda, las más antiguas primero.
+  // `deuda` sale de Calculo.deudas().
+  function mensajeDeuda(nombre, deuda) {
+    var lista = deuda.pendientes || [];
+    var lineas = lista.slice(0, 15).map(function (x) { return '· ' + lineaDeuda(x); });
+    if (lista.length > 15) lineas.push('· …y ' + (lista.length - 15) + ' más');
+    if (deuda.extra > 0.004) lineas.push('· Ajuste apuntado aparte: ' + eur(deuda.extra));
+    return 'Hola ' + nombre + '. Te paso lo que tengo apuntado pendiente de pagarme:\n' +
+      lineas.join('\n') + '\n\n' +
+      'Total: ' + eur(deuda.debe) + (lista.length > 1 ? ' (' + lista.length + ' ventas)' : '') + '\n\n' +
+      '¿Cuándo te viene bien? ¡Gracias!';
+  }
+
+  // Lo que pide atención, de más a menos urgente. Cada aviso dice a qué pestaña lleva.
+  // nivel: 'mal' (dinero o un error), 'aviso' (hay que hacer algo) o 'info'.
+  function avisos(calc, deudas, fichas, nombres, hoy) {
+    var out = [];
+    var nombre = function (id) { return (nombres && nombres.get && nombres.get(id)) || id; };
+    deudas.forEach(function (d) {
+      if (!(d.debe >= 0.5)) return;
+      var vieja = d.pendientes.length ? diasDesde(d.pendientes[0].venta.fecha, hoy) : null;
+      out.push({ nivel: 'mal', peso: d.debe, vista: 'cuentas', vendedor: d.vendedor,
+        texto: nombre(d.vendedor) + ' te debe ' + eur(d.debe) +
+          (d.pendientes.length ? ' por ' + d.pendientes.length + (d.pendientes.length === 1 ? ' prenda' : ' prendas') : '') +
+          (vieja != null && vieja > 0 ? ' (la más antigua, hace ' + vieja + (vieja === 1 ? ' día)' : ' días)') : '') });
     });
-    return 'Hola ' + nombre + '. Te paso las cuentas de lo que has vendido:\n' +
-      lineas.join('\n') + (suyas.length > 12 ? '\n· …y ' + (suyas.length - 12) + ' más' : '') + '\n\n' +
-      'Vendido: ' + eur(cuenta.bruto) + '\n' +
-      'Tu comisión: ' + eur(cuenta.comision) + '\n' +
-      'Me has pagado: ' + eur(cuenta.liquidado) + '\n' +
-      'Te queda por pagarme: ' + eur(Math.max(0, cuenta.pendiente)) + '\n\n' +
-      '¡Gracias!';
+    var negativas = calc.prods.filter(function (p) { return p.disponible < 0; });
+    if (negativas.length) {
+      out.push({ nivel: 'mal', peso: 0, vista: 'stock', filtro: 'agotado',
+        texto: negativas.length + (negativas.length === 1 ? ' talla tiene' : ' tallas tienen') + ' más vendido que comprado: revisa los apuntes (' +
+          negativas.slice(0, 3).map(function (p) { return p.sku; }).join(', ') + ')' });
+    }
+    (fichas || []).forEach(function (f) {
+      if (f.paradas) out.push({ nivel: 'aviso', peso: f.paradas, vista: 'reparto', vendedor: f.id,
+        texto: f.nombre + ' tiene ' + f.paradas + (f.paradas === 1 ? ' prenda parada' : ' prendas paradas') + ' (3 semanas o más sin venderse): pídeselas o bájales el precio' });
+    });
+    var sinPrecio = calc.ventas.filter(function (v) { return v.sinPrecio; }).length;
+    if (sinPrecio) out.push({ nivel: 'aviso', peso: sinPrecio, vista: 'movimientos', tipo: 'VENTA',
+      texto: sinPrecio + (sinPrecio === 1 ? ' venta sin precio: cuenta 0 €' : ' ventas sin precio: cuentan 0 €') + ' hasta que lo pongas' });
+    var agotadas = calc.prods.filter(function (p) { return p.inicial > 0 && p.disponible === 0; });
+    if (agotadas.length) out.push({ nivel: 'info', peso: agotadas.length, vista: 'pedido',
+      texto: agotadas.length + (agotadas.length === 1 ? ' talla agotada' : ' tallas agotadas') + ': mira en Segundo pedido si vale la pena volver a pedirlas' });
+    var reservadas = calc.prods.reduce(function (a, p) { return a + p.reservado; }, 0);
+    if (reservadas) out.push({ nivel: 'info', peso: reservadas, vista: 'stock', filtro: 'reservado',
+      texto: reservadas + (reservadas === 1 ? ' prenda reservada' : ' prendas reservadas') + ' sin vender todavía' });
+    var ultima = calc.ventas.reduce(function (a, v) { return v.fecha > a ? v.fecha : a; }, '');
+    var parado = ultima ? diasDesde(ultima, hoy) : null;
+    if (parado != null && parado >= 7) out.push({ nivel: 'info', peso: parado, vista: 'resumen',
+      texto: 'Llevas ' + parado + ' días sin apuntar ninguna venta' });
+    var orden = { mal: 0, aviso: 1, info: 2 };
+    return out.sort(function (a, b) { return orden[a.nivel] - orden[b.nivel] || b.peso - a.peso; });
+  }
+
+  // Cuánto se vende: hoy, los últimos 7 días, los 7 de antes y lo que va de mes.
+  function ritmo(ventas, hoy) {
+    var h = dia(hoy);
+    var menos = function (n) { return dia(new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - n)); };
+    var suma = function (desde, hasta) {
+      var r = { importe: 0, uds: 0 };
+      ventas.forEach(function (v) {
+        var f = String(v.fecha).slice(0, 10);
+        if (f >= desde && f <= hasta) { r.importe += v.importe; r.uds += v.cantidad; }
+      });
+      return r;
+    };
+    return { hoy: suma(h, h), semana: suma(menos(6), h), semanaAntes: suma(menos(13), menos(7)), mes: suma(h.slice(0, 8) + '01', h) };
   }
 
   // Enlace de WhatsApp. Con teléfono va directo a su chat (se le añade el 34 si es un móvil
@@ -263,7 +325,8 @@ var Panel = (function () {
 
   return { resumen: resumen, mensajeDeuda: mensajeDeuda, enlaceWhatsApp: enlaceWhatsApp, idPeticion: idPeticion, eur: eur,
     ventasPorDia: ventasPorDia, ventasPor: ventasPor, stockPorCategoria: stockPorCategoria,
-    fichas: fichas, rotacion: rotacion, recuento: recuento, textoRecuento: textoRecuento, diasDesde: diasDesde, DIAS_PARADA: DIAS_PARADA };
+    fichas: fichas, rotacion: rotacion, recuento: recuento, textoRecuento: textoRecuento, diasDesde: diasDesde, DIAS_PARADA: DIAS_PARADA,
+    lineaDeuda: lineaDeuda, avisos: avisos, ritmo: ritmo, fechaCorta: fechaCorta };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Panel;

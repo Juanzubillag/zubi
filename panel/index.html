@@ -24,16 +24,17 @@
     --r: 12px;
   }
   * { box-sizing: border-box; }
-  html, body { background: var(--fondo); }
+  html { background: var(--fondo); }
+  body { background: transparent; }   /* el fondo va en html: así la cuadrícula (z-index -1) se ve */
   body { margin: 0; color: var(--tinta); font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-text-size-adjust: 100%; min-height: 100vh; }
-  .fondo { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  .fondo { position: fixed; inset: 0; pointer-events: none; z-index: -1;
     background:
       radial-gradient(1200px 600px at 75% -10%, rgba(53, 201, 238, .10), transparent 60%),
       linear-gradient(var(--linea) 1px, transparent 1px) 0 0 / 44px 44px,
       linear-gradient(90deg, var(--linea) 1px, transparent 1px) 0 0 / 44px 44px;
     opacity: .55; mask-image: linear-gradient(#000, rgba(0,0,0,.25)); }
-  .wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding-inline: 16px; }
+  .wrap { position: relative; max-width: 1440px; margin: 0 auto; padding-inline: 16px; }
   h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
   [hidden] { display: none !important; }
@@ -66,7 +67,7 @@
   .btn:disabled { opacity: .5; cursor: default; }
   nav { display: flex; gap: 2px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
   nav::-webkit-scrollbar { display: none; }
-  nav button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; color: var(--suave);
+  nav button { display: inline-flex; align-items: center; flex: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; color: var(--suave);
     cursor: pointer; white-space: nowrap; font-family: var(--hud); font-size: 14px; letter-spacing: .04em; }
   nav button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--cian); text-shadow: 0 0 12px rgba(53,201,238,.5); }
 
@@ -89,9 +90,9 @@
   .entrar input { padding: 11px 12px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--fondo); font-size: 16px; }
   .entrar .err { color: var(--mal); font-size: 14px; min-height: 20px; }
 
-  /* ---- rejilla: vistas + consola ---- */
-  .rejilla { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 18px; align-items: start; }
-  @media (max-width: 1000px) { .rejilla { grid-template-columns: minmax(0, 1fr); } .consola { order: -1; } }
+  /* ---- las vistas ocupan todo el ancho: JARVIS flota encima ---- */
+  .rejilla { display: block; }
+  main { padding-bottom: 110px; }   /* sitio para la bolita de JARVIS */
 
   /* ---- mando ---- */
   .mando-top { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; }
@@ -100,7 +101,8 @@
   .reactor svg { width: 190px; max-width: 100%; height: auto; overflow: visible; }
   .reactor .pct { font-family: var(--display); font-weight: 800; fill: var(--tinta); }
   .reactor .d { color: var(--suave); font-size: 13px; }
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .tile { padding: 14px 16px; }
   .tile .v { font-family: var(--hud); font-size: 26px; font-weight: 700; margin-top: 2px; letter-spacing: -.01em; }
   .tile .d { font-size: 12.5px; color: var(--suave); margin-top: 2px; }
@@ -122,13 +124,30 @@
   #tip { position: fixed; z-index: 50; pointer-events: none; background: #02070b; border: 1px solid var(--linea-2); color: var(--tinta);
     padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: var(--hud); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
 
-  /* ---- tablas ---- */
-  .tabla { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  /* ---- tablas ----
+     Cada tabla va en su propio marco, como mucho del alto de la pantalla: la barra para ir a
+     los lados queda siempre a la vista (no hay que bajar al final), la cabecera no se va al
+     bajar y, en las anchas (.fija), la primera columna se queda quieta al ir a la derecha. */
+  .tabla { overflow: auto; max-height: calc(100vh - 190px); overscroll-behavior-x: contain; scrollbar-color: var(--cian-hondo) transparent; }
+  .tabla::-webkit-scrollbar { height: 12px; width: 10px; }
+  .tabla::-webkit-scrollbar-thumb { background: var(--cian-hondo); border-radius: 8px; border: 3px solid transparent; background-clip: padding-box; }
+  .tabla::-webkit-scrollbar-thumb:hover { background-color: var(--cian); }
+  .tabla.desborda { box-shadow: inset -26px 0 20px -20px rgba(53, 201, 238, .45); }
+  .grafica .tabla { max-height: 320px; }
+  table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 14px; }
   th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--linea); white-space: nowrap; vertical-align: middle; }
   th { font-family: var(--hud); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--suave); font-weight: 600; }
+  .tabla thead th { position: sticky; top: 0; z-index: 2; background: #0c1822; box-shadow: 0 1px 0 var(--linea-2); }
+  table.fija td:first-child, table.fija th:first-child { position: sticky; left: 0; z-index: 1; background: #0b1620;
+    box-shadow: 1px 0 0 var(--linea); }
+  table.fija thead th:first-child { z-index: 3; background: #0c1822; }
+  td.envuelve { white-space: normal; min-width: 150px; }
+  th.ordena { cursor: pointer; user-select: none; }
+  th.ordena:hover { color: var(--tinta); }
+  th.ordena[aria-sort="descending"]::after { content: " ↓"; color: var(--cian); }
+  th.ordena[aria-sort="ascending"]::after { content: " ↑"; color: var(--cian); }
   tbody tr:last-child td { border-bottom: 0; }
-  tbody tr:hover td { background: rgba(53, 201, 238, .04); }
+  tbody tr:hover td { background-color: #102230; }
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   td.cero { color: var(--tenue); } td.neg { color: var(--mal); font-weight: 700; } td.hay { color: var(--bien); font-weight: 650; }
   tr.grupo td { color: var(--cian); font-family: var(--hud); font-weight: 600; font-size: 13px; letter-spacing: .03em; }
@@ -146,6 +165,7 @@
   .vend h3 span { color: var(--suave); font-weight: 500; font-size: 13.5px; }
   .vend ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
   .vend li { display: flex; justify-content: space-between; gap: 10px; }
+  .vend li > b, .vend li > span:last-child:not(:first-child) { flex: none; white-space: nowrap; }
 
   .vend .cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 10px; }
   .vend .cab h3 { display: block; }
@@ -177,6 +197,55 @@
   .barrita i { display: block; height: 100%; background: var(--serie); }
   .ped-cab select { padding: 4px 8px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--panel); }
 
+  /* ---- pestañas con número (a quién cobrar, prendas paradas) ---- */
+  .insignia { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 6px; border-radius: 999px; font-size: 11px;
+    line-height: 18px; text-align: center; background: rgba(255, 138, 128, .16); color: var(--mal); font-weight: 700; }
+  .insignia.aviso { background: rgba(240, 180, 90, .15); color: var(--aviso); }
+
+  /* ---- mando: para hoy y ritmo ---- */
+  .dos-col { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+  @media (max-width: 900px) { .dos-col { grid-template-columns: minmax(0, 1fr); } }
+  .avisos { padding: 8px 6px; }
+  .avisos button { display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left; background: none; border: 0;
+    border-radius: 8px; padding: 9px 10px; cursor: pointer; font-size: 14.5px; line-height: 1.35; }
+  .avisos button:hover { background: rgba(53, 201, 238, .07); }
+  .avisos .ico { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800;
+    font-family: var(--hud); margin-top: -1px; }
+  .avisos .mal .ico { background: rgba(255, 138, 128, .16); color: var(--mal); }
+  .avisos .aviso-n .ico { background: rgba(240, 180, 90, .16); color: var(--aviso); }
+  .avisos .info .ico { background: rgba(53, 201, 238, .13); color: var(--cian); }
+  .avisos .ir { margin-left: auto; color: var(--tenue); font-family: var(--hud); font-size: 12.5px; white-space: nowrap; padding-left: 8px; }
+  .avisos .nada { color: var(--bien); padding: 10px; font-size: 14.5px; }
+  .ritmo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 480px) { .ritmo { grid-template-columns: minmax(0, 1fr); } }
+  .sube { color: var(--bien); } .baja { color: var(--mal); }
+
+  /* ---- cuentas: una ficha de cobro por amigo ---- */
+  .cobros-cab { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: baseline; padding: 14px 18px; margin-bottom: 12px; }
+  .cobros-cab .grande { font-family: var(--hud); font-size: 28px; font-weight: 700; color: var(--mal); }
+  .cobros { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; align-items: start; }
+  .cobro { padding: 14px 16px; }
+  .cobro.al-dia { opacity: .82; }
+  .cobro h3 { font-family: var(--hud); font-size: 17px; }
+  .cobro .cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 10px; }
+  .cobro .cab h3 span { color: var(--suave); font-weight: 500; font-size: 13.5px; }
+  .cifras { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 10px 0 2px; font-size: 13px; color: var(--suave); }
+  .cifras b { color: var(--tinta); font-family: var(--hud); font-weight: 600; }
+  .cifras .falta b { color: var(--mal); }
+  .sin-pagar { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; }
+  .sin-pagar li { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto auto; gap: 10px; align-items: center;
+    padding: 7px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .sin-pagar li:last-child { border-bottom: 0; }
+  .sin-pagar .cuando { font-family: var(--hud); font-size: 13px; line-height: 1.2; white-space: nowrap; }
+  .sin-pagar .cuando small, .sin-pagar .que small { display: block; color: var(--tenue); font-size: 12px; }
+  .sin-pagar .cuando.vieja small { color: var(--aviso); }
+  .sin-pagar .que { min-width: 0; overflow-wrap: anywhere; line-height: 1.3; }
+  .sin-pagar .falta { font-family: var(--hud); font-weight: 700; color: var(--mal); white-space: nowrap; }
+  .btn.mini { padding: 3px 9px; font-size: 12.5px; }
+  .mas { color: var(--suave); font-size: 13px; padding-top: 6px; }
+  .mas-cobros summary { cursor: pointer; color: var(--cian); font-family: var(--hud); font-size: 13px; padding: 8px 0 2px; }
+  @media (max-width: 480px) { .avisos .ir { display: none; } .sin-pagar li { grid-template-columns: 58px minmax(0, 1fr) auto; } .sin-pagar li .btn { grid-column: 2 / -1; justify-self: start; } }
+
   /* ---- apuntar ---- */
   .form { padding: 18px; display: grid; gap: 14px; max-width: 660px; }
   .campo { display: grid; gap: 5px; }
@@ -191,25 +260,51 @@
   .webs-barra .btn[aria-pressed="true"] { border-color: var(--cian); background: rgba(53, 201, 238, .18); }
   .marco { width: 100%; height: 72vh; border: 1px solid var(--linea-2); border-radius: var(--r); background: #fff; }
 
-  /* ---- consola JARVIS ---- */
-  .consola { position: sticky; top: 118px; display: flex; flex-direction: column; height: calc(100vh - 140px); min-height: 460px; }
+  /* ---- JARVIS: una bolita (el reactor) que abre la consola flotante ---- */
+  .orbe { position: fixed; z-index: 46; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    width: 68px; height: 68px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+    background: radial-gradient(circle, #071722 52%, #02070b 100%);
+    box-shadow: 0 0 0 1px rgba(53, 201, 238, .4), 0 12px 32px rgba(0, 0, 0, .65);
+    display: grid; place-items: center; transition: transform .2s ease; }
+  .orbe:hover { transform: scale(1.08); }
+  .orbe:active { transform: scale(.96); }
+  .orbe > span { position: absolute; border-radius: 50%; pointer-events: none; }
+  .orbe-halo { inset: -5px; box-shadow: 0 0 24px 2px rgba(53, 201, 238, .5); animation: latido 3s ease-in-out infinite; }
+  .orbe-anillo.uno { inset: 6px; border: 2px solid transparent; border-top-color: var(--cian); border-bottom-color: rgba(53, 201, 238, .45);
+    animation: gira 3.4s linear infinite; }
+  .orbe-anillo.dos { inset: 13px; border: 2px dashed rgba(53, 201, 238, .5); animation: gira 9s linear infinite reverse; }
+  .orbe-nucleo { width: 22px; height: 22px;
+    background: radial-gradient(circle, #eafcff 0 24%, var(--cian) 46%, rgba(53, 201, 238, .18) 70%, transparent 72%);
+    box-shadow: 0 0 18px var(--cian); animation: latido 3s ease-in-out infinite; }
+  .orbe-aviso { top: 3px; right: 3px; width: 15px; height: 15px; background: var(--mal); border: 2px solid var(--fondo);
+    box-shadow: 0 0 10px var(--mal); }
+  .orbe.piensa .orbe-anillo.uno { animation-duration: .8s; }
+  .orbe.piensa .orbe-anillo.dos { animation-duration: 2s; }
+  .orbe.piensa .orbe-halo { animation-duration: 1s; }
+  .orbe.abierto .orbe-anillo.uno { border-left-color: var(--cian); border-right-color: var(--cian); }
+  .orbe-hola { position: fixed; z-index: 46; right: 104px; bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    background: var(--panel-2); border: 1px solid var(--linea-2); border-radius: 12px 12px 4px 12px; padding: 8px 12px;
+    font-family: var(--hud); font-size: 13.5px; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); animation: aparece .35s ease both; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  @keyframes latido { 50% { opacity: .5; transform: scale(.9); } }
+  @keyframes aparece { from { opacity: 0; transform: translateY(8px); } }
+
+  .consola { position: fixed; z-index: 45; right: 24px; bottom: calc(106px + env(safe-area-inset-bottom, 0px));
+    width: min(430px, calc(100vw - 32px)); height: min(640px, calc(100vh - 150px));
+    display: flex; flex-direction: column; background: var(--panel);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .7), 0 0 0 1px var(--linea-2), 0 0 40px rgba(53, 201, 238, .08);
+    transform-origin: calc(100% - 34px) calc(100% + 48px); transform: scale(.35); opacity: 0; visibility: hidden;
+    transition: transform .22s ease, opacity .18s ease, visibility 0s .22s; }
+  .consola.abierta { transform: none; opacity: 1; visibility: visible; transition: transform .22s ease, opacity .18s ease; }
   .consola-cab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--linea); }
-  #j-cerrar, #j-abrir { display: none; }
-  /* En el móvil, JARVIS es un botón flotante que abre la consola desde abajo. */
-  @media (max-width: 1000px) {
-    .consola { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; top: auto; height: min(82vh, 640px); min-height: 0;
-      border-radius: 18px 18px 0 0; background: var(--panel); box-shadow: 0 -12px 40px rgba(0, 0, 0, .6);
-      transform: translateY(105%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s;
-      padding-bottom: env(safe-area-inset-bottom, 0px); }
-    .consola.abierta { transform: none; visibility: visible; transition: transform .25s ease; }
-    #j-cerrar { display: inline-flex; margin-left: 6px; }
-    #j-voz { margin-left: auto; }
-    #j-abrir { display: flex; position: fixed; z-index: 35; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-      align-items: center; gap: 10px; padding: 10px 16px 10px 10px; border-radius: 999px; border: 1px solid var(--cian);
-      background: rgba(5, 11, 16, .92); color: var(--tinta); font-family: var(--display); letter-spacing: .18em; font-size: 13px;
-      cursor: pointer; box-shadow: 0 0 22px rgba(53, 201, 238, .35); }
-    #j-abrir .reactor-mini { width: 26px; height: 26px; }
-    main { padding-bottom: 96px; }
+  /* En el móvil la consola sube desde abajo y la bolita se aparta mientras está abierta. */
+  @media (max-width: 640px) {
+    .orbe { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 60px; height: 60px; }
+    .orbe.abierto { display: none; }
+    .orbe-hola { right: 88px; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+    .consola { left: 0; right: 0; bottom: 0; width: auto; height: min(86vh, 700px); border-radius: 18px 18px 0 0;
+      transform: translateY(105%); opacity: 1; transform-origin: center bottom; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .consola.abierta { transform: none; }
   }
   .ojo { width: 14px; height: 14px; border-radius: 50%; background: var(--cian); box-shadow: 0 0 14px var(--cian); flex: none; }
   .ojo.piensa { animation: late 1s ease-in-out infinite; }
@@ -266,8 +361,8 @@
     <nav role="tablist" id="pestanas" hidden>
       <button role="tab" data-vista="resumen" aria-selected="true">Mando</button>
       <button role="tab" data-vista="stock" aria-selected="false">Stock</button>
-      <button role="tab" data-vista="reparto" aria-selected="false">Amigos</button>
-      <button role="tab" data-vista="cuentas" aria-selected="false">Cuentas</button>
+      <button role="tab" data-vista="reparto" aria-selected="false">Amigos<span class="insignia aviso" id="ins-reparto" hidden></span></button>
+      <button role="tab" data-vista="cuentas" aria-selected="false">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
       <button role="tab" data-vista="movimientos" aria-selected="false">Movimientos</button>
       <button role="tab" data-vista="apuntar" aria-selected="false">Apuntar</button>
       <button role="tab" data-vista="recuento" aria-selected="false">Contar la caja</button>
@@ -302,16 +397,17 @@
             <option value="reservado">Con reservas</option>
           </select>
         </div>
-        <div class="tabla caja"><table id="t-stock"></table></div>
+        <div class="tabla caja"><table class="fija" id="t-stock"></table></div>
       </section>
       <section id="v-reparto" hidden></section>
       <section id="v-cuentas" hidden></section>
       <section id="v-movimientos" hidden>
         <div class="filtros">
+          <input type="search" id="mov-q" placeholder="Buscar: prenda, talla, canal, notas…" autocomplete="off">
           <select id="mov-tipo"><option value="">Todos los tipos</option></select>
           <select id="mov-vend"><option value="">Todos los vendedores</option></select>
         </div>
-        <div class="tabla caja"><table id="t-mov"></table></div>
+        <div class="tabla caja"><table class="fija" id="t-mov"></table></div>
       </section>
       <section id="v-apuntar" hidden>
         <div id="apuntar-msg" hidden></div>
@@ -358,7 +454,7 @@
           </div>
           <div id="rec-msg" hidden></div>
         </div>
-        <div class="tabla caja"><table id="t-rec"></table></div>
+        <div class="tabla caja"><table class="fija" id="t-rec"></table></div>
       </section>
       <section id="v-pedido" hidden></section>
       <section id="v-webs" hidden>
@@ -399,7 +495,11 @@
       <div class="j-pie" id="j-gasto"></div>
     </aside>
   </div>
-  <button type="button" id="j-abrir" aria-controls="consola" aria-expanded="false" hidden><span class="reactor-mini" aria-hidden="true"></span>JARVIS</button>
+  <button type="button" class="orbe" id="j-abrir" aria-controls="consola" aria-expanded="false" aria-label="Abrir JARVIS" title="JARVIS" hidden>
+    <span class="orbe-halo"></span><span class="orbe-anillo uno"></span><span class="orbe-anillo dos"></span>
+    <span class="orbe-nucleo"></span><span class="orbe-aviso" id="j-nuevo" hidden></span>
+  </button>
+  <div class="orbe-hola" id="j-hola" hidden>¿Te ayudo? Pulsa y pregúntame.</div>
 </main>
 <div id="tip" hidden></div>
 
@@ -468,6 +568,8 @@
       S.resumen = Panel.resumen(S.calc, S.cuentas, j.config);
       S.nombre = new Map((j.vendedores || []).map((v) => [String(v.id).toUpperCase(), v.nombre || v.id]));
       S.contactos = j.contactos || {};
+      S.deudas = Calculo.deudas(S.calc);
+      S.fichas = Panel.fichas(S.calc, S.cuentas, j.movimientos || [], j.vendedores, S.contactos, new Date());
       ultimaCarga = Date.now();
       aviso('');
       pintarTodo();
@@ -480,6 +582,10 @@
     }
   }
   const nombreDe = (vid) => S.nombre.get(vid) || vid || '—';
+  const SIN_DEUDA = { pendientes: [], pendiente: 0, debe: 0, aFavor: 0, extra: 0, sinPrecio: 0 };
+  const deudaDe = (vid) => (S.deudas && S.deudas.get(vid)) || SIN_DEUDA;
+  const prendaDe = (p) => `${p.producto} — ${p.modelo} (${p.talla})`;
+  const diasAtras = (f) => Panel.diasDesde(f, new Date());
 
   // ---- Gráficas (SVG a mano: marcas finas, extremos redondeados, huecos de 2px) ----
   const barraV = (x, y, w, h) => {   // columna con las esquinas de arriba redondeadas
@@ -579,8 +685,18 @@
     const dias = Panel.ventasPorDia(S.calc.ventas, 30, new Date());
     const A = anchoVistas(), ancha = A - 34, media = A >= 672 ? Math.floor((A - 12) / 2) - 34 : ancha;
     anchoPintado = A;
+    const rt = Panel.ritmo(S.calc.ventas, new Date());
+    const cambio = rt.semanaAntes.importe > 0 ? Math.round((rt.semana.importe / rt.semanaAntes.importe - 1) * 100) : null;
+    const uds = (n) => `${n} ${n === 1 ? 'prenda' : 'prendas'}`;
+    const lista = Panel.avisos(S.calc, S.deudas, S.fichas, S.nombre, new Date());
+    const IR = { cuentas: 'Cuentas', reparto: 'Amigos', stock: 'Stock', pedido: 'Segundo pedido', movimientos: 'Movimientos', resumen: '' };
+    const avisosHtml = lista.length ? lista.slice(0, 8).map((a) => `<button type="button" class="${a.nivel === 'aviso' ? 'aviso-n' : a.nivel}"
+        data-ir="${a.vista}"${a.filtro ? ` data-filtro="${a.filtro}"` : ''}${a.tipo ? ` data-tipo="${a.tipo}"` : ''}>
+        <span class="ico" aria-hidden="true">${a.vista === 'cuentas' ? '€' : a.nivel === 'info' ? 'i' : '!'}</span>
+        <span>${esc(a.texto)}</span>${IR[a.vista] ? `<span class="ir">${IR[a.vista]} →</span>` : ''}</button>`).join('') +
+        (lista.length > 8 ? `<div class="mas" style="padding:4px 10px">…y ${lista.length - 8} ${lista.length - 8 === 1 ? 'aviso más' : 'avisos más'}</div>` : '')
+      : '<div class="nada">✓ Nada pendiente: nadie te debe, no hay prendas paradas ni errores.</div>';
     el('v-resumen').innerHTML = `
-      ${r.ventasSinPrecio ? `<div class="aviso">Hay ${r.ventasSinPrecio} ${r.ventasSinPrecio === 1 ? 'venta' : 'ventas'} sin precio: cuentan 0 € hasta que lo pongas.</div>` : ''}
       <div class="mando-top">
         <div class="reactor caja">
           <div class="etq">Recuperado del pedido</div>
@@ -605,6 +721,21 @@
           <div class="tile caja"><div class="etq">Disponibles</div><div class="v">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
           <div class="tile caja"><div class="etq">Vendidas</div><div class="v">${r.vendidas}</div><div class="d">${r.reservadas} reservadas</div></div>
           <div class="tile caja"><div class="etq">En casa de tus amigos</div><div class="v">${r.enLaCalle}</div><div class="d">prendas en consigna</div></div>
+        </div>
+      </div>
+      <div class="dos-col">
+        <div>
+          <h2 class="sec">Para hoy</h2>
+          <div class="avisos caja" id="avisos">${avisosHtml}</div>
+        </div>
+        <div>
+          <h2 class="sec">Ritmo de ventas</h2>
+          <div class="ritmo">
+            <div class="tile caja"><div class="etq">Hoy</div><div class="v">${eur(rt.hoy.importe)}</div><div class="d">${uds(rt.hoy.uds)}</div></div>
+            <div class="tile caja"><div class="etq">Últimos 7 días</div><div class="v">${eur(rt.semana.importe)}</div>
+              <div class="d">${cambio == null ? uds(rt.semana.uds) : `<span class="${cambio >= 0 ? 'sube' : 'baja'}">${cambio >= 0 ? '↑' : '↓'} ${Math.abs(cambio)} %</span> frente a los 7 de antes`}</div></div>
+            <div class="tile caja"><div class="etq">Este mes</div><div class="v">${eur(rt.mes.importe)}</div><div class="d">${uds(rt.mes.uds)}</div></div>
+          </div>
         </div>
       </div>
       <h2 class="sec">Estadísticas</h2>
@@ -642,11 +773,10 @@
   }
 
   // ---- Amigos: la ficha de cada uno ----
-  const fechaCorta = (f) => String(f || '').slice(8, 10) + '/' + String(f || '').slice(5, 7);
+  const fechaCorta = (f) => esc(String(f || '').slice(8, 10) + '/' + String(f || '').slice(5, 7));   // de la hoja: siempre escapado
   const hace = (d) => (d == null ? '' : d === 0 ? 'hoy' : d === 1 ? 'ayer' : 'hace ' + d + ' días');
   function pintarReparto() {
-    const fichas = Panel.fichas(S.calc, S.cuentas, DATOS.movimientos || [], DATOS.vendedores, S.contactos, new Date())
-      .filter((f) => !f.propio || f.uds || f.udsEnCasa);
+    const fichas = S.fichas.filter((f) => !f.propio || f.uds || f.udsEnCasa);
     el('v-reparto').innerHTML = fichas.length ? `<div class="vendedores">${fichas.map((f) => {
       const debe = !f.propio && f.pendiente > 0.005;
       const chips = [
@@ -668,13 +798,20 @@
       const acciones = [
         debe ? `<button class="btn primario" type="button" data-pago="${esc(f.id)}" data-importe="${f.pendiente.toFixed(2)}">Registrar pago</button>` : '',
         debe ? `<a class="btn wa" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto,
-          Panel.mensajeDeuda(f.nombre, { vendedor: f.id, bruto: f.bruto, comision: f.comision, liquidado: f.liquidado, pendiente: f.pendiente }, S.calc.ventas)))}">Recordar por WhatsApp</a>`
+          Panel.mensajeDeuda(f.nombre, deudaDe(f.id))))}">Recordar por WhatsApp</a>`
           : !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto, 'Hola ' + f.nombre + ', '))}">WhatsApp</a>` : '',
         f.propio ? '' : `<button class="btn" type="button" data-jarvis="${esc('¿Cómo va ' + f.nombre + '? Qué ha vendido, qué tiene en casa y qué me debe.')}">Preguntar a JARVIS</button>`,
       ].join('');
       return `<div class="vend caja">
         <div class="cab"><h3>${esc(f.nombre)} <span class="suave">${esc(f.id)}${tel ? ' · ' + esc(f.contacto) : ''}</span></h3><div class="chips">${chips}</div></div>
         <div class="datos">${datos.map(([k, v]) => `<div><div class="etq">${k}</div><b>${esc(v)}</b></div>`).join('')}</div>
+        ${(() => {
+          const dd = deudaDe(f.id);
+          if (f.propio || !dd.pendientes.length) return '';
+          return `<h4>Te debe por</h4><ul>${dd.pendientes.slice(0, 4).map((x) => `<li><span>${fechaCorta(x.venta.fecha)} · ${esc(x.venta.prod.producto)} (${esc(x.venta.prod.talla)})${x.venta.cantidad > 1 ? ' ×' + x.venta.cantidad : ''}</span><b style="color:var(--mal)">${eur(x.pendiente)}</b></li>`).join('')}</ul>
+            ${dd.pendientes.length > 4 ? `<div class="mas">…y ${dd.pendientes.length - 4} más.</div>` : ''}
+            <button class="btn mini" type="button" data-ir="cuentas" style="margin-top:8px">Ver todo en Cuentas →</button>`;
+        })()}
         ${f.enCasa.length ? `<h4>En su casa</h4><ul>${f.enCasa.map((x) => `<li><span>${esc(x.prod.producto)} — ${esc(x.prod.modelo)} (${esc(x.prod.talla)})${x.n > 1 ? ' ×' + x.n : ''}</span>
           <span class="${x.dias != null && x.dias >= Panel.DIAS_PARADA ? 'parada' : 'suave'}" title="${x.desde ? 'Desde el ' + esc(x.desde) : ''}">${x.dias == null ? '' : x.dias === 0 ? 'hoy' : x.dias + ' d'}</span></li>`).join('')}</ul>` : ''}
         ${f.ventas.length ? `<h4>Últimas ventas</h4><ul>${f.ventas.slice(0, 4).map((v) => `<li><span>${fechaCorta(v.fecha)} · ${esc(v.prod.producto)} (${esc(v.prod.talla)})${v.cantidad > 1 ? ' ×' + v.cantidad : ''}</span><b>${v.sinPrecio ? 'sin precio' : eur(v.importe)}</b></li>`).join('')}</ul>` : ''}
@@ -783,6 +920,7 @@
 
   // ---- Segundo pedido ----
   let SEMANAS = 8;
+  let ORDEN_PED = { col: 'ritmo', dir: -1 };
   function pintarPedido() {
     const R = Panel.rotacion(S.calc, DATOS.movimientos || [], DATOS.config || {}, new Date(), SEMANAS);
     const con = R.productos.filter((x) => x.vendidas > 0), sin = R.productos.filter((x) => !x.vendidas);
@@ -790,6 +928,16 @@
       el('v-pedido').innerHTML = '<div class="vacia">Cuando empiecen las ventas, aquí verás qué se vende más rápido, cuánto ganas con cada prenda y cuánto volver a pedir.</div>';
       return;
     }
+    // Se ordena pulsando la cabecera (por defecto, lo que más rápido se vende arriba).
+    const orden = (lista) => lista.slice().sort((a, b) => {
+      const k = ORDEN_PED.col, va = a[k], vb = b[k];
+      if (k === 'producto') return ORDEN_PED.dir * (a.producto + a.modelo).localeCompare(b.producto + b.modelo, 'es');
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      return ORDEN_PED.dir * (va - vb);
+    });
+    con.splice(0, con.length, ...orden(con));
     const total = con.reduce((a, x) => a + x.sugerido, 0);
     const coste = con.reduce((a, x) => a + x.sugerido * x.coste, 0);
     const semanasTxt = R.semanas.toLocaleString('es-ES', { maximumFractionDigits: 1 });
@@ -799,8 +947,11 @@
       <td class="n">${x.ritmo ? x.ritmo.toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '—'}</td><td class="n">${x.quedan}</td>
       <td class="n">${x.semanasDeStock == null ? '—' : x.semanasDeStock >= 52 ? '+1 año' : Math.round(x.semanasDeStock) + ' sem'}</td>
       <td class="n ${x.gananciaUd != null && x.gananciaUd < 0 ? 'neg' : ''}">${x.gananciaUd == null ? '—' : eur(x.gananciaUd)}</td>
-      <td>${esc(x.tallasTop.slice(0, 4).map((t) => t.talla + ' (' + t.vendidas + ')').join(', ')) || '—'}</td></tr>`;
-    const cab = '<thead><tr><th>Prenda</th><th class="n">Pedir</th><th class="n">Vendidas</th><th class="n">Del lote</th><th class="n">Por semana</th><th class="n">Quedan</th><th class="n">Te dura</th><th class="n">Ganas por prenda</th><th>Tallas que más salen</th></tr></thead>';
+      <td class="envuelve">${esc(x.tallasTop.slice(0, 4).map((t) => t.talla + ' (' + t.vendidas + ')').join(', ')) || '—'}</td></tr>`;
+    const COLS = [['producto', 'Prenda', ''], ['sugerido', 'Pedir', 'n'], ['vendidas', 'Vendidas', 'n'], ['pctVendido', 'Del lote', 'n'],
+      ['ritmo', 'Por semana', 'n'], ['quedan', 'Quedan', 'n'], ['semanasDeStock', 'Te dura', 'n'], ['gananciaUd', 'Ganas por prenda', 'n']];
+    const cab = `<thead><tr>${COLS.map(([k, t, c]) => `<th class="ordena${c ? ' ' + c : ''}" data-orden="${k}" tabindex="0"
+      aria-sort="${ORDEN_PED.col === k ? (ORDEN_PED.dir < 0 ? 'descending' : 'ascending') : 'none'}" title="Ordenar por ${t.toLowerCase()}">${t}</th>`).join('')}<th>Tallas que más salen</th></tr></thead>`;
     el('v-pedido').innerHTML = `<div class="rec-cab caja ped-cab">
         <p>Llevas ${semanasTxt} semanas vendiendo (desde el ${fechaCorta(R.inicio)}). Para tener prenda
           <select id="ped-semanas" aria-label="Semanas">${[4, 8, 12].map((n) => `<option value="${n}"${n === SEMANAS ? ' selected' : ''}>${n} semanas</option>`).join('')}</select>
@@ -809,49 +960,97 @@
           (${eur(R.envioUd)}). Es una guía: pregúntale a JARVIS antes de decidir.</p>
         <div class="acciones"><button class="btn" type="button" data-jarvis="Ayúdame con el segundo pedido: ¿qué se vende mejor, qué tallas y qué no volvería a pedir?">Preguntar a JARVIS</button></div>
       </div>
-      <div class="tabla caja"><table>${cab}<tbody>${con.map(fila).join('')}</tbody></table></div>
+      <div class="tabla caja"><table class="fija">${cab}<tbody>${con.map(fila).join('')}</tbody></table></div>
       ${sin.length ? `<details style="margin-top:12px"><summary class="suave" style="cursor:pointer">Sin ventas todavía (${sin.length})</summary>
-        <div class="tabla caja" style="margin-top:8px"><table>${cab}<tbody>${sin.map(fila).join('')}</tbody></table></div></details>` : ''}`;
+        <div class="tabla caja" style="margin-top:8px"><table class="fija">${cab}<tbody>${sin.map(fila).join('')}</tbody></table></div></details>` : ''}`;
   }
+  const ordenarPedido = (e) => {
+    const th = e.target.closest && e.target.closest('[data-orden]');
+    if (!th || (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ')) return;
+    if (e.type === 'keydown') e.preventDefault();
+    const k = th.dataset.orden;
+    ORDEN_PED = { col: k, dir: ORDEN_PED.col === k ? -ORDEN_PED.dir : (k === 'producto' ? 1 : -1) };
+    pintarPedido();
+  };
+  el('v-pedido').addEventListener('click', ordenarPedido);
+  el('v-pedido').addEventListener('keydown', ordenarPedido);
   el('v-pedido').addEventListener('change', (e) => {
     if (e.target && e.target.id === 'ped-semanas') { SEMANAS = Number(e.target.value) || 8; pintarPedido(); }
   });
 
   // ---- Cuentas con cada vendedor ----
+  // Qué te debe cada amigo y por qué prendas (Calculo.deudas: los pagos, a las ventas más antiguas).
   function pintarCuentas() {
-    const filas = S.cuentas.slice().sort((a, b) => (a.propio - b.propio) || (b.pendiente - a.pendiente));
-    el('v-cuentas').innerHTML = filas.length ? `<div class="tabla caja"><table><thead><tr><th>Vendedor</th><th class="n">Uds</th>
-      <th class="n">Vendido</th><th class="n">Su comisión</th><th class="n">Tu parte</th><th class="n">Te ha pagado</th>
-      <th class="n">Falta</th><th></th></tr></thead><tbody>${filas.map((c) => {
-        const nombre = nombreDe(c.vendedor);
-        const falta = c.propio ? '<td class="n cero">—</td>'
-          : `<td class="n ${c.pendiente > 0.005 ? 'neg' : 'hay'}">${eur(Math.max(0, c.pendiente))}</td>`;
-        const acc = c.propio ? '<span class="suave">tus ventas</span>'
-          : c.pendiente > 0.005 ? `<div class="acciones">
-              <button class="btn primario" type="button" data-pago="${esc(c.vendedor)}" data-importe="${c.pendiente.toFixed(2)}">Registrar pago</button>
-              <a class="btn wa" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(S.contactos[c.vendedor],
-                Panel.mensajeDeuda(nombre, c, S.calc.ventas)))}">Recordar por WhatsApp</a></div>`
-            : (c.pendiente < -0.005 ? `<span class="suave">al día · +${eur(-c.pendiente)} a favor</span>` : '<span class="suave">al día</span>');
-        return `<tr><td>${esc(nombre)}</td><td class="n">${c.uds}</td><td class="n">${eur(c.bruto)}</td>
-          <td class="n">${eur(c.comision)}</td><td class="n">${eur(c.tuParte)}</td><td class="n">${eur(c.liquidado)}</td>${falta}<td>${acc}</td></tr>`;
-      }).join('')}</tbody></table></div>`
-      : '<div class="vacio">Aún no hay ventas ni pagos.</div>';
+    const filas = S.cuentas.slice().sort((a, b) => (a.propio - b.propio) || (deudaDe(b.vendedor).debe - deudaDe(a.vendedor).debe));
+    if (!filas.length) { el('v-cuentas').innerHTML = '<div class="vacio">Aún no hay ventas ni pagos.</div>'; return; }
+    const amigos = filas.filter((c) => !c.propio);
+    const total = amigos.reduce((a, c) => a + deudaDe(c.vendedor).debe, 0);
+    const prendas = amigos.reduce((a, c) => a + deudaDe(c.vendedor).pendientes.length, 0);
+    const vieja = amigos.map((c) => deudaDe(c.vendedor).pendientes[0]).filter(Boolean)
+      .reduce((a, x) => (!a || x.venta.fecha < a.venta.fecha ? x : a), null);
+    const cab = `<div class="cobros-cab caja">
+        <div><div class="etq">Te deben en total</div><div class="grande">${eur(total)}</div></div>
+        <div class="suave" style="white-space:normal">${prendas ? `${prendas} ${prendas === 1 ? 'venta sin pagar' : 'ventas sin pagar'}${vieja ? `; la más antigua, del ${fechaCorta(vieja.venta.fecha)} (${esc(nombreDe(vieja.venta.vendedor))})` : ''}.
+          Los pagos se cuentan primero para la prenda que digan y, si no dicen ninguna, para las ventas más antiguas.` : 'Nadie te debe nada.'}</div>
+      </div>`;
+    const ficha = (c) => {
+      const nombre = nombreDe(c.vendedor);
+      if (c.propio) {
+        return `<div class="cobro caja al-dia"><div class="cab"><h3>${esc(nombre)} <span class="suave">${esc(c.vendedor)}</span></h3>
+          <div class="chips"><span class="chip">tus ventas</span></div></div>
+          <div class="cifras"><span>Vendido <b>${eur(c.bruto)}</b></span><span>${c.uds} ${c.uds === 1 ? 'prenda' : 'prendas'}</span><span>sin comisión: es todo tuyo</span></div></div>`;
+      }
+      const dd = deudaDe(c.vendedor);
+      const chip = dd.debe > 0.004 ? `<span class="chip mal">te debe ${eur(dd.debe)}</span>`
+        : dd.aFavor > 0.004 ? `<span class="chip">+${eur(dd.aFavor)} a su favor</span>` : '<span class="chip bien">al día</span>';
+      const lineas = dd.pendientes.map((x) => {   // una por venta, la más antigua primero
+        const d = diasAtras(x.venta.fecha);
+        return `<li><span class="cuando${d != null && d >= 14 ? ' vieja' : ''}">${fechaCorta(x.venta.fecha)}<small>${d == null ? '' : d === 0 ? 'hoy' : 'hace ' + d + ' d'}</small></span>
+          <span class="que">${esc(prendaDe(x.venta.prod))}${x.venta.cantidad > 1 ? ' ×' + x.venta.cantidad : ''}
+            <small>vendida a ${eur(x.venta.importe)}${x.pagado > 0.004 ? ` · ya te pagó ${eur(x.pagado)} de ${eur(x.tuParte)}` : ` · te tocan ${eur(x.tuParte)}`}</small></span>
+          <b class="falta">${eur(x.pendiente)}</b>
+          <button class="btn mini" type="button" data-pago="${esc(c.vendedor)}" data-importe="${x.pendiente.toFixed(2)}" data-sku="${esc(x.venta.sku)}"
+            title="Apuntar que te ha pagado esta prenda">Cobrar</button></li>`;
+      });
+      const copiar = dd.pendientes.map((x) => '· ' + Panel.lineaDeuda(x)).join('\n') + '\nTotal: ' + eur(dd.debe);
+      return `<div class="cobro caja${dd.debe > 0.004 ? '' : ' al-dia'}">
+        <div class="cab"><h3>${esc(nombre)} <span class="suave">${esc(c.vendedor)}</span></h3><div class="chips">${chip}</div></div>
+        <div class="cifras"><span>Vendido <b>${eur(c.bruto)}</b></span><span>Su comisión <b>${eur(c.comision)}</b></span>
+          <span>Te tocan <b>${eur(c.tuParte)}</b></span><span>Te ha pagado <b>${eur(c.liquidado)}</b></span>
+          ${dd.debe > 0.004 ? `<span class="falta">Falta <b>${eur(dd.debe)}</b></span>` : ''}</div>
+        ${dd.pendientes.length ? `<h4 class="etq" style="margin:14px 0 2px">Prendas sin pagar (${dd.pendientes.length})</h4><ul class="sin-pagar">${lineas.slice(0, 6).join('')}</ul>${lineas.length > 6
+          ? `<details class="mas-cobros"><summary>Ver ${lineas.length - 6 === 1 ? 'la otra' : 'las ' + (lineas.length - 6) + ' restantes'}</summary><ul class="sin-pagar">${lineas.slice(6).join('')}</ul></details>` : ''}` : ''}
+        ${dd.extra > 0.004 ? `<div class="mas">Además, ${eur(dd.extra)} de un ajuste apuntado sin prenda.</div>` : ''}
+        ${dd.sinPrecio ? `<div class="mas" style="color:var(--aviso)">${dd.sinPrecio} ${dd.sinPrecio === 1 ? 'venta suya no tiene' : 'ventas suyas no tienen'} precio: cuenta 0 € hasta que lo pongas.</div>` : ''}
+        ${dd.debe > 0.004 ? `<div class="acciones" style="flex-wrap:wrap;margin-top:12px">
+          <button class="btn primario" type="button" data-pago="${esc(c.vendedor)}" data-importe="${dd.debe.toFixed(2)}">Registrar pago de todo</button>
+          <a class="btn wa" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(S.contactos[c.vendedor], Panel.mensajeDeuda(nombre, dd)))}">Recordar por WhatsApp</a>
+          <button class="btn" type="button" data-copiar="${esc(copiar)}">Copiar la lista</button></div>` : ''}
+      </div>`;
+    };
+    el('v-cuentas').innerHTML = cab + `<div class="cobros">${filas.map(ficha).join('')}</div>`;
   }
 
   // ---- Movimientos (el más reciente arriba) ----
   function pintarMovimientos() {
     const tipo = el('mov-tipo').value, vend = el('mov-vend').value;
-    const lista = (DATOS.movimientos || []).map((m, i) => ({ ...m, i })).reverse().filter((m) =>
-      (!tipo || String(m.tipo).toUpperCase() === tipo) && (!vend || String(m.vendedor_id).toUpperCase() === vend)).slice(0, 200);
-    el('t-mov').innerHTML = lista.length ? `<thead><tr><th>Fecha</th><th>Tipo</th><th>Prenda</th><th>Quién</th>
+    const q = String(el('mov-q').value || '').trim().toLowerCase();
+    const texto = (m) => { const p = S.calc.porSku.get(String(m.sku || '').toUpperCase());
+      return `${m.fecha} ${m.sku} ${p ? prendaDe(p) : ''} ${m.canal} ${m.notas} ${nombreDe(String(m.vendedor_id).toUpperCase())}`.toLowerCase(); };
+    const todas = (DATOS.movimientos || []).map((m, i) => ({ ...m, i })).reverse().filter((m) =>
+      (!tipo || String(m.tipo).toUpperCase() === tipo) && (!vend || String(m.vendedor_id).toUpperCase() === vend) &&
+      (!q || q.split(/\s+/).every((w) => texto(m).includes(w))));
+    const lista = todas.slice(0, 300);
+    el('t-mov').innerHTML = lista.length ? `<caption class="suave" style="caption-side:bottom;text-align:left;padding:8px 12px">${
+      todas.length > lista.length ? `Se ven los ${lista.length} más recientes de ${todas.length}: afina la búsqueda para ver el resto.` : `${todas.length} ${todas.length === 1 ? 'movimiento' : 'movimientos'}`}</caption><thead><tr><th>Fecha</th><th>Tipo</th><th>Prenda</th><th>Quién</th>
       <th class="n">Cant.</th><th class="n">Precio</th><th>Dónde</th><th>Notas</th></tr></thead><tbody>${lista.map((m) => {
         const p = S.calc.porSku.get(String(m.sku || '').toUpperCase());
         return `<tr><td>${esc(m.fecha)}</td><td class="mono">${esc(m.tipo)}</td>
           <td>${p ? esc(p.producto + ' — ' + p.modelo + ' (' + p.talla + ')') : esc(m.sku || '—')}</td>
           <td>${esc(nombreDe(String(m.vendedor_id).toUpperCase()))}</td><td class="n">${esc(m.cantidad)}</td>
           <td class="n">${m.precio_venta_eur !== '' ? eur(Calculo.num(m.precio_venta_eur)) : ''}</td>
-          <td>${esc(m.canal)}</td><td>${esc(m.notas)}</td></tr>`;
-      }).join('')}</tbody>` : '<tbody><tr><td class="vacio">Aún no hay movimientos.</td></tr></tbody>';
+          <td>${esc(m.canal)}</td><td class="envuelve">${esc(m.notas)}</td></tr>`;
+      }).join('')}</tbody>` : `<tbody><tr><td class="vacio">${(DATOS.movimientos || []).length ? 'Nada coincide con lo que buscas.' : 'Aún no hay movimientos.'}</td></tr></tbody>`;
   }
 
   // ---- Apuntar ----
@@ -949,6 +1148,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     }).join('') + (pensando ? '<div class="burbuja asistente"><span class="puntos">Pensando</span></div>' : '');
     log.scrollTop = log.scrollHeight || 0;
     el('j-ojo').className = 'ojo' + (pensando ? ' piensa' : '');
+    pintarOrbe();
     el('j-estado').textContent = pensando ? 'pensando…' : 'a tu servicio';
   }
   function pintarGasto(a) {
@@ -974,6 +1174,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
       const r = await google({ cuerpo: { accion: 'asistente', clave: CLAVE, idPeticion: Panel.idPeticion(), mensajes: historial() } });
       if (r.ok) {
         CHAT.push({ rol: 'asistente', texto: r.respuesta, propuestas: (r.propuestas || []).map((p) => ({ ...p, estado: 'pendiente' })) });
+        if (!consolaAbierta) el('j-nuevo').hidden = false;   // contestó con el chat cerrado: punto en la bolita
         if (DATOS && DATOS.asistente) { DATOS.asistente.gastoHoy = r.gastoHoy; DATOS.asistente.preguntasHoy = (DATOS.asistente.preguntasHoy || 0) + 1; pintarGasto(DATOS.asistente); }
         hablar(r.respuesta);
       } else {
@@ -1026,13 +1227,24 @@ te lo preparo y tú lo confirmas.</div>` : '';
       rec.start();
     });
   }
-  function abrirConsola(si) {
-    el('consola').className = 'consola caja' + (si ? ' abierta' : '');
-    el('j-abrir').setAttribute('aria-expanded', String(si));
-    if (si && el('j-input').focus) setTimeout(() => el('j-input').focus(), 260);
+  // La bolita abre y cierra la consola; mientras JARVIS piensa gira más deprisa.
+  let consolaAbierta = false;
+  function pintarOrbe() {
+    el('j-abrir').className = 'orbe' + (pensando ? ' piensa' : '') + (consolaAbierta ? ' abierto' : '');
   }
-  el('j-abrir').addEventListener('click', () => abrirConsola(true));
+  function abrirConsola(si) {
+    consolaAbierta = !!si;
+    el('consola').className = 'consola caja' + (si ? ' abierta' : '');
+    el('j-abrir').setAttribute('aria-expanded', String(!!si));
+    el('j-abrir').setAttribute('aria-label', si ? 'Cerrar JARVIS' : 'Abrir JARVIS');
+    if (si) { el('j-nuevo').hidden = true; el('j-hola').hidden = true; }
+    pintarOrbe();
+    if (si && el('j-input').focus) setTimeout(() => el('j-input').focus(), 240);
+  }
+  el('j-abrir').addEventListener('click', () => abrirConsola(!consolaAbierta));
+  el('j-hola').addEventListener('click', () => abrirConsola(true));
   el('j-cerrar').addEventListener('click', () => abrirConsola(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && consolaAbierta) abrirConsola(false); });
   el('j-voz').addEventListener('click', () => {
     voz = !voz; pref('jarvis_voz', voz ? '1' : '0');
     el('j-voz').setAttribute('aria-pressed', String(voz));
@@ -1060,11 +1272,34 @@ te lo preparo y tú lo confirmas.</div>` : '';
     opcionesFormulario();
     if (DATOS.hoja) { el('hoja-abrir').href = DATOS.hoja; el('hoja-abrir').hidden = false; }
     pintarGasto(DATOS.asistente);
+    // Números en las pestañas: a cuántos amigos hay que cobrar y cuántas prendas llevan paradas.
+    const debiendo = S.cuentas.filter((c) => !c.propio && deudaDe(c.vendedor).debe > 0.004).length;
+    const paradas = S.fichas.reduce((a, f) => a + f.paradas, 0);
+    el('ins-cuentas').textContent = debiendo; el('ins-cuentas').hidden = !debiendo;
+    el('ins-cuentas').setAttribute('title', debiendo + (debiendo === 1 ? ' amigo te debe dinero' : ' amigos te deben dinero'));
+    el('ins-reparto').textContent = paradas; el('ins-reparto').hidden = !paradas;
+    el('ins-reparto').setAttribute('title', paradas + (paradas === 1 ? ' prenda parada' : ' prendas paradas') + ' en casa de tus amigos');
+    setTimeout(marcarDesbordes, 0);
   }
+  // Las tablas que no caben: sombra al borde derecho mientras quede algo a la derecha.
+  function marcarDesbordes() {
+    document.querySelectorAll('.tabla').forEach((t) => {
+      if (!t.classList) return;
+      t.classList.toggle('desborda', t.scrollWidth - t.clientWidth > 2 && t.scrollLeft + t.clientWidth < t.scrollWidth - 2);
+    });
+  }
+  document.addEventListener('scroll', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('tabla')) marcarDesbordes();
+  }, true);
+  const hashVista = () => { try { return String((window.location && window.location.hash) || '').slice(1); } catch (e) { return ''; } };
   function verVista(v) {
+    if (VISTAS.indexOf(v) < 0) v = 'resumen';
     document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
     if (v === 'webs' && !el('web-marco').src) verWeb('../');
+    pref('panel_vista', v);   // al volver, la misma pestaña
+    try { if (window.history && window.history.replaceState && hashVista() !== v) window.history.replaceState(null, '', '#' + v); } catch (e) { /* nada */ }
+    setTimeout(marcarDesbordes, 0);
   }
   function mostrarPanel(si) {
     el('entrar').hidden = si;
@@ -1072,8 +1307,17 @@ te lo preparo y tú lo confirmas.</div>` : '';
     el('conexion').hidden = !si;
     el('rejilla').hidden = !si;
     el('j-abrir').hidden = !si;
-    if (!si) abrirConsola(false);
-    if (si) { verVista('resumen'); pintarChat(); } else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
+    if (!si) { abrirConsola(false); el('j-hola').hidden = true; }
+    if (si) {
+      verVista(hashVista() || pref('panel_vista') || 'resumen');
+      pintarChat();
+      // La primera vez en esta pestaña, la bolita se presenta un momento.
+      if (!recordar('jarvis_hola')) {
+        guardar('jarvis_hola', '1');
+        el('j-hola').hidden = false;
+        setTimeout(() => { el('j-hola').hidden = true; }, 7000);
+      }
+    } else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
   }
   async function entrar(clave) {
     CLAVE = clave;
@@ -1110,6 +1354,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   el('stock-q').addEventListener('input', () => S.calc && pintarStock());
   el('stock-f').addEventListener('change', () => S.calc && pintarStock());
   el('mov-tipo').addEventListener('change', () => DATOS && pintarMovimientos());
+  el('mov-q').addEventListener('input', () => DATOS && pintarMovimientos());
   el('mov-vend').addEventListener('change', () => DATOS && pintarMovimientos());
   el('a-tipo').addEventListener('change', segunTipo);
   el('a-sku').addEventListener('change', segunTipo);
@@ -1120,15 +1365,33 @@ te lo preparo y tú lo confirmas.</div>` : '';
     if (!b) return;
     el('a-tipo').value = 'PAGO';
     el('a-vend').value = b.dataset.pago;
-    el('a-sku').value = '';
+    el('a-sku').value = b.dataset.sku || '';   // «Cobrar» de una prenda: el pago va para esa venta
     el('a-precio').value = String(b.dataset.importe).replace('.', ',');
+    el('a-notas').value = '';
     segunTipo();
     verVista('apuntar');
+    if (window.scrollTo) window.scrollTo(0, 0);
   };
-  el('v-cuentas').addEventListener('click', alPagar);
+  // En Cuentas: «Cobrar», «Registrar pago de todo» y «Copiar la lista» de lo que te debe un amigo.
+  el('v-cuentas').addEventListener('click', async (e) => {
+    const b = e.target.closest && e.target.closest('[data-copiar]');
+    if (!b) { alPagar(e); return; }
+    try { await navigator.clipboard.writeText(b.dataset.copiar); b.textContent = '✓ Copiada'; }
+    catch (err) { aviso(b.dataset.copiar); }
+    setTimeout(() => { b.textContent = 'Copiar la lista'; }, 2000);
+  });
   el('v-reparto').addEventListener('click', alPagar);
+  // Botones que llevan a otra pestaña (los avisos de «Para hoy», «Ver todo en Cuentas»…) y
   // «Preguntar a JARVIS» desde una ficha o desde el segundo pedido.
   el('rejilla').addEventListener('click', (e) => {
+    const ir = e.target.closest && e.target.closest('[data-ir]');
+    if (ir) {
+      if (ir.dataset.filtro) { el('stock-q').value = ''; el('stock-f').value = ir.dataset.filtro; pintarStock(); }
+      if (ir.dataset.tipo) { el('mov-q').value = ''; el('mov-tipo').value = ir.dataset.tipo; pintarMovimientos(); }
+      verVista(ir.dataset.ir);
+      if (window.scrollTo) window.scrollTo(0, 0);
+      return;
+    }
     const b = e.target.closest && e.target.closest('[data-jarvis]');
     if (!b) return;
     abrirConsola(true);
@@ -1149,7 +1412,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   let redibujo = 0;
   if (window.addEventListener) window.addEventListener('resize', () => {
     clearTimeout(redibujo);
-    redibujo = setTimeout(() => { if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen(); }, 200);
+    redibujo = setTimeout(() => { if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen(); marcarDesbordes(); }, 200);
   });
 
   // Al momento: se pide a Google cada minuto mientras la página está a la vista, y al volver a ella.
@@ -1167,7 +1430,8 @@ te lo preparo y tú lo confirmas.</div>` : '';
   const listo = guardada ? entrar(guardada) : Promise.resolve(false);
 
   // Para las pruebas (scripts/test-panel.js).
-  window.PANEL = { listo, entrar, cargar, enviarApunte, preguntar, confirmar, contar: (sku, n) => { contar(sku, n); pintarRecuento(); },
+  window.PANEL = { listo, entrar, cargar, enviarApunte, preguntar, confirmar, abrirConsola, verVista, consolaAbierta: () => consolaAbierta,
+    contar: (sku, n) => { contar(sku, n); pintarRecuento(); },
     guardarRecuento, semanas: (n) => { SEMANAS = n; pintarPedido(); }, estado: () => ({ CLAVE, DATOS, S, CHAT, CONTADOS }) };
 })();
 </script>
