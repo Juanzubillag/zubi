@@ -291,6 +291,25 @@ var Panel = (function () {
     return { inicio: inicio, semanas: semanas, envioUd: envioUd, productos: productos };
   }
 
+  // ---- La tienda: la analítica ----
+  // Google la cuenta día a día (visitas, «añadir», pedido abierto y pedido enviado, sin
+  // cookies); aquí se suma en los últimos `n` días, en total y por enlace de amigo.
+  var PASOS_TIENDA = ['visita', 'carrito', 'checkout', 'pedido'];
+  function tienda(dias, n, hoy) {
+    var desde = dia(new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - (n - 1)));
+    var r = { visita: 0, carrito: 0, checkout: 0, pedido: 0, porAmigo: {} };
+    (dias || []).forEach(function (d) {
+      if (!d || String(d.dia) < desde) return;
+      PASOS_TIENDA.forEach(function (k) { r[k] += Number(d[k]) || 0; });
+      Object.keys(d.v || {}).forEach(function (id) {
+        var a = r.porAmigo[id] || (r.porAmigo[id] = { visita: 0, carrito: 0, checkout: 0, pedido: 0 });
+        PASOS_TIENDA.forEach(function (k) { a[k] += Number(d.v[id][k]) || 0; });
+      });
+    });
+    r.conversion = r.visita ? r.pedido / r.visita : null;
+    return r;
+  }
+
   // ---- Contar la caja ----
   // `contados`: {sku: unidades contadas}. Devuelve las tallas contadas que no cuadran.
   function recuento(prods, contados) {
@@ -326,7 +345,7 @@ var Panel = (function () {
   return { resumen: resumen, mensajeDeuda: mensajeDeuda, enlaceWhatsApp: enlaceWhatsApp, idPeticion: idPeticion, eur: eur,
     ventasPorDia: ventasPorDia, ventasPor: ventasPor, stockPorCategoria: stockPorCategoria,
     fichas: fichas, rotacion: rotacion, recuento: recuento, textoRecuento: textoRecuento, diasDesde: diasDesde, DIAS_PARADA: DIAS_PARADA,
-    lineaDeuda: lineaDeuda, avisos: avisos, ritmo: ritmo, fechaCorta: fechaCorta };
+    lineaDeuda: lineaDeuda, avisos: avisos, ritmo: ritmo, fechaCorta: fechaCorta, tienda: tienda };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Panel;

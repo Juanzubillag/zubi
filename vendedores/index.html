@@ -171,7 +171,7 @@
   </div>
 </header>
 
-<div class="wrap">
+<main class="wrap">
   <div id="aviso-fuente" class="aviso" hidden></div>
 
   <div id="lightbox" hidden>
@@ -186,9 +186,9 @@
   <section id="v-catalogo">
     <div class="stats" id="stats"></div>
     <div class="filtros">
-      <input type="search" id="q" placeholder="Buscar: ralph, arcteryx, España…" autocomplete="off">
-      <select id="f-cat"><option value="">Todas las categorías</option></select>
-      <select id="f-talla"><option value="">Todas las tallas</option></select>
+      <input type="search" id="q" placeholder="Buscar: ralph, arcteryx, España…" autocomplete="off" aria-label="Buscar prenda">
+      <select id="f-cat" aria-label="Categoría"><option value="">Todas las categorías</option></select>
+      <select id="f-talla" aria-label="Talla"><option value="">Todas las tallas</option></select>
       <label class="chk"><input type="checkbox" id="f-hay" checked> Solo disponible</label>
     </div>
     <div class="grid" id="grid"></div>
@@ -244,7 +244,7 @@
       <div class="tabla-wrap"><table id="t-reparto"></table></div>
     </div>
   </section>
-</div>
+</main>
 
 <script src="config.js"></script>
 <script src="datos.js"></script>
@@ -272,8 +272,12 @@
   // comprueba en Google, no aquí: en esta web no hay ninguna contraseña que leer.
   const enlace = (params) => CFG.registroUrl + (CFG.registroUrl.includes('?') ? '&' : '?') +
     new URLSearchParams(params).toString();
-  async function pedir(params) {
-    const r = await fetch(enlace(params));
+  // Lo público (el catálogo) se pide por la dirección; lo que lleva tu clave, por POST: en la
+  // dirección quedaría en el historial del navegador y en los registros.
+  async function pedir(params, cuerpo) {
+    const r = cuerpo
+      ? await fetch(CFG.registroUrl, { method: 'POST', body: JSON.stringify(cuerpo) })
+      : await fetch(enlace(params));
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const j = await r.json();
     if (j.tramos) TRAMOS = j.tramos;
@@ -317,7 +321,7 @@
   let PRIV = null;   // { calc, cuentas, nombre }
   async function desbloquear(clave) {
     if (!CFG.registroUrl) throw new Error('Falta el enlace de Google (registroUrl) en config.js.');
-    const j = await pedir({ modo: 'privado', clave });
+    const j = await pedir(null, { accion: 'privado', clave });
     if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
     const calc = Calculo.calcular(j.productos, j.movimientos, { tramos: TRAMOS, propio: PROPIO });
     const nombre = new Map((j.vendedores || []).map((v) => [String(v.id).toUpperCase(), v.nombre || v.id]));

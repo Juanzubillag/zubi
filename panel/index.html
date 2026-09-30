@@ -352,6 +352,8 @@
   .avisos .nada { color: var(--bien); padding: 10px; font-size: 14.5px; }
   .ritmo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   @media (max-width: 480px) { .ritmo { grid-template-columns: minmax(0, 1fr); } }
+  .embudo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 700px) { .embudo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .sube { color: var(--bien); } .baja { color: var(--mal); }
 
   /* ---- cuentas: una ficha de cobro por amigo ---- */
@@ -486,6 +488,13 @@
   .propuesta.hecha { border-color: rgba(65, 211, 154, .5); } .propuesta.hecha .estado { color: var(--bien); }
   .propuesta.descartada { opacity: .55; } .propuesta.error .estado { color: var(--mal); }
   .propuesta .estado { font-family: var(--hud); font-size: 13px; margin-top: 6px; }
+  .propuesta .cambio { margin-top: 8px; }
+  .propuesta .cambio summary { cursor: pointer; color: var(--suave); font-family: var(--hud); font-size: 12.5px; }
+  .propuesta .cambio .etq { display: block; margin-top: 8px; font-size: 10.5px; }
+  .propuesta .cambio pre { margin: 3px 0 0; padding: 8px 10px; border-radius: 8px; max-height: 260px; overflow: auto;
+    white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .propuesta .quita pre { background: rgba(255, 138, 128, .08); border: 1px solid rgba(255, 138, 128, .35); }
+  .propuesta .pone pre { background: rgba(65, 211, 154, .08); border: 1px solid rgba(65, 211, 154, .35); }
   .puntos::after { content: "…"; animation: late 1s infinite; }
   .j-sug { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
   .j-sug button { border: 1px solid var(--linea-2); background: none; border-radius: 999px; padding: 5px 11px; font-size: 12.5px;
@@ -773,6 +782,15 @@
   const recordar = (k) => { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } };
   const olvidar = (k) => { try { window.sessionStorage.removeItem(k); } catch (e) { /* nada */ } };
   const pref = (k, v) => { try { if (v === undefined) return window.localStorage.getItem(k); window.localStorage.setItem(k, v); } catch (e) { return null; } };
+  // El enlace de la tienda de un amigo (…/zubi/?v=V2): el pedido que llegue por él lleva su
+  // código, para que lo apuntes a su nombre. La tienda está un nivel por encima del panel;
+  // fuera de la web, la dirección publicada.
+  const TIENDA_PUBLICA = 'https://juanzubillag.github.io/zubi/';
+  const enlaceTienda = (id) => {
+    let base = TIENDA_PUBLICA;
+    try { const u = new URL('../', window.location.href); if (/^https?:$/.test(u.protocol)) base = u.href; } catch (e) { /* sin dirección */ }
+    return base + '?v=' + encodeURIComponent(id);
+  };
   // Pone o quita una clase sin pisar las demás (con classList si lo hay; si no, a mano).
   const clase = (n, c, si) => {
     if (!n) return;
@@ -828,6 +846,7 @@
     S.contactos = j.contactos || {};
     S.deudas = Calculo.deudas(S.calc);
     S.fichas = Panel.fichas(S.calc, S.cuentas, j.movimientos || [], j.vendedores, S.contactos, new Date());
+    S.tienda = j.tienda || [];
     ultimaCarga = Date.now();
     aviso('');
     pintarTodo();
@@ -839,7 +858,8 @@
     cargando = true;
     conexion('cargando', 'Actualizando…');
     try {
-      const j = await google({ params: { modo: 'privado', clave: CLAVE } });
+      // La clave va en el cuerpo (POST), nunca en la dirección: ahí quedaría en el historial.
+      const j = await google({ cuerpo: { accion: 'privado', clave: CLAVE } });
       if (!j.ok) {
         if (/clave/i.test(j.error || '')) { salir(j.error); return; }
         throw new Error(j.error || 'Google ha contestado algo inesperado.');
@@ -957,6 +977,28 @@
         cats.map((c) => [c.categoria, c.vendidas, c.enLaCalle, c.enCasa, c.total]));
   }
 
+  // ---- La tienda: visitas, carritos y pedidos (los cuenta Google, sin cookies) ----
+  function pintarTienda() {
+    const hoy = new Date();
+    const t30 = Panel.tienda(S.tienda, 30, hoy), t7 = Panel.tienda(S.tienda, 7, hoy);
+    if (!t30.visita && !t30.pedido) {
+      return `<h2 class="sec">La tienda</h2><div class="vacia">Aún no hay visitas contadas. La tienda empieza a contarlas (sin cookies)
+        en cuanto publiques esta versión con npm run web.</div>`;
+    }
+    const pct = (a, b) => (b ? Math.round(a / b * 100) + ' %' : '—');
+    const pasos = [['visita', 'Visitas', ''], ['carrito', 'Añadieron algo', 'visita'], ['checkout', 'Abrieron el pedido', 'carrito'],
+      ['pedido', 'Enviaron el pedido', 'checkout']];
+    const amigos = Object.entries(t30.porAmigo).sort((a, b) => b[1].pedido - a[1].pedido || b[1].visita - a[1].visita);
+    return `<h2 class="sec">La tienda · últimos 30 días</h2>
+      <div class="embudo">${pasos.map(([k, t, antes], n) => `<div class="tile caja" style="--i:${6.5 + n * 0.5}"><div class="etq">${t}</div><div class="v" data-n="${t30[k]}">${t30[k]}</div>
+        <div class="d">${antes ? pct(t30[k], t30[antes]) + ' del paso anterior' : t7.visita + ' en los últimos 7 días'}</div></div>`).join('')}</div>
+      ${amigos.length ? `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>Por el enlace de un amigo</th>
+        <th class="n">Visitas</th><th class="n">Añadieron</th><th class="n">Pedidos</th></tr></thead><tbody>${amigos.map(([id, a]) =>
+          `<tr><td>${esc(nombreDe(id))}</td><td class="n">${a.visita}</td><td class="n">${a.carrito}</td><td class="n">${a.pedido}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      <p class="suave" style="white-space:normal;margin-top:8px">De cada 100 visitas, ${t30.conversion == null ? '—' : Math.round(t30.conversion * 100)}
+        envían un pedido. Se cuenta una vez por visita, sin cookies ni datos de nadie.</p>`;
+  }
+
   // ---- Mando ----
   let anchoPintado = 0;
   function pintarResumen() {
@@ -1021,6 +1063,7 @@
           </div>
         </div>
       </div>
+      ${pintarTienda()}
       <h2 class="sec">Estadísticas</h2>
       <div class="graficas">
         <div class="grafica caja ancha" style="--i:7" data-revela="dias"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
@@ -1079,12 +1122,18 @@
         ['Vende en', f.canales.map((c) => c.nombre).join(', ') || '—'],
       ].filter(Boolean);
       const tel = String(f.contacto || '').replace(/\D/g, '');
+      const suEnlace = f.propio ? '' : enlaceTienda(f.id);
       const acciones = [
         debe ? `<button class="btn primario" type="button" data-pago="${esc(f.id)}" data-importe="${f.pendiente.toFixed(2)}">Registrar pago</button>` : '',
         debe ? `<a class="btn wa" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto,
           Panel.mensajeDeuda(f.nombre, deudaDe(f.id))))}">Recordar por WhatsApp</a>`
           : !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto, 'Hola ' + f.nombre + ', '))}">WhatsApp</a>` : '',
         f.propio ? '' : `<button class="btn" type="button" data-jarvis="${esc('¿Cómo va ' + f.nombre + '? Qué ha vendido, qué tiene en casa y qué me debe.')}">Preguntar a JARVIS</button>`,
+        // Su enlace de la tienda: el pedido que llegue por él lleva su código (para apuntárselo a él).
+        f.propio ? '' : `<button class="btn" type="button" data-enlace="${esc(suEnlace)}">Copiar su enlace de la tienda</button>`,
+        !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto,
+          'Hola ' + f.nombre + ', este es tu enlace de la tienda ZUBI: ' + suEnlace +
+          '\nLos pedidos que lleguen desde él van a tu nombre y llevan tu comisión.'))}">Mandarle su enlace</a>` : '',
       ].join('');
       return `<div class="vend caja" style="--i:${Math.min(n, 10)}">
         <div class="cab"><h3>${esc(f.nombre)} <span class="suave">${esc(f.id)}${tel ? ' · ' + esc(f.contacto) : ''}</span></h3><div class="chips">${chips}</div></div>
@@ -1306,6 +1355,9 @@
         ${dd.pendientes.length ? `<h4 class="etq" style="margin:14px 0 2px">Prendas sin pagar (${dd.pendientes.length})</h4><ul class="sin-pagar">${lineas.slice(0, 6).join('')}</ul>${lineas.length > 6
           ? `<details class="mas-cobros"><summary>Ver ${lineas.length - 6 === 1 ? 'la otra' : 'las ' + (lineas.length - 6) + ' restantes'}</summary><ul class="sin-pagar">${lineas.slice(6).join('')}</ul></details>` : ''}` : ''}
         ${dd.extra > 0.004 ? `<div class="mas">Además, ${eur(dd.extra)} de un ajuste apuntado sin prenda.</div>` : ''}
+        ${dd.aFavor > 0.004 ? `<div class="mas">Tiene ${eur(dd.aFavor)} a su favor: lo normal es su comisión de un pedido de la tienda que cobraste tú.
+          Cuando se la pagues, apúntalo.</div><div class="acciones" style="margin-top:8px">
+          <button class="btn" type="button" data-pago="${esc(c.vendedor)}" data-importe="${(-dd.aFavor).toFixed(2)}">Pagarle ${eur(dd.aFavor)}</button></div>` : ''}
         ${dd.sinPrecio ? `<div class="mas" style="color:var(--aviso)">${dd.sinPrecio} ${dd.sinPrecio === 1 ? 'venta suya no tiene' : 'ventas suyas no tienen'} precio: cuenta 0 € hasta que lo pongas.</div>` : ''}
         ${dd.debe > 0.004 ? `<div class="acciones" style="flex-wrap:wrap;margin-top:12px">
           <button class="btn primario" type="button" data-pago="${esc(c.vendedor)}" data-importe="${dd.debe.toFixed(2)}">Registrar pago de todo</button>
@@ -1364,7 +1416,8 @@
     el('c-precio').hidden = !(t === 'VENTA' || pago);
     el('c-canal').hidden = t !== 'VENTA';
     el('a-precio-l').textContent = pago ? 'Importe recibido (€)' : 'Precio cobrado (€)';
-    el('a-sku-ayuda').textContent = pago ? 'Opcional: la venta que te paga. Déjalo vacío si es un pago de varias.' : '';
+    el('a-sku-ayuda').textContent = pago ? 'Opcional: la venta que te paga. Déjalo vacío si es un pago de varias. ' +
+      'Si eres tú quien le paga (su comisión de un pedido de la tienda), pon el importe en negativo.' : '';
     const p = S.calc && S.calc.porSku.get(String(el('a-sku').value).toUpperCase());
     if (t === 'VENTA' && p && !el('a-precio').value) el('a-precio').value = String(p.pvp).replace('.', ',');
   }
@@ -1417,6 +1470,12 @@
   let pensando = false;
   const guardarChat = () => guardar('chat_jarvis', JSON.stringify(CHAT.slice(-40)));
 
+  // Un cambio de código de la tienda o el catálogo, entero: lo que quita y lo que pone. La
+  // frase de la propuesta va recortada; esto no, para que veas exactamente qué confirmas.
+  const detalleCambio = (d, abierto) => `<details class="cambio"${abierto ? ' open' : ''}>
+      <summary>El cambio entero · ${esc(d.ruta)}${d.linea ? ', línea ' + esc(d.linea) : ''}</summary>
+      <div class="quita"><span class="etq">Quita</span><pre>${esc(d.antes) || '(nada)'}</pre></div>
+      <div class="pone"><span class="etq">Pone</span><pre>${esc(d.despues) || '(nada)'}</pre></div></details>`;
   let pintados = CHAT.length;   // las que ya estaban no vuelven a entrar al repintar
   function pintarChat() {
     const log = el('j-log');
@@ -1426,7 +1485,7 @@
 te lo preparo y tú lo confirmas.</div>` : '';
     log.innerHTML = inicio + CHAT.map((m, i) => {
       const props = (m.propuestas || []).map((p) => `<div class="propuesta ${p.estado}">
-        <div class="que">${esc(p.descripcion)}</div>
+        <div class="que">${esc(p.descripcion)}</div>${p.detalle ? detalleCambio(p.detalle, p.estado === 'pendiente') : ''}
         ${p.estado === 'pendiente' ? `<div class="acciones"><button class="btn primario" type="button" data-confirmar="${esc(p.id)}">Confirmar</button>
           <button class="btn" type="button" data-descartar="${esc(p.id)}">Descartar</button></div>`
           : `<div class="estado">${p.estado === 'hecha' ? '✓ Hecho' + (p.resultado ? ': ' + esc(p.resultado) : '') :
@@ -1732,7 +1791,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     setTimeout(() => decir('Google está tardando más de lo normal. Sigue conectando…'), 9000);
     setTimeout(() => decir('Aún conectando. A veces Google tarda hasta un minuto.'), 25000);
     try {
-      const j = await google({ params: { modo: 'privado', clave } }, 3, () => {
+      const j = await google({ cuerpo: { accion: 'privado', clave } }, 3, () => {
         btn.innerHTML = '<span class="girando" aria-hidden="true"></span> Sigue intentando…';
       });
       if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
@@ -1803,7 +1862,13 @@ te lo preparo y tú lo confirmas.</div>` : '';
     catch (err) { aviso(b.dataset.copiar); }
     setTimeout(() => { b.textContent = 'Copiar la lista'; }, 2000);
   });
-  el('v-reparto').addEventListener('click', alPagar);
+  el('v-reparto').addEventListener('click', async (e) => {
+    const b = e.target.closest && e.target.closest('[data-enlace]');
+    if (!b) { alPagar(e); return; }
+    try { await navigator.clipboard.writeText(b.dataset.enlace); b.textContent = '✓ Copiado'; }
+    catch (err) { aviso('Su enlace de la tienda: ' + b.dataset.enlace); }
+    setTimeout(() => { b.textContent = 'Copiar su enlace de la tienda'; }, 2000);
+  });
   // Botones que llevan a otra pestaña (los avisos de «Para hoy», «Ver todo en Cuentas»…) y
   // «Preguntar a JARVIS» desde una ficha o desde el segundo pedido.
   el('rejilla').addEventListener('click', (e) => {

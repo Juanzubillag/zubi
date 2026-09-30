@@ -1,8 +1,31 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>ZUBI Madrid</title>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ZUBI · Ropa de calle en Madrid a precio de mercadillo</title>
+<meta name="description" content="Fútbol retro, punto, sudaderas, chaquetas y zapatillas en Madrid. Stock real por talla, pedido por WhatsApp en un minuto, envío a toda España en 24-48 h y recogida en mano gratis.">
+<meta name="theme-color" content="#E8E9E3">
+<link rel="canonical" href="https://juanzubillag.github.io/zubi/">
+<!-- Lo que sale al compartir el enlace por WhatsApp, Instagram o Telegram -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZUBI">
+<meta property="og:locale" content="es_ES">
+<meta property="og:url" content="https://juanzubillag.github.io/zubi/">
+<meta property="og:title" content="ZUBI · Ropa de calle a precio de mercadillo">
+<meta property="og:description" content="Stock real por talla. Pides por WhatsApp y te lo confirmo el mismo día. Envío 24-48 h, gratis desde 50 €. Recogida en Madrid.">
+<meta property="og:image" content="https://juanzubillag.github.io/zubi/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ZUBI · Ropa de calle a precio de mercadillo · Madrid">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314181C'/%3E%3Cpath fill='%23F7F7F4' d='M13 15h32v8L26 41h19v8H13v-8l19-18H13z'/%3E%3Ccircle cx='52' cy='45' r='5' fill='%23C42E16'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+</head>
+<body>
 <style>
 :root{
   color-scheme:light;
@@ -140,7 +163,11 @@ a{color:var(--azul); text-underline-offset:3px; text-decoration-thickness:1px}
 .card.out{opacity:.5}
 .shot{aspect-ratio:1/1; max-width:100%; display:grid; place-items:center; position:relative; overflow:hidden; background:radial-gradient(120% 120% at 28% 16%, color-mix(in srgb, currentColor 20%, var(--panel)) 0%, var(--panel) 60%); border-bottom:1px solid var(--line)}
 .shot svg{width:62%; height:62%; transition:transform .3s var(--ease-out)}
-@media (hover:hover) and (pointer:fine){.card:hover .shot svg{transform:scale(1.07)}}
+/* Las fotos propias (tienda/fotos/ZB-001.jpg…) ocupan todo el cuadro; sin foto, el dibujo */
+.shot img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .3s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.card:hover .shot svg,.card:hover .shot img{transform:scale(1.07)}}
+.shot .badge,.shot .ref{z-index:1}
+.shot:has(img) .ref{background:var(--surface); padding:1px 5px; border-radius:2px}
 .badge{position:absolute; top:10px; left:10px; font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; background:var(--signal); color:var(--on-signal); padding:3px 7px; border-radius:2px; font-weight:600}
 .badge.low{background:var(--warn); color:var(--on-warn)}
 .badge.gone{background:var(--ink-3); color:var(--paper)}
@@ -208,6 +235,17 @@ footer{border-top:2px solid var(--ink); padding-block:36px 44px; margin-top:52px
 .li{display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--line)}
 .li .mini{width:50px; height:50px; flex:none; background:radial-gradient(120% 120% at 28% 16%, color-mix(in srgb, currentColor 22%, var(--panel)) 0%, var(--panel) 62%); border:1px solid var(--line); display:grid; place-items:center; border-radius:3px}
 .li .mini svg{width:70%; height:70%}
+.li .mini{overflow:hidden}
+.li .mini img{width:100%; height:100%; object-fit:cover}
+/* Después de abrir WhatsApp: el pedido sigue aquí hasta que el cliente diga que lo ha enviado */
+.enviado{padding:34px 0 10px}
+.enviado .ok{width:44px; height:44px; border-radius:50%; display:grid; place-items:center; background:var(--ok); color:#fff; font-size:22px; font-weight:700}
+.enviado .ok.no{background:var(--warn); color:var(--on-warn)}
+.enviado h3{font-size:19px; font-weight:800; font-stretch:112%; letter-spacing:-.02em; margin-top:16px; text-transform:uppercase}
+.enviado p{color:var(--ink-2); font-size:14.5px; line-height:1.55; margin-top:10px}
+.enviado .ref-ped{font-family:var(--mono); font-size:13px; color:var(--ink); background:var(--surface-2); padding:2px 7px; border-radius:3px; white-space:nowrap}
+.enviado .aviso{margin-top:16px; padding:11px 13px; border:1px solid var(--warn); color:var(--warn); border-radius:3px; font-size:13.5px}
+a.btn{text-decoration:none}
 .li .info{flex:1; min-width:0; overflow-wrap:anywhere}
 .li .info .n{font-size:14px; font-weight:600; line-height:1.3}
 .li .info .m{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); margin-top:4px}
@@ -358,10 +396,10 @@ body::after{
       <h1>Ropa de calle<br>a precio de <em>mercadillo</em></h1>
       <p>Fútbol retro, punto, sudaderas, técnico y zapatilla. Lo que ves es lo que hay: stock real por talla, sin reposición. Cuando se acaba una talla, se acaba.</p>
       <p class="manifest">
-        <span><b id="mRefs">30</b> referencias</span>
-        <span>quedan <b id="mStock">304</b> prendas</span>
+        <span><b id="mRefs">–</b> referencias</span>
+        <span>quedan <b id="mStock">–</b> prendas</span>
         <span>stock <b id="mFecha">del pedido</b></span>
-        <span>desde <b id="mFrom">3,95 €</b></span>
+        <span>desde <b id="mFrom">–</b></span>
         <span>envío gratis desde 50 €</span>
         <span>Madrid · 24-48 h</span>
       </p>
@@ -528,8 +566,11 @@ const TIENDA = {
 };
 
 /* ===== FOTO DE STOCK · la escribe `npm run tienda`: no la edites a mano ===== */
-const STOCK = {"fecha":"2026-09-25","fuente":"pedido inicial","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
+const STOCK = {"fecha":"2026-09-30","fuente":"pedido inicial","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
 /* ===== FIN DE LA FOTO DE STOCK ===== */
+/* ===== FOTOS PROPIAS · las pone `npm run web` con lo que haya en tienda/fotos/ (ZB-001.jpg…) ===== */
+const FOTOS = {};
+/* ===== FIN DE LAS FOTOS ===== */
 const IG_PLACEHOLDER = "zubi.madrid", MAIL_PLACEHOLDER = "hola@zubi.es";
 
 /* ---------- catálogo ---------- */
@@ -590,13 +631,16 @@ aplicarStock(STOCK.disponible || {});
 let cart = [];
 let fCat = "Todo", fSizes = new Set(), fQ = "", fSort = "destacado", fAvail = true;
 let sel = {}, step = "cart", delivery = "envio", justAdded = null;
+let pedidoRef = null, ultimoEnvio = null;   // la referencia del pedido y lo que se abrió en WhatsApp
+let cliente = {};                           // lo que ha escrito en «Tus datos», para no perderlo al volver
 
 const byRef = r => CATALOGO.find(p => p.r === r);
 const eur = n => n.toFixed(2).replace(".", ",") + " €";
+const priceOf = (r) => byRef(r).price;
 const inCart = (r,s) => { const l = cart.find(i => i.r===r && i.size===s); return l ? l.qty : 0; };
 const left = (r,s) => byRef(r).sizes[s] - inCart(r,s);
 const totalLeft = r => Object.keys(byRef(r).sizes).reduce((a,s)=>a+left(r,s), 0);
-const subtotal = () => cart.reduce((a,i)=>a + byRef(i.r).price * i.qty, 0);
+const subtotal = () => cart.reduce((a,i)=>a + priceOf(i.r, i.size) * i.qty, 0);
 const units = () => cart.reduce((a,i)=>a+i.qty, 0);
 const shipping = () => {
   if (!cart.length) return 0;
@@ -621,7 +665,18 @@ function toast(msg){
   t.textContent = msg; t.classList.add("on");
   clearTimeout(tTimer); tTimer = setTimeout(()=>t.classList.remove("on"), 2800);
 }
-function save(){ try{ localStorage.setItem("zubi_cart", JSON.stringify(cart)); }catch(e){} }
+// El carrito cambia: es otro pedido (otra referencia) y ya no se está esperando el anterior.
+function save(){
+  pedidoRef = null; ultimoEnvio = null; olvidarEnviado();
+  if (step === "enviado") step = "cart";
+  try{ localStorage.setItem("zubi_cart", JSON.stringify(cart)); }catch(e){}
+}
+// El pedido que se acaba de mandar a WhatsApp: se recuerda un día, para que si el cliente
+// vuelve (o recarga) le siga saliendo «¿lo has enviado?».
+const ENVIADO = "zubi_pedido_enviado";
+function guardarEnviado(){ try{ localStorage.setItem(ENVIADO, JSON.stringify({ ...ultimoEnvio, hasta: Date.now() + 864e5 })); }catch(e){} }
+function leerEnviado(){ try{ const e = JSON.parse(localStorage.getItem(ENVIADO) || "null"); return e && e.hasta > Date.now() ? e : null; }catch(e){ return null; } }
+function olvidarEnviado(){ try{ localStorage.removeItem(ENVIADO); }catch(e){} }
 function load(){
   try{
     const raw = localStorage.getItem("zubi_cart"); if(!raw) return;
@@ -633,6 +688,10 @@ function load(){
   }catch(e){ cart = []; }
 }
 const svg = (id) => '<svg aria-hidden="true"><use href="#'+id+'"/></svg>';
+// La foto propia de la prenda si la hay (tienda/fotos/), si no el dibujo.
+const imagen = (p) => FOTOS[p.r]
+  ? '<img src="fotos/'+esc(FOTOS[p.r])+'" alt="'+esc(p.name)+'" loading="lazy" decoding="async">'
+  : svg(p.g);
 const fold = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -702,7 +761,7 @@ function renderGrid(swap){
     }).join("");
 
     return '<article class="card'+(rem===0?' out':'')+'">'+
-      '<div class="shot" style="color:'+p.tint+'">'+badge+svg(p.g)+'<span class="ref">'+p.r+'</span></div>'+
+      '<div class="shot" style="color:'+p.tint+'">'+badge+imagen(p)+'<span class="ref">'+p.r+'</span></div>'+
       '<div class="body">'+
         '<div><p class="cat">'+esc(p.cat)+'</p><h3 class="name">'+esc(p.name)+'</h3></div>'+
         '<div class="priceline"><span class="price">'+eur(p.price)+'</span>'+
@@ -730,6 +789,7 @@ document.getElementById("grid").addEventListener("click", e => {
     line ? line.qty++ : cart.push({r, size:s, qty:1});
     justAdded = r + "|" + s;
     save(); renderGrid(); renderCart(true);
+    evento("carrito");
     toast(p.name + " · talla " + s + " añadida");
   }
 });
@@ -772,15 +832,16 @@ function renderCart(animate){
   }
 
   document.getElementById("dTitle").textContent = step === "form" ? "Tus datos" : "Tu pedido";
+  if (step === "enviado" && ultimoEnvio){ renderEnviado(); return; }
   if (step === "form"){ renderForm(); return; }
 
   body.innerHTML = cart.map((i,k) => {
     const p = byRef(i.r);
     return '<div class="li">'+
-      '<div class="mini" style="color:'+p.tint+'">'+svg(p.g)+'</div>'+
+      '<div class="mini" style="color:'+p.tint+'">'+imagen(p)+'</div>'+
       '<div class="info"><div class="n">'+esc(p.name)+'</div>'+
-        '<div class="m">'+p.r+' · Talla '+esc(i.size)+' · '+eur(p.price)+'</div></div>'+
-      '<div class="rt"><span class="amt">'+eur(p.price*i.qty)+'</span>'+
+        '<div class="m">'+p.r+' · Talla '+esc(i.size)+' · '+eur(priceOf(i.r, i.size))+'</div></div>'+
+      '<div class="rt"><span class="amt">'+eur(priceOf(i.r, i.size)*i.qty)+'</span>'+
         '<div class="qty"><button type="button" data-dec="'+k+'" aria-label="Quitar una unidad de '+esc(p.name)+'">&minus;</button>'+
         '<span>'+i.qty+'</span>'+
         '<button type="button" data-inc="'+k+'" '+(left(i.r,i.size)<=0?'disabled':'')+' aria-label="Añadir una unidad de '+esc(p.name)+'">+</button></div>'+
@@ -805,13 +866,15 @@ function renderCart(animate){
 
 function renderForm(){
   const sub = subtotal(), env = shipping();
+  const c = cliente, val = k => c[k] ? ' value="'+esc(c[k])+'"' : '';
+  const pagoMarcado = v => (c.pago || "Bizum") === v ? " checked" : "";
   document.getElementById("dBody").innerHTML =
     '<form class="form" id="chk" novalidate>'+
       '<div class="fg"><label for="f-nombre">Nombre y apellidos</label>'+
-        '<input id="f-nombre" name="nombre" autocomplete="name" maxlength="70" required></div>'+
+        '<input id="f-nombre" name="nombre" autocomplete="name" maxlength="70" required'+val("nombre")+'></div>'+
       '<div class="fg two">'+
-        '<div class="fg"><label for="f-tel">Teléfono</label><input id="f-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" required></div>'+
-        '<div class="fg"><label for="f-email">Email · opcional</label><input id="f-email" name="email" type="email" autocomplete="email" maxlength="90"></div>'+
+        '<div class="fg"><label for="f-tel">Teléfono</label><input id="f-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" required'+val("tel")+'></div>'+
+        '<div class="fg"><label for="f-email">Email · opcional</label><input id="f-email" name="email" type="email" autocomplete="email" maxlength="90"'+val("email")+'></div>'+
       '</div>'+
       '<div class="fg"><label id="lblEnt">Entrega</label><div class="radio" role="radiogroup" aria-labelledby="lblEnt">'+
         '<label><input type="radio" name="entrega" value="envio" '+(delivery==="envio"?"checked":"")+'> Envío 24-48 h</label>'+
@@ -819,14 +882,14 @@ function renderForm(){
       '</div></div>'+
       '<div class="fg" id="dirWrap"'+(delivery==="recogida"?' hidden':'')+'>'+
         '<label for="f-dir">Dirección completa</label>'+
-        '<textarea id="f-dir" name="dir" autocomplete="street-address" maxlength="220" placeholder="Calle, número, piso, código postal y ciudad"></textarea></div>'+
+        '<textarea id="f-dir" name="dir" autocomplete="street-address" maxlength="220" placeholder="Calle, número, piso, código postal y ciudad">'+esc(c.dir || "")+'</textarea></div>'+
       '<div class="fg"><label id="lblPago">Forma de pago</label><div class="radio" role="radiogroup" aria-labelledby="lblPago">'+
-        '<label><input type="radio" name="pago" value="Bizum" checked> Bizum</label>'+
-        '<label><input type="radio" name="pago" value="Transferencia"> Transferencia</label>'+
-        '<label><input type="radio" name="pago" value="Efectivo"> Efectivo en mano</label>'+
+        '<label><input type="radio" name="pago" value="Bizum"'+pagoMarcado("Bizum")+'> Bizum</label>'+
+        '<label><input type="radio" name="pago" value="Transferencia"'+pagoMarcado("Transferencia")+'> Transferencia</label>'+
+        '<label><input type="radio" name="pago" value="Efectivo"'+pagoMarcado("Efectivo")+'> Efectivo en mano</label>'+
       '</div></div>'+
       '<div class="fg"><label for="f-notas">Notas · opcional</label>'+
-        '<textarea id="f-notas" name="notas" maxlength="300" placeholder="Horario de entrega, portal, algo que deba saber…"></textarea></div>'+
+        '<textarea id="f-notas" name="notas" maxlength="300" placeholder="Horario de entrega, portal, algo que deba saber…">'+esc(c.notas || "")+'</textarea></div>'+
       '<p class="err" id="fErr" role="alert" hidden></p>'+
     '</form>';
 
@@ -838,12 +901,15 @@ function renderForm(){
       '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.2s-.7 1-.9 1.2c-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.6-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.6s-.7-1.6-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5 2.2.8 3 .9 4 .8.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2m0 1.7a8.3 8.3 0 0 1 6.5 13.4 8.3 8.3 0 0 1-10.8 2l-.4-.2-3.1.8.8-3-.2-.4a8.3 8.3 0 0 1 7.2-12.6"/></svg>'+
       'Enviar por WhatsApp</button>'+
     '<div class="btnrow">'+
-      '<button class="btn ghost" type="button" data-send="ig">Instagram</button>'+
+      // Mientras el Instagram sea el de ejemplo, no se ofrece: el pedido (con dirección y
+      // teléfono) acabaría en una cuenta que no es la tuya.
+      (instagramListo() ? '<button class="btn ghost" type="button" data-send="ig">Instagram</button>' : '')+
       '<button class="btn ghost" type="button" data-send="copy">Copiar pedido</button>'+
     '</div>'+
     '<button class="btn link" type="button" data-step="cart" style="margin-top:4px">Volver al carrito</button>'+
     '<p class="notice">No se cobra nada desde la web. Te confirmo stock y te paso los datos de pago al recibir el pedido.</p>';
 
+  document.getElementById("chk").addEventListener("input", () => { cliente = readForm(); });
   document.getElementById("chk").addEventListener("change", e => {
     if (e.target.name === "entrega"){
       delivery = e.target.value;
@@ -858,11 +924,73 @@ function renderForm(){
   document.getElementById("f-nombre").focus();
 }
 
+// Después de abrir WhatsApp (o Instagram): el pedido sigue aquí hasta que el cliente diga que
+// lo ha enviado. Si su navegador no ha abierto el chat, el enlace de abajo sí lo abre (un
+// enlace pulsado a mano no lo bloquea ningún navegador).
+function renderEnviado(){
+  const e = ultimoEnvio;
+  document.getElementById("dTitle").textContent = "Casi está";
+  document.getElementById("dBody").innerHTML = '<div class="enviado"><div class="ok'+(e.abierta ? '' : ' no')+'" aria-hidden="true">'+(e.abierta ? '✓' : '!')+'</div>'+
+    '<h3>Falta pulsar enviar en '+esc(e.canal)+'</h3>'+
+    '<p>'+(e.pegar ? 'He copiado tu pedido: pégalo en el chat de '+esc(e.canal)+' y envíalo.'
+      : 'Se ha abierto '+esc(e.canal)+' con tu pedido ya escrito: solo tienes que pulsar enviar en el chat.')+
+    ' Referencia <span class="ref-ped">'+esc(e.ref)+'</span>.</p>'+
+    (e.abierta ? '' : '<p class="aviso" role="alert">Tu navegador no ha abierto '+esc(e.canal)+'. Pulsa «Abrir '+esc(e.canal)+'» aquí abajo.</p>')+
+    '<p>Te contesto el mismo día para confirmarte el stock y pasarte los datos de pago. Tu pedido se queda aquí hasta que me lo envíes.</p></div>';
+  document.getElementById("dFoot").innerHTML =
+    '<a class="btn '+(e.canal === "WhatsApp" ? "wa" : "primary")+'" href="'+esc(e.destino)+'" target="_blank" rel="noopener">'+
+      (e.abierta ? '¿No se ha abierto? Abrir ' : 'Abrir ')+esc(e.canal)+'</a>'+
+    '<div class="btnrow"><button class="btn primary" type="button" data-hecho>Ya lo he enviado</button>'+
+      '<button class="btn ghost" type="button" data-copiar-pedido>Copiar el pedido</button></div>'+
+    '<button class="btn link" type="button" data-step="form" style="margin-top:4px">Volver a mis datos</button>';
+}
+const instagramListo = () => !!TIENDA.instagram && TIENDA.instagram !== IG_PLACEHOLDER;
+
 /* ---------- construir el pedido ---------- */
 function orderId(){
   const d = new Date(), p = n => String(n).padStart(2,"0");
   return "PED-" + d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + "-" + (Math.floor(Math.random()*9000)+1000);
 }
+// La misma referencia mientras el pedido no cambie: si el cliente lo envía dos veces, en la hoja
+// se apunta una sola.
+function refPedido(){ if (!pedidoRef) pedidoRef = orderId(); return pedidoRef; }
+
+/* ---------- el enlace de un amigo ---------- */
+// Cada amigo tiene su enlace (…/zubi/?v=V2, lo copia Juan en su panel). Durante 30 días, lo que
+// se pida desde ese navegador lleva «Código de amigo: V2», para que Juan lo apunte a su nombre
+// con su comisión. Un enlace de otro amigo lo sustituye.
+const AMIGO_DIAS = 30;
+function amigoDeLaDireccion(){
+  try{
+    const v = String(new URLSearchParams(location.search).get("v") || "").trim().toUpperCase();
+    return /^V\d{1,3}$/.test(v) ? v : "";
+  }catch(e){ return ""; }
+}
+function recordarAmigo(){
+  const v = amigoDeLaDireccion();
+  if (!v) return;
+  try{ localStorage.setItem("zubi_amigo", JSON.stringify({ v, hasta: Date.now() + AMIGO_DIAS*864e5 })); }catch(e){}
+}
+function amigoDelEnlace(){
+  try{
+    const a = JSON.parse(localStorage.getItem("zubi_amigo") || "null");
+    if (a && /^V\d{1,3}$/.test(a.v) && a.hasta > Date.now()) return a.v;
+  }catch(e){}
+  return amigoDeLaDireccion();
+}
+
+/* ---------- analítica, sin cookies ---------- */
+// Cuántos visitan, añaden algo, abren el pedido y lo envían. Lo cuenta Google (en la hoja no
+// entra nada de nadie), una vez por visita. Dentro del panel de Juan (Webs y hoja) no se cuenta.
+function evento(tipo){
+  if (!TIENDA.stockUrl) return;
+  try{ if (window.top !== window.self) return; }catch(e){ return; }
+  try{ if (sessionStorage.getItem("zubi_ev_" + tipo)) return; sessionStorage.setItem("zubi_ev_" + tipo, "1"); }catch(e){}
+  const cuerpo = JSON.stringify({ accion: "evento", tipo, vendedor: amigoDelEnlace() });
+  try{ if (navigator.sendBeacon && navigator.sendBeacon(TIENDA.stockUrl, new Blob([cuerpo], { type: "text/plain" }))) return; }catch(e){}
+  try{ fetch(TIENDA.stockUrl, { method: "POST", body: cuerpo, keepalive: true }).catch(() => {}); }catch(e){}
+}
+
 function readForm(){
   const v = id => (document.getElementById(id)?.value || "").trim();
   const pago = document.querySelector('#chk input[name="pago"]:checked');
@@ -884,10 +1012,11 @@ function orderText(f){
   const sub = subtotal(), env = shipping(), L = "————————————————";
   const lines = cart.map(i => {
     const p = byRef(i.r);
-    return i.qty + "× " + p.r + " · " + p.name + " · talla " + i.size + " — " + eur(p.price * i.qty);
+    return i.qty + "× " + p.r + " · " + p.name + " · talla " + i.size + " — " + eur(priceOf(i.r, i.size) * i.qty);
   });
+  const amigo = amigoDelEnlace();
   return [
-    "*NUEVO PEDIDO — ZUBI*", "Ref. " + orderId(), L,
+    "*NUEVO PEDIDO — ZUBI*", "Ref. " + refPedido(), L,
     ...lines, L,
     "Subtotal: " + eur(sub),
     "Envío: " + (env === 0 ? "Gratis" : eur(env)),
@@ -898,7 +1027,8 @@ function orderText(f){
     "Entrega: " + f.entrega,
     delivery === "envio" ? "Dirección: " + f.dir : null,
     "Pago: " + f.pago,
-    f.notas ? "Notas: " + f.notas : null
+    f.notas ? "Notas: " + f.notas : null,
+    amigo ? "Código de amigo: " + amigo : null
   ].filter(Boolean).join("\n");
 }
 // Primero la copia síncrona: no pide permisos al marco y ocurre mientras la página aún tiene el foco.
@@ -929,26 +1059,29 @@ async function send(how){
     return;
   }
   errEl.hidden = true;
+  cliente = f;
   const txt = orderText(f);
 
-  if (how === "wa"){
+  // WhatsApp o Instagram: se abre el chat, pero el pedido NO se borra hasta que el cliente diga
+  // que lo ha enviado (antes se vaciaba al abrir WhatsApp, aunque no llegara a enviarlo o su
+  // navegador no lo abriera).
+  if (how === "wa" || how === "ig"){
     sending = true; setTimeout(()=>{ sending = false; }, 1500);
-    const url = "https://wa.me/" + TIENDA.whatsapp + "?text=" + encodeURIComponent(txt);
-    if (url.length > 1800){
-      copySync(txt);
-      window.open("https://wa.me/" + TIENDA.whatsapp, "_blank", "noopener");
-      toast("El pedido es largo y no cabe en el enlace. Lo he copiado: pégalo en el chat.");
-      return;
+    const ref = refPedido();
+    let destino, pegar = false;
+    if (how === "wa"){
+      destino = "https://wa.me/" + TIENDA.whatsapp + "?text=" + encodeURIComponent(txt);
+      if (destino.length > 1800){ copySync(txt); destino = "https://wa.me/" + TIENDA.whatsapp; pegar = true; }
+    } else {
+      copySync(txt); pegar = true;
+      destino = "https://ig.me/m/" + TIENDA.instagram;
     }
-    window.open(url, "_blank", "noopener");
-    toast("Pedido enviado a WhatsApp. Te contesto en cuanto lo vea.");
-    clearCart(); closeCart(); return;
-  }
-  if (how === "ig"){
-    sending = true; setTimeout(()=>{ sending = false; }, 1500);
-    const ok = copySync(txt);
-    window.open("https://ig.me/m/" + TIENDA.instagram, "_blank", "noopener");
-    toast(ok ? "Pedido copiado. Pégalo en el chat de Instagram." : "Abre Instagram y copia el pedido a mano.");
+    const w = window.open(destino, "_blank");   // sin «noopener» aquí: si no, no se sabe si se ha abierto
+    if (w){ try{ w.opener = null; }catch(e){} }
+    ultimoEnvio = { ref, txt, destino, abierta: !!w, pegar, canal: how === "wa" ? "WhatsApp" : "Instagram" };
+    guardarEnviado();
+    evento("pedido");
+    step = "enviado"; renderCart(false);
     return;
   }
   const ok = await copyText(txt);
@@ -989,8 +1122,17 @@ document.addEventListener("keydown", e => {
 drawer.addEventListener("click", e => {
   const t = e.target;
   if (t.closest("[data-close]")) return closeCart();
+  if (t.closest("[data-hecho]")){
+    clearCart(); closeCart();
+    toast("¡Gracias! Te contesto en cuanto lo vea.");
+    return;
+  }
+  if (t.closest("[data-copiar-pedido]")){
+    copyText(ultimoEnvio ? ultimoEnvio.txt : "").then(ok => toast(ok ? "Pedido copiado." : "No se ha podido copiar. Selecciónalo a mano."));
+    return;
+  }
   const st = t.closest("[data-step]");
-  if (st){ step = st.dataset.step; renderCart(false); return; }
+  if (st){ step = st.dataset.step; if (step === "form") evento("checkout"); renderCart(false); return; }
   const snd = t.closest("[data-send]");
   if (snd) return send(snd.dataset.send);
   const dec = t.closest("[data-dec]");
@@ -1033,25 +1175,27 @@ themeBtn.addEventListener("click", () => {
 });
 
 /* ---------- contacto ---------- */
-(function manifest(){
+// Las cifras de arriba salen de los datos, no se escriben a mano (se repintan al llegar el stock).
+function pintarManifiesto(){
   document.getElementById("mRefs").textContent = CATALOGO.length;
   document.getElementById("mFrom").textContent = eur(Math.min(...CATALOGO.map(p => p.price)));
-})();
+}
+pintarManifiesto();
 (function links(){
   const wa = document.getElementById("fWa");
   wa.href = "https://wa.me/" + TIENDA.whatsapp; wa.target = "_blank"; wa.rel = "noopener";
   wa.textContent = "WhatsApp · +" + TIENDA.whatsapp.replace(/^34/, "34 ");
+  // Instagram y email solo salen cuando son los de verdad: «por configurar» a la vista del
+  // cliente parece una tienda a medio hacer.
   const ig = document.getElementById("fIg");
-  if (TIENDA.instagram === IG_PLACEHOLDER){
-    ig.removeAttribute("href"); ig.style.color = "var(--ink-3)"; ig.textContent = "Instagram · por configurar";
-  } else {
+  if (!instagramListo()) ig.hidden = true;
+  else {
     ig.href = "https://instagram.com/" + TIENDA.instagram; ig.target = "_blank"; ig.rel = "noopener";
     ig.textContent = "@" + TIENDA.instagram;
   }
   const m = document.getElementById("fMail");
-  if (TIENDA.email === MAIL_PLACEHOLDER){
-    m.removeAttribute("href"); m.style.color = "var(--ink-3)"; m.textContent = "Email · por configurar";
-  } else { m.href = "mailto:" + TIENDA.email; m.textContent = TIENDA.email; }
+  if (!TIENDA.email || TIENDA.email === MAIL_PLACEHOLDER) m.hidden = true;
+  else { m.href = "mailto:" + TIENDA.email; m.textContent = TIENDA.email; }
   document.getElementById("yr").textContent = new Date().getFullYear();
 })();
 
@@ -1088,7 +1232,9 @@ async function stockEnDirecto(){
   try{
     if (!j || !j.ok || !j.stock) return;
     aplicarStock(j.stock);
-    ajustarCarrito();
+    // Con un pedido recién enviado, no se le toca el carrito: es lo que ha mandado.
+    if (!(step === "enviado" && ultimoEnvio)) ajustarCarrito();
+    pintarManifiesto();
     fechaStock("en directo");
     renderGrid(); renderCart(false);
   }catch(e){ /* dentro de claude.ai no se puede conectar con Google: se queda la foto de stock */ }
@@ -1100,12 +1246,18 @@ try{
   if (th === "dark" || th === "light") document.documentElement.setAttribute("data-theme", th);
 }catch(e){}
 syncThemeLabel();
+recordarAmigo();
 load();
+{ // ¿Mandó un pedido a WhatsApp y ha vuelto? Le sigue esperando «¿lo has enviado?».
+  const e = leerEnviado();
+  if (e && cart.length){ ultimoEnvio = e; pedidoRef = e.ref; step = "enviado"; } else olvidarEnviado();
+}
 buildChips();
 if (STOCK.fecha) fechaStock("al " + new Date(STOCK.fecha + "T12:00:00").toLocaleDateString("es-ES", {day:"numeric", month:"short"}));
 renderGrid();
 renderCart(false);
 stockEnDirecto();
+evento("visita");
 </script>
 
 </body></html>
