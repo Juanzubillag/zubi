@@ -570,6 +570,24 @@
     el('actualizado').textContent = texto;
   }
 
+  // Convierte lo que manda Google (modo=privado) en las cuentas y pinta el panel. Aparte de
+  // cargar(), también lo usa entrar(): así, al entrar, los datos que ya llegaron para
+  // comprobar la clave no se piden una segunda vez (eso era la mitad del tiempo de espera).
+  function procesarDatos(j) {
+    DATOS = j;
+    S.calc = Calculo.calcular(j.productos, j.movimientos, { tramos: j.tramos, propio: j.propio });
+    S.cuentas = [...Calculo.cuentas(S.calc).values()];
+    S.resumen = Panel.resumen(S.calc, S.cuentas, j.config);
+    S.nombre = new Map((j.vendedores || []).map((v) => [String(v.id).toUpperCase(), v.nombre || v.id]));
+    S.contactos = j.contactos || {};
+    S.deudas = Calculo.deudas(S.calc);
+    S.fichas = Panel.fichas(S.calc, S.cuentas, j.movimientos || [], j.vendedores, S.contactos, new Date());
+    ultimaCarga = Date.now();
+    aviso('');
+    pintarTodo();
+    conexion('', 'Actualizado ahora');
+  }
+
   async function cargar() {
     if (cargando || !CLAVE) return;
     cargando = true;
@@ -580,18 +598,7 @@
         if (/clave/i.test(j.error || '')) { salir(j.error); return; }
         throw new Error(j.error || 'Google ha contestado algo inesperado.');
       }
-      DATOS = j;
-      S.calc = Calculo.calcular(j.productos, j.movimientos, { tramos: j.tramos, propio: j.propio });
-      S.cuentas = [...Calculo.cuentas(S.calc).values()];
-      S.resumen = Panel.resumen(S.calc, S.cuentas, j.config);
-      S.nombre = new Map((j.vendedores || []).map((v) => [String(v.id).toUpperCase(), v.nombre || v.id]));
-      S.contactos = j.contactos || {};
-      S.deudas = Calculo.deudas(S.calc);
-      S.fichas = Panel.fichas(S.calc, S.cuentas, j.movimientos || [], j.vendedores, S.contactos, new Date());
-      ultimaCarga = Date.now();
-      aviso('');
-      pintarTodo();
-      conexion('', 'Actualizado ahora');
+      procesarDatos(j);
     } catch (e) {
       conexion('mal', 'Sin conexión con Google');
       aviso(e.message, 'mal');
@@ -1355,7 +1362,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
       if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
       guardar('clave_privada', clave);
       mostrarPanel(true);
-      await cargar();
+      procesarDatos(j);   // ya han llegado los datos al comprobar la clave: no hace falta pedirlos otra vez
       return true;
     } catch (e) {
       CLAVE = null;
