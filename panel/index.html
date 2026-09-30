@@ -93,6 +93,9 @@
   /* ---- las vistas ocupan todo el ancho: JARVIS flota encima ---- */
   .rejilla { display: block; }
   main { padding-bottom: 110px; }   /* sitio para la bolita de JARVIS */
+  /* container-type deja que .graficas (más abajo) mire el ancho de #vistas con @container,
+     el mismo número exacto que lee anchoVistas() en JS para calcular el tamaño de las gráficas. */
+  .vistas { container-type: inline-size; container-name: vistas; }
 
   /* ---- mando ---- */
   .mando-top { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; }
@@ -108,7 +111,15 @@
   .tile .d { font-size: 12.5px; color: var(--suave); margin-top: 2px; }
   .tile.bien .v { color: var(--bien); } .tile.debe .v { color: var(--mal); }
   h2.sec { font-family: var(--hud); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--suave); margin: 22px 0 10px; font-weight: 600; }
-  .graficas { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 12px; }
+  /* auto-fit calcula las columnas solo por lo ancho que haya sitio, sin saber que aquí solo
+     hay dos gráficas medianas: en una pantalla ancha metía 4 columnas (dos vacías) en vez de
+     2, y el texto de dentro de las gráficas (que se dibuja en JS a la medida exacta del
+     hueco) salía diminuto. Con columnas fijas al mismo ancho (672px) que usa anchoVistas()
+     para decidir "media" o "ancha", el hueco que mide JS y el que pinta CSS son siempre el
+     mismo. @container mira el ancho de #vistas (ver container-type más abajo), no el de la
+     ventana: así no depende de cuánto ocupen la cabecera o el margen de la página. */
+  .graficas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  @container vistas (min-width: 672px) { .graficas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .grafica { padding: 14px 16px 12px; min-width: 0; }
   .grafica h3 { font-family: var(--hud); font-size: 15px; font-weight: 600; }
   .grafica .nota { color: var(--suave); font-size: 12.5px; margin: 2px 0 8px; }
@@ -1297,6 +1308,10 @@ te lo preparo y tú lo confirmas.</div>` : '';
     document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
     if (v === 'webs' && !el('web-marco').src) verWeb('../');
+    // Las gráficas se miden por el hueco real: si Mando estaba oculto la primera vez que se
+    // pintaron (se recuerda otra pestaña de una visita anterior), medían mal y el texto salía
+    // diminuto. Al entrar en Mando, si el hueco ha cambiado desde que se pintó, se rehace.
+    if (v === 'resumen' && S.calc && anchoVistas() !== anchoPintado) pintarResumen();
     pref('panel_vista', v);   // al volver, la misma pestaña
     try { if (window.history && window.history.replaceState && hashVista() !== v) window.history.replaceState(null, '', '#' + v); } catch (e) { /* nada */ }
     setTimeout(marcarDesbordes, 0);
