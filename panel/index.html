@@ -88,7 +88,12 @@
   .entrar h2 { font-family: var(--display); font-size: 18px; letter-spacing: .18em; }
   .entrar p { margin: 0; color: var(--suave); font-size: 14px; }
   .entrar input { padding: 11px 12px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--fondo); font-size: 16px; }
+  .entrar input:disabled { opacity: .55; }
   .entrar .err { color: var(--mal); font-size: 14px; min-height: 20px; }
+  /* El botón de entrar, mientras trabaja: gira algo visible, no solo un poco más apagado. */
+  .girando { width: 14px; height: 14px; flex: none; border: 2px solid rgba(3, 32, 43, .35);
+    border-top-color: #03202b; border-radius: 50%; animation: gira .7s linear infinite; }
+  #entrar-btn[aria-busy="true"] { cursor: wait; }
 
   /* ---- las vistas ocupan todo el ancho: JARVIS flota encima ---- */
   .rejilla { display: block; }
@@ -533,11 +538,13 @@
   const pref = (k, v) => { try { if (v === undefined) return window.localStorage.getItem(k); window.localStorage.setItem(k, v); } catch (e) { return null; } };
 
   // ---- Google, con reintentos: a veces contesta «No se puede abrir el archivo» ----
-  async function google(opciones, intentos = 3) {
+  // `onReintento(intento)` (opcional) avisa antes de cada reintento, para no dejar al que
+  // espera sin saber si ha pasado algo.
+  async function google(opciones, intentos = 3, onReintento) {
     if (!CFG.registroUrl) throw new Error('Falta el enlace de Google (registroUrl) en config.js.');
     let ultimo = null;
     for (let intento = 0; intento < intentos; intento++) {
-      if (intento) await espera(intento === 1 ? 1500 : 4000);
+      if (intento) { if (onReintento) onReintento(intento); await espera(intento === 1 ? 1500 : 4000); }
       try {
         const r = opciones.cuerpo
           ? await fetch(CFG.registroUrl, { method: 'POST', body: JSON.stringify(opciones.cuerpo) })
@@ -1335,11 +1342,16 @@ te lo preparo y tú lo confirmas.</div>` : '';
     } else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
   }
   async function entrar(clave) {
+    const btn = el('entrar-btn'), campo = el('clave');
+    if (btn.disabled) return false;   // ya está entrando: un segundo clic no hace nada
     CLAVE = clave;
     el('entrar-err').textContent = '';
-    el('entrar-btn').disabled = true;
+    btn.disabled = true; campo.disabled = true; btn.setAttribute('aria-busy', 'true');
+    btn.innerHTML = '<span class="girando" aria-hidden="true"></span> Entrando…';
     try {
-      const j = await google({ params: { modo: 'privado', clave } });
+      const j = await google({ params: { modo: 'privado', clave } }, 3, () => {
+        btn.innerHTML = '<span class="girando" aria-hidden="true"></span> Sigue intentando…';
+      });
       if (!j.ok) throw new Error(j.error || 'No se ha podido entrar.');
       guardar('clave_privada', clave);
       mostrarPanel(true);
@@ -1350,7 +1362,8 @@ te lo preparo y tú lo confirmas.</div>` : '';
       el('entrar-err').textContent = e.message;
       return false;
     } finally {
-      el('entrar-btn').disabled = false;
+      btn.disabled = false; campo.disabled = false; btn.setAttribute('aria-busy', 'false');
+      btn.textContent = 'Entrar';
     }
   }
   function salir(motivo) {
