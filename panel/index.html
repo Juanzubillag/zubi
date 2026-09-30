@@ -243,13 +243,6 @@
   #tip { position: fixed; z-index: 50; pointer-events: none; background: rgba(2, 7, 11, .94); border: 1px solid var(--linea-2); color: var(--tinta);
     padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: var(--hud); box-shadow: 0 8px 26px -6px rgba(0,0,0,.7), 0 0 18px -8px rgba(53,201,238,.6);
     font-variant-numeric: tabular-nums; animation: aparece-o .12s ease-out; }
-  /* La barra bajo el ratón se enciende. */
-  .grafica path { transition: fill .15s ease, filter .15s ease; }
-  .grafica rect[data-tip]:hover + path, .grafica g[data-tip]:hover path, .grafica path[data-tip]:hover {
-    fill: #5fdcf8; filter: drop-shadow(0 0 6px rgba(53, 201, 238, .7)); }
-  .grafica path[data-tip][fill="var(--s2)"]:hover { fill: #f07a4a; filter: drop-shadow(0 0 6px rgba(217, 89, 38, .7)); }
-  .grafica path[data-tip][fill="var(--s3)"]:hover { fill: #2cc48e; filter: drop-shadow(0 0 6px rgba(25, 158, 112, .7)); }
-  .grafica path[data-tip][fill="var(--s1)"]:hover { fill: #62a5f0; filter: drop-shadow(0 0 6px rgba(57, 135, 229, .7)); }
 
   /* ---- tablas ----
      Cada tabla va en su propio marco, como mucho del alto de la pantalla: la barra para ir a
@@ -268,6 +261,11 @@
   table.fija td:first-child, table.fija th:first-child { position: sticky; left: 0; z-index: 1; background: #0b1620;
     box-shadow: 1px 0 0 var(--linea); }
   table.fija thead th:first-child { z-index: 3; background: #0c1822; }
+  /* En el móvil, la columna fija no puede comerse la pantalla: si el nombre es largo, parte en
+     dos líneas. (Con 278 px fijos en un hueco de 356, la tabla parecía no moverse.) */
+  @media (max-width: 640px) {
+    table.fija td:first-child:not([colspan]), table.fija th:first-child { white-space: normal; max-width: 40vw; min-width: 96px; overflow-wrap: anywhere; line-height: 1.3; }
+  }
   td.envuelve { white-space: normal; min-width: 150px; }
   th.ordena { cursor: pointer; user-select: none; }
   th.ordena:hover { color: var(--tinta); }
@@ -525,15 +523,56 @@
   .arranque .caja { animation: entra .75s var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 55ms + 160ms); }
   .arranque h2.sec { animation: aparece-o .6s ease both .5s; }
   @keyframes entra { from { opacity: 0; transform: translateY(16px) scale(.985); filter: blur(7px); } }
-  .arranque .anillo-luz { animation: dibuja 1.4s var(--ease-out) both .35s; }
+  /* ---- REVELAR: cada gráfica (y el reactor) se enciende cuando aparece en pantalla ----
+     Cada vez que entras en Mando, no en las actualizaciones de cada minuto (lo lleva
+     prepararRevelado() en JS con un IntersectionObserver). */
+  .revela .anillo-luz { animation: dibuja 1.4s var(--ease-out) both .1s; }
   @keyframes dibuja { from { stroke-dasharray: 0 999; } }
-  .arranque .barra-v { transform-box: fill-box; transform-origin: 50% 100%; animation: crece-v .8s var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 16ms + 420ms); }
-  .arranque .barra-h { transform-box: fill-box; transform-origin: 0 50%; animation: crece-h .8s var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 45ms + 480ms); }
+  .grafica.revela .barra-v { transform-box: fill-box; transform-origin: 50% 100%; animation: crece-v .9s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 20ms + 120ms); }
+  .grafica.revela .barra-h { transform-box: fill-box; transform-origin: 0 50%; animation: crece-h .9s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms + 140ms); }
   @keyframes crece-v { from { transform: scaleY(0); } }
   @keyframes crece-h { from { transform: scaleX(0); } }
-  .arranque .grafica svg text { animation: aparece-o .5s ease both 1s; }
+  .grafica.revela .base { stroke-dasharray: 100; animation: base 1s var(--ease-out) both; }
+  @keyframes base { from { stroke-dashoffset: 100; } }
+  .grafica.revela svg text:not([data-n]):not(.valor-barra) { animation: aparece-o .5s ease both .45s; }
+  .grafica.revela .leyenda .ley { animation: aparece .45s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms + 80ms); }
+  /* Un escáner cruza la gráfica de días al revelarse. */
+  .escaner { opacity: 0; pointer-events: none; }
+  .grafica.revela .escaner { animation: escanea 1.35s var(--ease-in-out) .12s both; }
+  @keyframes escanea { 0% { transform: translateX(0); opacity: 0; } 12%, 82% { opacity: 1; } 100% { transform: translateX(var(--w)); opacity: 0; } }
+
+  /* ---- gráficas vivas: la barra que señalas se enciende y las demás se apagan ----
+     Con ratón, al pasar; en el móvil, al tocar (.activa / .foco los pone el JS). */
+  .grafica .barra-v, .grafica .barra-h { transition: opacity .22s ease, fill .15s ease, filter .2s ease; }
+  .grafica .zona { transition: fill .15s ease; }
+  .grafica .fila, .grafica .max-etq { transition: opacity .2s ease; }
+  .grafica svg:has(.dia:hover) .dia:not(:hover) .barra-v, .grafica svg.foco .dia:not(.activa) .barra-v { opacity: .28; }
+  .grafica .dia:hover .barra-v, .grafica .dia.activa .barra-v { fill: #5fdcf8; filter: drop-shadow(0 0 7px rgba(53, 201, 238, .8)); }
+  .grafica .dia:hover .zona, .grafica .dia.activa .zona, .grafica .fila:hover .zona, .grafica .fila.activa .zona { fill: rgba(53, 201, 238, .06); }
+  .grafica svg:has(.dia:hover) .max-etq, .grafica svg.foco .max-etq { opacity: 0; }
+  .valor-barra { fill: var(--tinta); font-variant-numeric: tabular-nums; opacity: 0; transform: translateY(5px); pointer-events: none;
+    transition: opacity .16s ease, transform .24s var(--ease-out); }
+  .grafica .dia:hover .valor-barra, .grafica .dia.activa .valor-barra { opacity: 1; transform: none; }
+  .grafica svg:has(.fila:hover) .fila:not(:hover), .grafica svg.foco .fila:not(.activa) { opacity: .35; }
+  .grafica .fila:hover .barra-h, .grafica .fila.activa .barra-h { fill: #5fdcf8; filter: drop-shadow(0 0 7px rgba(53, 201, 238, .75)); }
+  .grafica svg text { font-variant-numeric: tabular-nums; }
+  /* Dónde está cada prenda: señalar un tramo (o su leyenda) aísla esa serie. */
+  .grafica svg:has([data-s="0"]:hover) [data-s]:not([data-s="0"]), .grafica:has(.ley[data-s="0"]:hover) svg [data-s]:not([data-s="0"]), .grafica[data-foco="0"] svg [data-s]:not([data-s="0"]),
+  .grafica svg:has([data-s="1"]:hover) [data-s]:not([data-s="1"]), .grafica:has(.ley[data-s="1"]:hover) svg [data-s]:not([data-s="1"]), .grafica[data-foco="1"] svg [data-s]:not([data-s="1"]),
+  .grafica svg:has([data-s="2"]:hover) [data-s]:not([data-s="2"]), .grafica:has(.ley[data-s="2"]:hover) svg [data-s]:not([data-s="2"]), .grafica[data-foco="2"] svg [data-s]:not([data-s="2"]) {
+    opacity: .2; }
+  .grafica[data-foco="0"] .ley:not([data-s="0"]), .grafica[data-foco="1"] .ley:not([data-s="1"]), .grafica[data-foco="2"] .ley:not([data-s="2"]) { opacity: .45; }
+  .grafica path[data-s="0"]:hover, .grafica[data-foco="0"] path[data-s="0"] { fill: #62a5f0; filter: drop-shadow(0 0 6px rgba(57, 135, 229, .75)); }
+  .grafica path[data-s="1"]:hover, .grafica[data-foco="1"] path[data-s="1"] { fill: #f07a4a; filter: drop-shadow(0 0 6px rgba(217, 89, 38, .75)); }
+  .grafica path[data-s="2"]:hover, .grafica[data-foco="2"] path[data-s="2"] { fill: #2cc48e; filter: drop-shadow(0 0 6px rgba(25, 158, 112, .75)); }
+  .ley { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 3px 6px; margin: -3px -6px; border-radius: 6px;
+    color: inherit; font: inherit; cursor: pointer; transition: opacity .2s ease, background-color .15s ease; -webkit-tap-highlight-color: transparent; }
+  @media (hover: hover) and (pointer: fine) { .ley:hover { background: rgba(53, 201, 238, .08); color: var(--tinta); } }
+  /* «Hoy» late en la línea base: el día en curso. */
+  .hoy-onda { transform-box: fill-box; transform-origin: center; animation: onda-hoy 2.4s var(--ease-out) infinite; }
+  @keyframes onda-hoy { from { transform: scale(1); opacity: .9; } to { transform: scale(3.4); opacity: 0; } }
 
   /* Movimiento reducido: sin desplazamientos ni giros; los cambios de estado se siguen viendo
      (fundidos cortos y colores). */
@@ -842,17 +881,26 @@
     const banda = (W - iz - de) / serie.length, w = Math.min(24, banda - 2);
     const imax = serie.findIndex((d) => d.importe === max);
     const fecha = (f) => f.slice(8, 10) + '/' + f.slice(5, 7);
+    const base = arriba + ph;
+    // Cada día es un grupo: su zona (para señalarlo), su barra y su importe (sale al señalarlo).
     const barras = serie.map((d, i) => {
       const x = iz + i * banda + (banda - w) / 2, h = d.importe > 0 ? Math.max(2, d.importe / max * ph) : 0;
       const tip = `${fecha(d.fecha)} · ${eur(d.importe)} · ${d.uds} ${d.uds === 1 ? 'prenda' : 'prendas'}`;
-      return `<rect x="${iz + i * banda}" y="${arriba}" width="${banda}" height="${ph}" fill="transparent" data-tip="${esc(tip)}"/>` +
-        (h ? `<path class="barra-v" style="--i:${i}" d="${barraV(x, arriba + ph - h, w, h)}" fill="var(--serie)" pointer-events="none"/>` : '');
+      const cx = Math.min(Math.max(iz + i * banda + banda / 2, 30), W - 30);
+      return `<g class="dia" data-tip="${esc(tip)}"><rect class="zona" x="${iz + i * banda}" y="${arriba}" width="${banda}" height="${ph}" fill="transparent"/>` +
+        (h ? `<path class="barra-v" style="--i:${i}" d="${barraV(x, base - h, w, h)}" fill="var(--serie)"/>` +
+          `<text class="valor-barra" x="${cx}" y="${base - h - 7}" font-size="11.5" text-anchor="middle">${eur(d.importe)}</text>` : '') + '</g>';
     }).join('');
-    const xMax = iz + imax * banda + banda / 2;
+    const xMax = iz + imax * banda + banda / 2, xHoy = iz + (serie.length - 1) * banda + banda / 2;
     return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Ventas de los últimos 30 días; el mejor día ${eur(max)}">
-      <line x1="${iz}" x2="${W - de}" y1="${arriba + ph}" y2="${arriba + ph}" stroke="var(--linea-2)" stroke-width="1"/>
+      <defs><linearGradient id="g-escaner" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#35c9ee" stop-opacity="0"/>
+        <stop offset=".75" stop-color="#35c9ee" stop-opacity=".22"/><stop offset="1" stop-color="#bff3ff" stop-opacity=".95"/></linearGradient></defs>
+      <line class="base" pathLength="100" x1="${iz}" x2="${W - de}" y1="${base}" y2="${base}" stroke="var(--linea-2)" stroke-width="1"/>
       ${barras}
-      <text x="${Math.min(Math.max(xMax, 40), W - 40)}" y="${arriba + ph - max / max * ph - 6}" fill="var(--tinta)" font-size="12" text-anchor="middle">${eur(max)}</text>
+      <rect class="escaner" x="-90" y="${arriba - 6}" width="90" height="${ph + 6}" fill="url(#g-escaner)" style="--w:${W + 90}px"/>
+      <circle class="hoy-onda" cx="${xHoy}" cy="${base}" r="3.5" fill="none" stroke="var(--cian)" stroke-width="1.5" pointer-events="none"/>
+      <circle cx="${xHoy}" cy="${base}" r="3" fill="var(--cian)" pointer-events="none"/>
+      <text class="max-etq" x="${Math.min(Math.max(xMax, 40), W - 40)}" y="${base - ph - 6}" fill="var(--tinta)" font-size="12" text-anchor="middle" data-n="${max}" data-f="eur">${eur(max)}</text>
       <text x="${iz}" y="${H - 8}" fill="var(--suave)" font-size="11">${fecha(serie[0].fecha)}</text>
       <text x="${W / 2}" y="${H - 8}" fill="var(--suave)" font-size="11" text-anchor="middle">${fecha(serie[Math.floor(serie.length / 2)].fecha)}</text>
       <text x="${W - de}" y="${H - 8}" fill="var(--suave)" font-size="11" text-anchor="end">hoy</text>
@@ -866,14 +914,14 @@
     const H = filas.length * fila + 6;
     const cuerpo = filas.map((f, i) => {
       const y = 4 + i * fila, w = Math.max(f.importe > 0 ? 3 : 0, f.importe / max * (W - iz - de));
-      return `<g data-tip="${esc(`${f.nombre} · ${eur(f.importe)} · ${f.uds} ${f.uds === 1 ? 'prenda' : 'prendas'}`)}">
-        <rect x="0" y="${y}" width="${W}" height="${fila}" fill="transparent"/>
+      return `<g class="fila" data-tip="${esc(`${f.nombre} · ${eur(f.importe)} · ${f.uds} ${f.uds === 1 ? 'prenda' : 'prendas'}`)}">
+        <rect class="zona" x="0" y="${y}" width="${W}" height="${fila}" rx="6" fill="transparent"/>
         <text x="${iz - 10}" y="${y + fila / 2 + 4}" fill="var(--suave)" font-size="12.5" text-anchor="end">${esc(corta(f.nombre, iz - 12))}</text>
         ${w ? `<path class="barra-h" style="--i:${i}" d="${barraH(iz, y + (fila - grosor) / 2, w, grosor, true)}" fill="var(--serie)"/>` : ''}
-        <text x="${iz + w + 8}" y="${y + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5">${eur(f.importe)}</text></g>`;
+        <text x="${iz + w + 8}" y="${y + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5" data-n="${f.importe}" data-f="eur">${eur(f.importe)}</text></g>`;
     }).join('');
     return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(filas.map((f) => f.nombre + ' ' + eur(f.importe)).join(', '))}">
-      <line x1="${iz}" x2="${iz}" y1="2" y2="${H - 2}" stroke="var(--linea-2)" stroke-width="1"/>${cuerpo}</svg>` +
+      <line class="base" pathLength="100" x1="${iz}" x2="${iz}" y1="2" y2="${H - 2}" stroke="var(--linea-2)" stroke-width="1"/>${cuerpo}</svg>` +
       tabla(['', 'Importe', 'Prendas'], filas.map((f) => [f.nombre, eur(f.importe), f.uds]));
   }
 
@@ -893,14 +941,15 @@
         const w = Math.max(1, ultimo ? ancho : ancho - 2);   // 2px de hueco entre tramos
         const d = barraH(x, y, w, grosor, ultimo);
         x += ancho;
-        return `<path class="barra-h" style="--i:${i + j * 1.6}" d="${d}" fill="${SERIES[si][2]}" data-tip="${esc(`${c.categoria} · ${SERIES[si][1]}: ${v}`)}"/>`;
+        return `<path class="barra-h" style="--i:${i + j * 1.6}" data-s="${si}" d="${d}" fill="${SERIES[si][2]}" data-tip="${esc(`${c.categoria} · ${SERIES[si][1]}: ${v}`)}"/>`;
       }).join('');
       return `<text x="${iz - 10}" y="${4 + i * fila + fila / 2 + 4}" fill="var(--suave)" font-size="12.5" text-anchor="end">${esc(corta(c.categoria, iz - 12))}</text>
         ${segs}<text x="${iz + largo(c) / max * (W - iz - de) + 8}" y="${4 + i * fila + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5">${c.total}${
           c.deMas ? `<tspan fill="var(--mal)"> · ${c.deMas} de más</tspan>` : ''}</text>`;
     }).join('');
     const deMas = cats.reduce((a, c) => a + c.deMas, 0);
-    return `<div class="leyenda">${SERIES.map(([, n, col]) => `<span><i style="background:${col}"></i>${n}</span>`).join('')}</div>
+    return `<div class="leyenda">${SERIES.map(([, n, col], si) => `<button type="button" class="ley" data-s="${si}" style="--i:${si}"
+        title="Ver solo: ${n.toLowerCase()}"><i style="background:${col}"></i>${n}</button>`).join('')}</div>
       <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Prendas por categoría: vendidas, en casa de amigos y en tu casa">${cuerpo}</svg>` +
       (deMas ? `<p class="nota" style="color:var(--mal)">⚠ Hay ${deMas} ${deMas === 1 ? 'prenda apuntada' : 'prendas apuntadas'} de más que las compradas:
         en Stock, filtra por «Agotadas o en negativo» para ver cuál.</p>` : '') +
@@ -930,7 +979,7 @@
       : '<div class="nada">✓ Nada pendiente: nadie te debe, no hay prendas paradas ni errores.</div>';
     el('v-resumen').innerHTML = `
       <div class="mando-top">
-        <div class="reactor caja" style="--i:0">
+        <div class="reactor caja" style="--i:0" data-revela="reactor">
           <div class="etq">Recuperado del pedido</div>
           <svg viewBox="0 0 200 200" role="img" aria-label="${pct} % recuperado">
             <defs><filter id="brillo"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
@@ -974,11 +1023,12 @@
       </div>
       <h2 class="sec">Estadísticas</h2>
       <div class="graficas">
-        <div class="grafica caja ancha" style="--i:7"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
-        <div class="grafica caja" style="--i:8"><h3>Por canal</h3><p class="nota">Dónde se vende más, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', media)}</div>
-        <div class="grafica caja" style="--i:8.5"><h3>Por vendedor</h3><p class="nota">Lo que ha vendido cada uno, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', media)}</div>
-        <div class="grafica caja ancha" style="--i:9"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus amigos y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), ancha)}</div>
+        <div class="grafica caja ancha" style="--i:7" data-revela="dias"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
+        <div class="grafica caja" style="--i:8" data-revela="canal"><h3>Por canal</h3><p class="nota">Dónde se vende más, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', media)}</div>
+        <div class="grafica caja" style="--i:8.5" data-revela="vendedor"><h3>Por vendedor</h3><p class="nota">Lo que ha vendido cada uno, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', media)}</div>
+        <div class="grafica caja ancha" style="--i:9" data-revela="stock"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus amigos y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), ancha)}</div>
       </div>`;
+    prepararRevelado();
   }
 
   // ---- Stock ----
@@ -1530,6 +1580,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   document.addEventListener('scroll', (e) => {
     if (e.target && e.target.classList && e.target.classList.contains('tabla')) marcarDesbordes();
   }, true);
+  let vistaActual = '';
   const hashVista = () => { try { return String((window.location && window.location.hash) || '').slice(1); } catch (e) { return ''; } };
   function verVista(v) {
     if (VISTAS.indexOf(v) < 0) v = 'resumen';
@@ -1539,7 +1590,10 @@ te lo preparo y tú lo confirmas.</div>` : '';
     // Las gráficas se miden por el hueco real: si Mando estaba oculto la primera vez que se
     // pintaron (se recuerda otra pestaña de una visita anterior), medían mal y el texto salía
     // diminuto. Al entrar en Mando, si el hueco ha cambiado desde que se pintó, se rehace.
+    if (v === 'resumen' && vistaActual !== 'resumen') revelados.clear();   // al volver a Mando, las gráficas se vuelven a encender
+    vistaActual = v;
     if (v === 'resumen' && S.calc && anchoVistas() !== anchoPintado) pintarResumen();
+    else if (v === 'resumen' && S.calc) prepararRevelado();
     pref('panel_vista', v);   // al volver, la misma pestaña
     try { if (window.history && window.history.replaceState && hashVista() !== v) window.history.replaceState(null, '', '#' + v); } catch (e) { /* nada */ }
     moverLuz(true);
@@ -1561,32 +1615,68 @@ te lo preparo y tú lo confirmas.</div>` : '';
   // Un barrido cruza la pantalla, las pestañas y las tarjetas entran en cascada, el anillo del
   // reactor se dibuja, las barras crecen y las cifras cuentan desde 0. Solo una vez por
   // entrada: el panel se repinta cada minuto y eso no debe repetirse.
-  let arrancado = false;
+  let arrancado = false, arrancando = false;
   function arrancar() {
     if (arrancado) return;
     arrancado = true;
     if (quieto()) return;
     const vista = VISTAS.map((x) => el('v-' + x)).find((s) => s && !s.hidden);
     const nav = el('pestanas'), barrido = el('barrido');
+    arrancando = true;
     clase(nav, 'arranque', true);
     clase(vista, 'arranque', true);
     if (barrido) barrido.hidden = false;
-    contarCifras();
+    const r = el('v-resumen');
+    contarCifras(r.querySelectorAll ? r.querySelectorAll('.tiles [data-n], .ritmo [data-n]') : [], 350, 1400);
     setTimeout(() => {
+      arrancando = false;
       clase(nav, 'arranque', false);
       clase(vista, 'arranque', false);
       if (barrido) barrido.hidden = true;
     }, 2000);
   }
-  // Las cifras del Mando cuentan desde 0 hasta su valor (el texto final ya está puesto: si
-  // esto no corre, se ve el número de siempre).
-  function contarCifras() {
-    if (!window.requestAnimationFrame || !document.querySelector) return;
-    const nodos = [...(el('v-resumen').querySelectorAll ? el('v-resumen').querySelectorAll('[data-n]') : [])];
+
+  // ---- Revelar: el reactor y cada gráfica se encienden al aparecer en pantalla ----
+  // Cada vez que entras en Mando (verVista vacía `revelados`), pero no cuando el panel se
+  // repinta solo cada minuto: lo ya revelado en esta visita no se repite.
+  const revelados = new Set();
+  let mirador = null;
+  function prepararRevelado() {
+    const raiz = el('v-resumen');
+    if (!raiz || raiz.hidden || !raiz.querySelectorAll) return;
+    const pendientes = [...raiz.querySelectorAll('[data-revela]')].filter((n) => !revelados.has(n.getAttribute('data-revela')));
+    if (!pendientes.length) return;
+    if (quieto() || !window.IntersectionObserver) { pendientes.forEach((n) => revelados.add(n.getAttribute('data-revela'))); return; }
+    if (mirador) mirador.disconnect();
+    mirador = new window.IntersectionObserver((vistos) => vistos.forEach((v) => {
+      if (!v.isIntersecting) return;
+      mirador.unobserve(v.target);
+      revelar(v.target);
+    }), { threshold: 0.3 });
+    pendientes.forEach((n) => mirador.observe(n));
+  }
+  function revelar(n) {
+    const clave = n.getAttribute('data-revela');
+    if (revelados.has(clave)) return;
+    revelados.add(clave);
+    // En el arranque, espera a que su tarjeta haya entrado.
+    setTimeout(() => {
+      if (!n.isConnected) return;
+      clase(n, 'revela', true);
+      contarCifras(n.querySelectorAll('[data-n]'), clave === 'reactor' ? 100 : 140, clave === 'reactor' ? 1400 : 1000);
+      setTimeout(() => clase(n, 'revela', false), 2600);
+    }, arrancando ? 520 : 0);
+  }
+
+  // Cifras que cuentan desde 0 hasta su valor (el texto final ya está puesto: si esto no
+  // corre, se ve el número de siempre).
+  function contarCifras(lista, retraso, dura) {
+    if (!window.requestAnimationFrame || quieto()) return;
+    const nodos = [...(lista || [])];
     if (!nodos.length) return;
     const fmt = (n, f) => (f === 'eur' ? eur(n) : f === 'pct' ? Math.round(n) + ' %' : String(Math.round(n)));
     const fin = nodos.map((n) => Number(n.getAttribute('data-n')) || 0);
-    const t0 = Date.now() + 350, dura = 1400;   // al compás del anillo del reactor (.anillo-luz)
+    const t0 = Date.now() + retraso;
     const paso = () => {
       const t = Math.min(1, Math.max(0, (Date.now() - t0) / dura));
       const k = t === 1 ? 1 : 1 - Math.pow(1 - t, 4);   // frena al final, como el anillo
@@ -1672,6 +1762,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   function salir(motivo) {
     CLAVE = null; DATOS = null;
     arrancado = false;   // la próxima entrada vuelve a encender el sistema
+    vistaActual = ''; revelados.clear();
     olvidar('clave_privada');
     mostrarPanel(false);
     el('entrar-err').textContent = motivo || '';
@@ -1731,6 +1822,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   });
   // Detalle de las gráficas al pasar por encima.
   el('v-resumen').addEventListener('mousemove', (e) => {
+    if (activa) return;   // en el móvil manda el toque (ver más abajo)
     const t = e.target.closest && e.target.closest('[data-tip]');
     const tip = el('tip');
     if (!t) { tip.hidden = true; return; }
@@ -1739,7 +1831,43 @@ te lo preparo y tú lo confirmas.</div>` : '';
     tip.style.left = Math.min(e.clientX + 14, (window.innerWidth || 800) - 240) + 'px';
     tip.style.top = (e.clientY + 14) + 'px';
   });
-  el('v-resumen').addEventListener('mouseleave', () => { el('tip').hidden = true; });
+  el('v-resumen').addEventListener('mouseleave', () => { if (!activa) el('tip').hidden = true; });
+  // En el móvil no hay «pasar por encima»: tocar una barra la enciende y enseña su detalle;
+  // tocarla otra vez, o fuera, lo quita. La leyenda de «Dónde está cada prenda» aísla una serie.
+  let activa = null;
+  const tactil = () => { try { return !!(window.matchMedia && window.matchMedia('(hover: none)').matches); } catch (e) { return false; } };
+  function soltar() {
+    if (!activa) return;
+    clase(activa, 'activa', false);
+    clase(activa.ownerSVGElement, 'foco', false);
+    const g = activa.closest && activa.closest('.grafica');
+    if (g && activa.getAttribute && activa.getAttribute('data-s') != null) g.removeAttribute('data-foco');
+    activa = null;
+    el('tip').hidden = true;
+  }
+  el('v-resumen').addEventListener('click', (e) => {
+    const ley = e.target.closest && e.target.closest('.ley');
+    if (ley) {
+      const g = ley.closest('.grafica'), s = ley.getAttribute('data-s');
+      if (g.getAttribute('data-foco') === s) g.removeAttribute('data-foco'); else g.setAttribute('data-foco', s);
+      return;
+    }
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (!t || !tactil()) { if (!t) soltar(); return; }
+    if (activa === t) { soltar(); return; }
+    soltar();
+    activa = t;
+    clase(t, 'activa', true);
+    if (t.getAttribute('data-s') != null) t.closest('.grafica').setAttribute('data-foco', t.getAttribute('data-s'));
+    else clase(t.ownerSVGElement, 'foco', true);
+    const r = t.getBoundingClientRect(), tip = el('tip');
+    tip.textContent = t.getAttribute('data-tip');
+    tip.hidden = false;
+    const ancho = tip.offsetWidth || 180, vw = window.innerWidth || 400;
+    tip.style.left = Math.round(Math.min(Math.max(8, r.left + r.width / 2 - ancho / 2), vw - ancho - 8)) + 'px';
+    tip.style.top = Math.round(Math.max(8, r.top - (tip.offsetHeight || 32) - 10)) + 'px';
+  });
+  window.addEventListener && window.addEventListener('scroll', () => { if (activa) soltar(); }, { passive: true });
 
   let redibujo = 0;
   if (window.addEventListener) window.addEventListener('resize', () => {
