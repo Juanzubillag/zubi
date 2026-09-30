@@ -14,7 +14,7 @@
     color-scheme: dark;
     --fondo: #050b10; --panel: #0b1620; --panel-2: #0f1e2b;
     --linea: rgba(90, 200, 255, .14); --linea-2: rgba(90, 200, 255, .32);
-    --tinta: #e4f2fa; --suave: #8aa7bc; --tenue: #5c7890;
+    --tinta: #e4f2fa; --suave: #8aa7bc; --tenue: #6a879d;   /* --tenue: 4,5:1 sobre --panel */
     --cian: #35c9ee; --cian-hondo: #0f6f8f;
     /* Gráficas: validadas contra --panel (dataviz, modo oscuro). */
     --serie: #1b98c0; --s1: #3987e5; --s2: #d95926; --s3: #199e70;
@@ -22,9 +22,17 @@
     --hud: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
     --display: "Orbitron", "Chakra Petch", ui-sans-serif, sans-serif;
     --r: 12px;
+    /* Movimiento: salidas rápidas, llegadas que frenan fuerte. */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --sombra: inset 0 1px 0 rgba(160, 230, 255, .05), 0 2px 6px -2px rgba(0, 0, 0, .55), 0 20px 44px -24px rgba(0, 0, 0, .9);
   }
   * { box-sizing: border-box; }
-  html { background: var(--fondo); }
+  html { background: var(--fondo); scrollbar-color: var(--cian-hondo) var(--fondo); accent-color: var(--cian); }
+  ::selection { background: rgba(53, 201, 238, .34); color: #fff; }
+  input, textarea { caret-color: var(--cian); }
+  ::placeholder { color: #6f8ba1; opacity: 1; }
   body { background: transparent; }   /* el fondo va en html: así la cuadrícula (z-index -1) se ve */
   body { margin: 0; color: var(--tinta); font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-text-size-adjust: 100%; min-height: 100vh; }
@@ -48,28 +56,47 @@
     border-bottom: 1px solid var(--linea); }
   .top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 12px 0; }
   .marca { display: flex; align-items: center; gap: 12px; }
-  .reactor-mini { width: 30px; height: 30px; border-radius: 50%; flex: none;
+  .reactor-mini { width: 30px; height: 30px; border-radius: 50%; flex: none; position: relative;
     background: radial-gradient(circle, #d9f7ff 0 18%, var(--cian) 30%, rgba(53,201,238,.15) 60%, transparent 62%);
     box-shadow: 0 0 18px rgba(53, 201, 238, .6), inset 0 0 0 2px rgba(53, 201, 238, .5); }
+  .reactor-mini::after { content: ""; position: absolute; inset: -5px; border-radius: 50%;
+    border: 1px dashed rgba(53, 201, 238, .5); border-top-color: var(--cian); animation: gira 14s linear infinite; }
   .marca h1 { font-family: var(--display); font-size: 19px; letter-spacing: .22em; font-weight: 700; }
   .marca .sub { font-family: var(--hud); color: var(--suave); font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; }
   .conexion { margin-left: auto; display: flex; align-items: center; gap: 10px; font-family: var(--hud); font-size: 13px; color: var(--suave); }
   .conexion .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--bien); box-shadow: 0 0 10px var(--bien); display: inline-block; }
   .conexion.mal .punto { background: var(--mal); box-shadow: 0 0 10px var(--mal); }
-  .conexion.cargando .punto { background: var(--aviso); box-shadow: 0 0 10px var(--aviso); }
+  .conexion.cargando .punto { background: var(--aviso); box-shadow: 0 0 10px var(--aviso); animation: ping 1.1s var(--ease-out) infinite; }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(240, 180, 90, .55), 0 0 10px var(--aviso); }
+    100% { box-shadow: 0 0 0 7px rgba(240, 180, 90, 0), 0 0 10px var(--aviso); } }
   .btn { border: 1px solid var(--linea-2); background: rgba(53, 201, 238, .06); border-radius: 8px; padding: 6px 12px;
     cursor: pointer; font-family: var(--hud); font-size: 13.5px; font-weight: 600; white-space: nowrap; color: var(--tinta);
-    text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s, border-color .15s; }
-  .btn:hover { border-color: var(--cian); background: rgba(53, 201, 238, .14); }
-  .btn.primario { background: var(--cian); border-color: var(--cian); color: #03202b; }
-  .btn.primario:hover { background: #6fdcf6; }
+    text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .2s ease, transform .16s var(--ease-out);
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .btn:active:not(:disabled) { transform: scale(.97); }
+  .btn.primario { background: var(--cian); border-color: var(--cian); color: #03202b; box-shadow: 0 0 0 0 rgba(53, 201, 238, 0); }
   .btn.wa { background: #15803d; border-color: #15803d; color: #fff; }
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover { border-color: var(--cian); background: rgba(53, 201, 238, .14); }
+    .btn.primario:hover { background: #6fdcf6; box-shadow: 0 0 22px -4px rgba(53, 201, 238, .7); }
+    .btn.wa:hover { background: #16a34a; border-color: #16a34a; box-shadow: 0 0 20px -6px rgba(34, 197, 94, .7); }
+  }
   .btn:disabled { opacity: .5; cursor: default; }
-  nav { display: flex; gap: 2px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
+  nav { position: relative; display: flex; gap: 2px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
   nav::-webkit-scrollbar { display: none; }
   nav button { display: inline-flex; align-items: center; flex: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; color: var(--suave);
-    cursor: pointer; white-space: nowrap; font-family: var(--hud); font-size: 14px; letter-spacing: .04em; }
+    cursor: pointer; white-space: nowrap; font-family: var(--hud); font-size: 14px; letter-spacing: .04em;
+    transition: color .18s ease, text-shadow .25s ease; -webkit-tap-highlight-color: transparent; }
+  @media (hover: hover) and (pointer: fine) { nav button:hover { color: var(--tinta); } }
   nav button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--cian); text-shadow: 0 0 12px rgba(53,201,238,.5); }
+  /* La luz bajo la pestaña activa se desliza de una a otra (la pone moverLuz() en JS; sin JS,
+     queda el borde de abajo de siempre). */
+  .nav-luz { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; border-radius: 2px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--cian) 18%, #bff3ff 50%, var(--cian) 82%, transparent);
+    box-shadow: 0 0 12px var(--cian), 0 -4px 14px -2px rgba(53, 201, 238, .55); opacity: 0; }
+  nav.con-luz .nav-luz { opacity: 1; transition: transform .34s var(--ease-out), width .34s var(--ease-out); }
+  nav.con-luz button[aria-selected="true"] { border-bottom-color: transparent; }
 
   main { padding-block: 20px 60px; }
   .aviso { border: 1px solid rgba(240, 180, 90, .6); background: rgba(240, 180, 90, .08); color: var(--aviso);
@@ -78,22 +105,93 @@
   .ok-msg { border: 1px solid rgba(65, 211, 154, .5); background: rgba(65, 211, 154, .08); color: var(--bien);
     border-radius: var(--r); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
   .caja { background: linear-gradient(180deg, rgba(15, 30, 43, .92), rgba(11, 22, 32, .92)); border: 1px solid var(--linea);
-    border-radius: var(--r); position: relative; }
+    border-radius: var(--r); position: relative; box-shadow: var(--sombra); isolation: isolate;
+    transition: border-color .25s ease; }
   .caja::before { content: ""; position: absolute; top: -1px; left: 14px; width: 42px; height: 2px; background: var(--cian);
-    box-shadow: 0 0 10px var(--cian); border-radius: 2px; }
+    box-shadow: 0 0 10px var(--cian); border-radius: 2px; transition: width .4s var(--ease-out); }
+  /* Un foco de luz sigue al ratón por dentro de cada tarjeta (--mx/--my los pone el JS). Va
+     detrás del contenido (z-index -1 dentro de su isolation) y solo con ratón. */
+  .caja:not(.tabla):not(.consola)::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -200px), rgba(53, 201, 238, .075), transparent 45%);
+    opacity: 0; transition: opacity .35s ease; }
+  @media (hover: hover) and (pointer: fine) {
+    .caja:not(.tabla):not(.consola):hover { border-color: rgba(90, 200, 255, .26); }
+    .caja:not(.tabla):not(.consola):hover::after { opacity: 1; }
+    .caja:not(.tabla):not(.consola):hover::before { width: 64px; }
+  }
   .etq { font-family: var(--hud); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--suave); }
 
-  /* ---- entrada ---- */
-  .entrar { max-width: 400px; margin: 70px auto; padding: 30px 26px; display: grid; gap: 12px; }
-  .entrar h2 { font-family: var(--display); font-size: 18px; letter-spacing: .18em; }
-  .entrar p { margin: 0; color: var(--suave); font-size: 14px; }
-  .entrar input { padding: 11px 12px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--fondo); font-size: 16px; }
+  /* ---- entrada: el reactor se monta anillo a anillo y acelera mientras conecta ---- */
+  .entrar { max-width: 400px; margin: 56px auto; padding: 30px 28px 26px; display: grid; gap: 12px; text-align: center;
+    animation: sube .7s var(--ease-out) backwards .1s; }
+  .entrar h2 { font-family: var(--display); font-size: 18px; letter-spacing: .22em; margin-top: 4px; }
+  .entrar p { margin: 0 0 4px; color: var(--suave); font-size: 14px; text-wrap: pretty; }
+  .entrar input { padding: 12px 13px; border: 1px solid var(--linea-2); border-radius: 9px; background: var(--fondo); font-size: 16px;
+    text-align: center; letter-spacing: .08em; transition: border-color .2s ease, box-shadow .2s ease; }
   .entrar input:disabled { opacity: .55; }
+  .entrar .btn.primario { padding: 11px 12px; font-size: 14.5px; letter-spacing: .06em; }
   .entrar .err { color: var(--mal); font-size: 14px; min-height: 20px; }
+  .entrar-estado { color: var(--suave); font-family: var(--hud); font-size: 12.5px; letter-spacing: .04em; min-height: 18px; margin-top: -6px; }
+  .entrar-estado:empty, .entrar .err:empty { display: none; }
+  /* Esquinas de visor en la tarjeta de entrada. */
+  .esquinas { position: absolute; inset: 0; pointer-events: none; }
+  .esquinas i { position: absolute; width: 16px; height: 16px; border: 0 solid var(--cian); opacity: .8; pointer-events: none; }
+  .esquinas i:nth-child(1) { top: 8px; left: 8px; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 4px; }
+  .esquinas i:nth-child(2) { top: 8px; right: 8px; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 4px; }
+  .esquinas i:nth-child(3) { bottom: 8px; left: 8px; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 4px; }
+  .esquinas i:nth-child(4) { bottom: 8px; right: 8px; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 4px; }
+  .entrar .esquinas i { animation: esquina .6s var(--ease-out) both .35s; }
+  @keyframes esquina { from { opacity: 0; transform: scale(1.6); } }
+  .rl { position: relative; width: 112px; height: 112px; margin: 0 auto 6px; display: grid; place-items: center; }
+  .rl > span { position: absolute; border-radius: 50%; }
+  .rl-halo { inset: 8px; box-shadow: 0 0 46px 6px rgba(53, 201, 238, .32); animation: latido 3.2s ease-in-out infinite; }
+  .rl-a1 { inset: 0; border: 1px solid rgba(53, 201, 238, .22); border-top-color: var(--cian); border-bottom-color: var(--cian);
+    animation: monta .8s var(--ease-out) both .15s, gira 7s linear infinite .95s; }
+  .rl-a2 { inset: 14px; border: 2px dashed rgba(53, 201, 238, .45);
+    animation: monta .8s var(--ease-out) both .25s, gira 16s linear infinite reverse 1.05s; }
+  .rl-a3 { inset: 27px; border: 3px solid transparent; border-left-color: var(--cian); border-right-color: rgba(53, 201, 238, .5);
+    animation: monta .8s var(--ease-out) both .35s, gira 3.6s linear infinite 1.15s; }
+  .rl-nucleo { width: 30px; height: 30px;
+    background: radial-gradient(circle, #f0fdff 0 22%, var(--cian) 46%, rgba(53, 201, 238, .18) 70%, transparent 72%);
+    box-shadow: 0 0 26px var(--cian); animation: monta .7s var(--ease-out) both .5s, latido 3.2s ease-in-out infinite 1.2s; }
+  @keyframes monta { from { opacity: 0; transform: scale(.55) rotate(-120deg); } }
+  /* Conectando: los anillos aceleran, el núcleo se enciende y un escáner recorre la tarjeta. */
+  .entrar.conectando .rl-a1 { animation: gira 1.1s linear infinite; }
+  .entrar.conectando .rl-a2 { animation: gira 2.2s linear infinite reverse; }
+  .entrar.conectando .rl-a3 { animation: gira .6s linear infinite; }
+  .entrar.conectando .rl-halo { animation: latido .9s ease-in-out infinite; }
+  .entrar.conectando .rl-nucleo { animation: latido .9s ease-in-out infinite; box-shadow: 0 0 40px 4px var(--cian); }
+  .entrar-linea { position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; overflow: hidden; border-radius: 2px; opacity: 0; transition: opacity .3s ease; }
+  .entrar-linea::before { content: ""; position: absolute; inset: 0; width: 40%;
+    background: linear-gradient(90deg, transparent, var(--cian), transparent); animation: recorre 1.2s var(--ease-in-out) infinite; }
+  .entrar.conectando .entrar-linea { opacity: 1; }
+  @keyframes recorre { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+  @keyframes sube { from { opacity: 0; transform: translateY(16px); filter: blur(6px); } }
   /* El botón de entrar, mientras trabaja: gira algo visible, no solo un poco más apagado. */
   .girando { width: 14px; height: 14px; flex: none; border: 2px solid rgba(3, 32, 43, .35);
-    border-top-color: #03202b; border-radius: 50%; animation: gira .7s linear infinite; }
+    border-top-color: #03202b; border-radius: 50%; animation: gira .6s linear infinite; }
   #entrar-btn[aria-busy="true"] { cursor: wait; }
+
+  /* ---- campos: foco en cian y flecha propia en los desplegables ---- */
+  .campo input, .campo select, .campo textarea, .filtros input, .filtros select, .entrar input, .j-form input, .contar, .ped-cab select {
+    transition: border-color .2s ease, box-shadow .2s ease; }
+  .campo input:focus, .campo select:focus, .campo textarea:focus, .filtros input:focus, .filtros select:focus,
+  .entrar input:focus, .j-form input:focus, .contar:focus, .ped-cab select:focus {
+    outline: none; border-color: var(--cian); box-shadow: 0 0 0 3px rgba(53, 201, 238, .16), 0 0 18px -6px rgba(53, 201, 238, .6); }
+  .campo select, .filtros select, .ped-cab select { -webkit-appearance: none; appearance: none; padding-right: 34px; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%2335c9ee' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; }
+  option, optgroup { background: var(--panel); color: var(--tinta); }
+
+  /* ---- desplegables «Ver los datos», «Ver las restantes»… ---- */
+  summary { list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 9px 2px 2px;
+    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg);
+    transition: transform .22s var(--ease-out); }
+  details[open] > summary::before { transform: rotate(45deg); }
+  details[open] > summary ~ * { animation: aparece .28s var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) { summary:hover { color: var(--tinta); } }
 
   /* ---- las vistas ocupan todo el ancho: JARVIS flota encima ---- */
   .rejilla { display: block; }
@@ -107,12 +205,17 @@
   @media (max-width: 700px) { .mando-top { grid-template-columns: minmax(0, 1fr); } }
   .reactor { padding: 18px; display: grid; place-items: center; gap: 6px; text-align: center; }
   .reactor svg { width: 190px; max-width: 100%; height: auto; overflow: visible; }
-  .reactor .pct { font-family: var(--display); font-weight: 800; fill: var(--tinta); }
+  .reactor .pct { font-family: var(--display); font-weight: 800; fill: var(--tinta); font-variant-numeric: tabular-nums; }
   .reactor .d { color: var(--suave); font-size: 13px; }
+  /* El anillo exterior de marcas gira despacio: el reactor está encendido. */
+  .reactor .marcas { transform-box: view-box; transform-origin: 50% 50%; animation: gira 60s linear infinite; }
+  .reactor .marcas-2 { transform-box: view-box; transform-origin: 50% 50%; animation: gira 24s linear infinite reverse; }
   .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   @media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .tile { padding: 14px 16px; }
-  .tile .v { font-family: var(--hud); font-size: 26px; font-weight: 700; margin-top: 2px; letter-spacing: -.01em; }
+  .tile .v { font-family: var(--hud); font-size: 26px; font-weight: 700; margin-top: 2px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .tile.bien .v { text-shadow: 0 0 22px rgba(65, 211, 154, .35); }
+  .tile.debe .v { text-shadow: 0 0 22px rgba(255, 138, 128, .3); }
   .tile .d { font-size: 12.5px; color: var(--suave); margin-top: 2px; }
   .tile.bien .v { color: var(--bien); } .tile.debe .v { color: var(--mal); }
   h2.sec { font-family: var(--hud); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--suave); margin: 22px 0 10px; font-weight: 600; }
@@ -137,8 +240,16 @@
   .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
   .leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
   .vacia { color: var(--tenue); font-size: 13.5px; padding: 26px 8px; text-align: center; border: 1px dashed var(--linea); border-radius: 10px; }
-  #tip { position: fixed; z-index: 50; pointer-events: none; background: #02070b; border: 1px solid var(--linea-2); color: var(--tinta);
-    padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: var(--hud); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  #tip { position: fixed; z-index: 50; pointer-events: none; background: rgba(2, 7, 11, .94); border: 1px solid var(--linea-2); color: var(--tinta);
+    padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: var(--hud); box-shadow: 0 8px 26px -6px rgba(0,0,0,.7), 0 0 18px -8px rgba(53,201,238,.6);
+    font-variant-numeric: tabular-nums; animation: aparece-o .12s ease-out; }
+  /* La barra bajo el ratón se enciende. */
+  .grafica path { transition: fill .15s ease, filter .15s ease; }
+  .grafica rect[data-tip]:hover + path, .grafica g[data-tip]:hover path, .grafica path[data-tip]:hover {
+    fill: #5fdcf8; filter: drop-shadow(0 0 6px rgba(53, 201, 238, .7)); }
+  .grafica path[data-tip][fill="var(--s2)"]:hover { fill: #f07a4a; filter: drop-shadow(0 0 6px rgba(217, 89, 38, .7)); }
+  .grafica path[data-tip][fill="var(--s3)"]:hover { fill: #2cc48e; filter: drop-shadow(0 0 6px rgba(25, 158, 112, .7)); }
+  .grafica path[data-tip][fill="var(--s1)"]:hover { fill: #62a5f0; filter: drop-shadow(0 0 6px rgba(57, 135, 229, .7)); }
 
   /* ---- tablas ----
      Cada tabla va en su propio marco, como mucho del alto de la pantalla: la barra para ir a
@@ -163,7 +274,8 @@
   th.ordena[aria-sort="descending"]::after { content: " ↓"; color: var(--cian); }
   th.ordena[aria-sort="ascending"]::after { content: " ↑"; color: var(--cian); }
   tbody tr:last-child td { border-bottom: 0; }
-  tbody tr:hover td { background-color: #102230; }
+  tbody td { transition: background-color .12s ease; }
+  @media (hover: hover) and (pointer: fine) { tbody tr:hover td { background-color: #102230; } }
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   td.cero { color: var(--tenue); } td.neg { color: var(--mal); font-weight: 700; } td.hay { color: var(--bien); font-weight: 650; }
   tr.grupo td { color: var(--cian); font-family: var(--hud); font-weight: 600; font-size: 13px; letter-spacing: .03em; }
@@ -215,7 +327,9 @@
 
   /* ---- pestañas con número (a quién cobrar, prendas paradas) ---- */
   .insignia { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 6px; border-radius: 999px; font-size: 11px;
-    line-height: 18px; text-align: center; background: rgba(255, 138, 128, .16); color: var(--mal); font-weight: 700; }
+    line-height: 18px; text-align: center; background: rgba(255, 138, 128, .16); color: var(--mal); font-weight: 700;
+    font-variant-numeric: tabular-nums; animation: pop .4s var(--ease-out) both; }
+  @keyframes pop { from { opacity: 0; transform: scale(.6); } }
   .insignia.aviso { background: rgba(240, 180, 90, .15); color: var(--aviso); }
 
   /* ---- mando: para hoy y ritmo ---- */
@@ -223,8 +337,14 @@
   @media (max-width: 900px) { .dos-col { grid-template-columns: minmax(0, 1fr); } }
   .avisos { padding: 8px 6px; }
   .avisos button { display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left; background: none; border: 0;
-    border-radius: 8px; padding: 9px 10px; cursor: pointer; font-size: 14.5px; line-height: 1.35; }
-  .avisos button:hover { background: rgba(53, 201, 238, .07); }
+    border-radius: 8px; padding: 9px 10px; cursor: pointer; font-size: 14.5px; line-height: 1.35;
+    transition: background-color .15s ease, transform .16s var(--ease-out); -webkit-tap-highlight-color: transparent; }
+  .avisos button:active { transform: scale(.985); }
+  .avisos .ir { transition: color .15s ease, transform .2s var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .avisos button:hover { background: rgba(53, 201, 238, .07); }
+    .avisos button:hover .ir { color: var(--cian); transform: translateX(3px); }
+  }
   .avisos .ico { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800;
     font-family: var(--hud); margin-top: -1px; }
   .avisos .mal .ico { background: rgba(255, 138, 128, .16); color: var(--mal); }
@@ -238,7 +358,9 @@
 
   /* ---- cuentas: una ficha de cobro por amigo ---- */
   .cobros-cab { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: baseline; padding: 14px 18px; margin-bottom: 12px; }
-  .cobros-cab .grande { font-family: var(--hud); font-size: 28px; font-weight: 700; color: var(--mal); }
+  .cobros-cab .grande { font-family: var(--hud); font-size: 28px; font-weight: 700; color: var(--mal); font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 22px rgba(255, 138, 128, .3); }
+  .datos b, .cifras b, .sin-pagar .falta, .rec-cifras { font-variant-numeric: tabular-nums; }
   .cobros { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; align-items: start; }
   .cobro { padding: 14px 16px; }
   .cobro.al-dia { opacity: .82; }
@@ -281,9 +403,13 @@
     width: 68px; height: 68px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
     background: radial-gradient(circle, #071722 52%, #02070b 100%);
     box-shadow: 0 0 0 1px rgba(53, 201, 238, .4), 0 12px 32px rgba(0, 0, 0, .65);
-    display: grid; place-items: center; transition: transform .2s ease; }
-  .orbe:hover { transform: scale(1.08); }
-  .orbe:active { transform: scale(.96); }
+    display: grid; place-items: center; transition: transform .22s var(--ease-out), box-shadow .3s ease;
+    -webkit-tap-highlight-color: transparent; animation: orbe-entra .6s var(--ease-out) backwards .2s; }
+  @media (hover: hover) and (pointer: fine) {
+    .orbe:hover { transform: scale(1.07); box-shadow: 0 0 0 1px rgba(53, 201, 238, .7), 0 0 34px -4px rgba(53, 201, 238, .55), 0 12px 32px rgba(0, 0, 0, .65); }
+  }
+  .orbe:active { transform: scale(.94); transition-duration: .1s; }
+  @keyframes orbe-entra { from { opacity: 0; transform: translateY(18px) scale(.8); } }
   .orbe > span { position: absolute; border-radius: 50%; pointer-events: none; }
   .orbe-halo { inset: -5px; box-shadow: 0 0 24px 2px rgba(53, 201, 238, .5); animation: latido 3s ease-in-out infinite; }
   .orbe-anillo.uno { inset: 6px; border: 2px solid transparent; border-top-color: var(--cian); border-bottom-color: rgba(53, 201, 238, .45);
@@ -293,25 +419,32 @@
     background: radial-gradient(circle, #eafcff 0 24%, var(--cian) 46%, rgba(53, 201, 238, .18) 70%, transparent 72%);
     box-shadow: 0 0 18px var(--cian); animation: latido 3s ease-in-out infinite; }
   .orbe-aviso { top: 3px; right: 3px; width: 15px; height: 15px; background: var(--mal); border: 2px solid var(--fondo);
-    box-shadow: 0 0 10px var(--mal); }
+    box-shadow: 0 0 10px var(--mal); animation: pop .45s var(--ease-out) both, ping-rojo 1.8s ease-out infinite .45s; }
+  @keyframes ping-rojo { 0% { box-shadow: 0 0 0 0 rgba(255, 138, 128, .6), 0 0 10px var(--mal); }
+    70%, 100% { box-shadow: 0 0 0 8px rgba(255, 138, 128, 0), 0 0 10px var(--mal); } }
   .orbe.piensa .orbe-anillo.uno { animation-duration: .8s; }
   .orbe.piensa .orbe-anillo.dos { animation-duration: 2s; }
   .orbe.piensa .orbe-halo { animation-duration: 1s; }
   .orbe.abierto .orbe-anillo.uno { border-left-color: var(--cian); border-right-color: var(--cian); }
   .orbe-hola { position: fixed; z-index: 46; right: 104px; bottom: calc(40px + env(safe-area-inset-bottom, 0px));
     background: var(--panel-2); border: 1px solid var(--linea-2); border-radius: 12px 12px 4px 12px; padding: 8px 12px;
-    font-family: var(--hud); font-size: 13.5px; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); animation: aparece .35s ease both; }
+    font-family: var(--hud); font-size: 13.5px; box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+    transform-origin: 100% 100%; animation: bocadillo .45s var(--ease-out) both .9s; cursor: pointer; }
+  @keyframes bocadillo { from { opacity: 0; transform: translateX(10px) scale(.92); filter: blur(4px); } }
   @keyframes gira { to { transform: rotate(360deg); } }
   @keyframes latido { 50% { opacity: .5; transform: scale(.9); } }
   @keyframes aparece { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes aparece-o { from { opacity: 0; } }
 
+  /* La consola sale de la bolita (origen en ella) y se enfoca; al cerrar, vuelve más deprisa. */
   .consola { position: fixed; z-index: 45; right: 24px; bottom: calc(106px + env(safe-area-inset-bottom, 0px));
     width: min(430px, calc(100vw - 32px)); height: min(640px, calc(100vh - 150px));
     display: flex; flex-direction: column; background: var(--panel);
     box-shadow: 0 24px 64px rgba(0, 0, 0, .7), 0 0 0 1px var(--linea-2), 0 0 40px rgba(53, 201, 238, .08);
-    transform-origin: calc(100% - 34px) calc(100% + 48px); transform: scale(.35); opacity: 0; visibility: hidden;
-    transition: transform .22s ease, opacity .18s ease, visibility 0s .22s; }
-  .consola.abierta { transform: none; opacity: 1; visibility: visible; transition: transform .22s ease, opacity .18s ease; }
+    transform-origin: calc(100% - 34px) calc(100% + 48px); transform: translateY(10px) scale(.88); opacity: 0; filter: blur(8px); visibility: hidden;
+    transition: transform .2s var(--ease-out), opacity .16s ease, filter .16s ease, visibility 0s .2s; }
+  .consola.abierta { transform: none; opacity: 1; filter: none; visibility: visible;
+    transition: transform .42s var(--ease-out), opacity .22s ease, filter .3s ease; }
   .consola-cab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--linea); }
   /* En el móvil la consola sube desde abajo y la bolita se aparta mientras está abierta. */
   @media (max-width: 640px) {
@@ -319,8 +452,9 @@
     .orbe.abierto { display: none; }
     .orbe-hola { right: 88px; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
     .consola { left: 0; right: 0; bottom: 0; width: auto; height: min(86vh, 700px); border-radius: 18px 18px 0 0;
-      transform: translateY(105%); opacity: 1; transform-origin: center bottom; padding-bottom: env(safe-area-inset-bottom, 0px); }
-    .consola.abierta { transform: none; }
+      transform: translateY(105%); opacity: 1; filter: none; transform-origin: center bottom; padding-bottom: env(safe-area-inset-bottom, 0px);
+      transition: transform .26s var(--ease-drawer), visibility 0s .26s; }
+    .consola.abierta { transform: none; filter: none; transition: transform .46s var(--ease-drawer); }
   }
   .ojo { width: 14px; height: 14px; border-radius: 50%; background: var(--cian); box-shadow: 0 0 14px var(--cian); flex: none; }
   .ojo.piensa { animation: late 1s ease-in-out infinite; }
@@ -338,6 +472,16 @@
   .burbuja.asistente { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--linea); border-bottom-left-radius: 4px; }
   .burbuja.sistema { align-self: center; background: none; color: var(--suave); font-size: 13px; text-align: center; }
   .burbuja.error { align-self: flex-start; color: var(--mal); border: 1px solid rgba(255, 138, 128, .4); }
+  /* Solo la burbuja que acaba de llegar entra (el chat se repinta entero cada vez). */
+  .burbuja.nueva { animation: burbuja .36s var(--ease-out) both; transform-origin: 0 100%; }
+  .burbuja.usuario.nueva { transform-origin: 100% 100%; }
+  @keyframes burbuja { from { opacity: 0; transform: translateY(10px) scale(.96); filter: blur(3px); } }
+  /* Mientras piensa: un ecualizador, la voz de JARVIS preparándose. */
+  .ondas { display: inline-flex; align-items: center; gap: 3px; height: 14px; margin-right: 8px; vertical-align: -2px; }
+  .ondas i { width: 3px; height: 100%; border-radius: 2px; background: var(--cian); box-shadow: 0 0 8px var(--cian);
+    transform-origin: 50% 50%; animation: onda .9s var(--ease-in-out) infinite; }
+  .ondas i:nth-child(2) { animation-delay: .12s; } .ondas i:nth-child(3) { animation-delay: .24s; } .ondas i:nth-child(4) { animation-delay: .36s; }
+  @keyframes onda { 0%, 100% { transform: scaleY(.25); opacity: .55; } 50% { transform: scaleY(1); opacity: 1; } }
   .propuesta { margin-top: 8px; padding: 10px; border: 1px solid var(--linea-2); border-radius: 10px; background: rgba(53, 201, 238, .05); white-space: normal; }
   .propuesta .que { font-size: 14px; }
   .propuesta .acciones { margin-top: 8px; }
@@ -347,15 +491,62 @@
   .puntos::after { content: "…"; animation: late 1s infinite; }
   .j-sug { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
   .j-sug button { border: 1px solid var(--linea-2); background: none; border-radius: 999px; padding: 5px 11px; font-size: 12.5px;
-    cursor: pointer; font-family: var(--hud); color: var(--suave); }
-  .j-sug button:hover { color: var(--tinta); border-color: var(--cian); }
+    cursor: pointer; font-family: var(--hud); color: var(--suave);
+    transition: color .15s ease, border-color .15s ease, background-color .15s ease, transform .16s var(--ease-out); }
+  .j-sug button:active { transform: scale(.96); }
+  @media (hover: hover) and (pointer: fine) { .j-sug button:hover { color: var(--tinta); border-color: var(--cian); background: rgba(53, 201, 238, .08); } }
   .j-form { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--linea); }
   .j-form input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--linea-2); border-radius: 10px; background: var(--fondo); font-size: 16px; }
   .j-form .btn { padding: 8px 12px; }
   #j-mic.escuchando { border-color: var(--mal); color: var(--mal); }
   .j-pie { padding: 0 14px 10px; color: var(--tenue); font-size: 12px; font-family: var(--hud); }
   @media (max-width: 560px) { .fila2 { grid-template-columns: 1fr; } .conexion { margin-left: 0; width: 100%; } }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+  /* ---- cambiar de pestaña: la vista nueva aparece (rápido: se hace muchas veces al día) ---- */
+  .vistas > section:not([hidden]) { animation: vista .24s var(--ease-out); }
+  @keyframes vista { from { opacity: 0; transform: translateY(6px); } }
+  .aviso, .ok-msg { animation: aviso-entra .3s var(--ease-out); }
+  @keyframes aviso-entra { from { opacity: 0; transform: translateY(-6px); } }
+
+  /* ---- ARRANQUE: la primera vez tras la clave, el sistema se enciende ----
+     Solo mientras #pestanas y la vista tienen .arranque (lo quita arrancar() al acabar): el
+     panel se repinta cada minuto y nada de esto debe repetirse. */
+  .barrido { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+  .barrido::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 140px;
+    background: linear-gradient(180deg, transparent, rgba(53, 201, 238, .07) 70%, rgba(53, 201, 238, .22) 97%, #bff3ff 99%, transparent);
+    box-shadow: 0 12px 30px -6px rgba(53, 201, 238, .6);
+    animation: barre 1.05s var(--ease-in-out) forwards; }
+  .barrido::after { content: ""; position: absolute; inset: 0; background: radial-gradient(1200px 700px at 50% 30%, rgba(53, 201, 238, .09), transparent 70%);
+    animation: destello 1s ease-out forwards; }
+  @keyframes barre { from { transform: translateY(-150px); } to { transform: translateY(calc(100vh + 20px)); } }
+  @keyframes destello { from { opacity: 1; } to { opacity: 0; } }
+  nav.arranque button { animation: entra-tab .5s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 40ms + 80ms); }
+  @keyframes entra-tab { from { opacity: 0; transform: translateY(-6px); filter: blur(4px); } }
+  .arranque .caja { animation: entra .75s var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 55ms + 160ms); }
+  .arranque h2.sec { animation: aparece-o .6s ease both .5s; }
+  @keyframes entra { from { opacity: 0; transform: translateY(16px) scale(.985); filter: blur(7px); } }
+  .arranque .anillo-luz { animation: dibuja 1.4s var(--ease-out) both .35s; }
+  @keyframes dibuja { from { stroke-dasharray: 0 999; } }
+  .arranque .barra-v { transform-box: fill-box; transform-origin: 50% 100%; animation: crece-v .8s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 16ms + 420ms); }
+  .arranque .barra-h { transform-box: fill-box; transform-origin: 0 50%; animation: crece-h .8s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 45ms + 480ms); }
+  @keyframes crece-v { from { transform: scaleY(0); } }
+  @keyframes crece-h { from { transform: scaleX(0); } }
+  .arranque .grafica svg text { animation: aparece-o .5s ease both 1s; }
+
+  /* Movimiento reducido: sin desplazamientos ni giros; los cambios de estado se siguen viendo
+     (fundidos cortos y colores). */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
+      scroll-behavior: auto !important; }
+    .btn:active:not(:disabled), .orbe:active, .orbe:hover, .avisos button:active, .j-sug button:active { transform: none; }
+    .consola, .consola.abierta { transform: none !important; filter: none !important; }
+    .vistas > section:not([hidden]), .aviso, .ok-msg, .burbuja.nueva { animation: aparece-o .2s ease !important; }
+    .girando, .entrar.conectando .rl-nucleo, .ondas i, .conexion.cargando .punto { animation: pulso 1.4s ease-in-out infinite !important; }
+    .barrido { display: none; }
+  }
+  @keyframes pulso { 50% { opacity: .35; } }
 </style>
 </head>
 <body>
@@ -375,15 +566,16 @@
       </div>
     </div>
     <nav role="tablist" id="pestanas" hidden>
-      <button role="tab" data-vista="resumen" aria-selected="true">Mando</button>
-      <button role="tab" data-vista="stock" aria-selected="false">Stock</button>
-      <button role="tab" data-vista="reparto" aria-selected="false">Amigos<span class="insignia aviso" id="ins-reparto" hidden></span></button>
-      <button role="tab" data-vista="cuentas" aria-selected="false">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
-      <button role="tab" data-vista="movimientos" aria-selected="false">Movimientos</button>
-      <button role="tab" data-vista="apuntar" aria-selected="false">Apuntar</button>
-      <button role="tab" data-vista="recuento" aria-selected="false">Contar la caja</button>
-      <button role="tab" data-vista="pedido" aria-selected="false">Segundo pedido</button>
-      <button role="tab" data-vista="webs" aria-selected="false">Webs y hoja</button>
+      <button role="tab" data-vista="resumen" aria-selected="true" style="--i:0">Mando</button>
+      <button role="tab" data-vista="stock" aria-selected="false" style="--i:1">Stock</button>
+      <button role="tab" data-vista="reparto" aria-selected="false" style="--i:2">Amigos<span class="insignia aviso" id="ins-reparto" hidden></span></button>
+      <button role="tab" data-vista="cuentas" aria-selected="false" style="--i:3">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
+      <button role="tab" data-vista="movimientos" aria-selected="false" style="--i:4">Movimientos</button>
+      <button role="tab" data-vista="apuntar" aria-selected="false" style="--i:5">Apuntar</button>
+      <button role="tab" data-vista="recuento" aria-selected="false" style="--i:6">Contar la caja</button>
+      <button role="tab" data-vista="pedido" aria-selected="false" style="--i:7">Segundo pedido</button>
+      <button role="tab" data-vista="webs" aria-selected="false" style="--i:8">Webs y hoja</button>
+      <span class="nav-luz" id="nav-luz" aria-hidden="true"></span>
     </nav>
   </div>
 </header>
@@ -392,11 +584,16 @@
   <div id="aviso" class="aviso" hidden></div>
 
   <form class="entrar caja" id="entrar" autocomplete="on">
+    <span class="esquinas" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <div class="rl" aria-hidden="true"><span class="rl-halo"></span><span class="rl-a1"></span><span class="rl-a2"></span>
+      <span class="rl-a3"></span><span class="rl-nucleo"></span></div>
     <h2>IDENTIFÍCATE</h2>
     <p>Escribe tu clave privada. Se comprueba en Google; en esta página no hay nada guardado.</p>
     <input type="password" id="clave" autocomplete="current-password" placeholder="Clave privada" required>
     <button class="btn primario" type="submit" id="entrar-btn">Entrar</button>
+    <div class="entrar-estado" id="entrar-estado" aria-live="polite"></div>
     <div class="err" id="entrar-err" role="alert"></div>
+    <div class="entrar-linea" aria-hidden="true"></div>
   </form>
 
   <div class="rejilla" id="rejilla" hidden>
@@ -518,6 +715,7 @@
   <div class="orbe-hola" id="j-hola" hidden>¿Te ayudo? Pulsa y pregúntame.</div>
 </main>
 <div id="tip" hidden></div>
+<div class="barrido" id="barrido" aria-hidden="true" hidden></div>
 
 <script src="../vendedores/config.js"></script>
 <script src="../vendedores/calculo.js"></script>
@@ -536,6 +734,15 @@
   const recordar = (k) => { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } };
   const olvidar = (k) => { try { window.sessionStorage.removeItem(k); } catch (e) { /* nada */ } };
   const pref = (k, v) => { try { if (v === undefined) return window.localStorage.getItem(k); window.localStorage.setItem(k, v); } catch (e) { return null; } };
+  // Pone o quita una clase sin pisar las demás (con classList si lo hay; si no, a mano).
+  const clase = (n, c, si) => {
+    if (!n) return;
+    if (n.classList) { n.classList.toggle(c, !!si); return; }
+    const l = String(n.className || '').split(/\s+/).filter((x) => x && x !== c);
+    n.className = (si ? l.concat(c) : l).join(' ');
+  };
+  // Movimiento reducido (ajuste del sistema): sin arranque, sin cifras que cuentan.
+  const quieto = () => { try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return true; } };
 
   // ---- Google, con reintentos: a veces contesta «No se puede abrir el archivo» ----
   // `onReintento(intento)` (opcional) avisa antes de cada reintento, para no dejar al que
@@ -639,7 +846,7 @@
       const x = iz + i * banda + (banda - w) / 2, h = d.importe > 0 ? Math.max(2, d.importe / max * ph) : 0;
       const tip = `${fecha(d.fecha)} · ${eur(d.importe)} · ${d.uds} ${d.uds === 1 ? 'prenda' : 'prendas'}`;
       return `<rect x="${iz + i * banda}" y="${arriba}" width="${banda}" height="${ph}" fill="transparent" data-tip="${esc(tip)}"/>` +
-        (h ? `<path d="${barraV(x, arriba + ph - h, w, h)}" fill="var(--serie)" pointer-events="none"/>` : '');
+        (h ? `<path class="barra-v" style="--i:${i}" d="${barraV(x, arriba + ph - h, w, h)}" fill="var(--serie)" pointer-events="none"/>` : '');
     }).join('');
     const xMax = iz + imax * banda + banda / 2;
     return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Ventas de los últimos 30 días; el mejor día ${eur(max)}">
@@ -662,7 +869,7 @@
       return `<g data-tip="${esc(`${f.nombre} · ${eur(f.importe)} · ${f.uds} ${f.uds === 1 ? 'prenda' : 'prendas'}`)}">
         <rect x="0" y="${y}" width="${W}" height="${fila}" fill="transparent"/>
         <text x="${iz - 10}" y="${y + fila / 2 + 4}" fill="var(--suave)" font-size="12.5" text-anchor="end">${esc(corta(f.nombre, iz - 12))}</text>
-        ${w ? `<path d="${barraH(iz, y + (fila - grosor) / 2, w, grosor, true)}" fill="var(--serie)"/>` : ''}
+        ${w ? `<path class="barra-h" style="--i:${i}" d="${barraH(iz, y + (fila - grosor) / 2, w, grosor, true)}" fill="var(--serie)"/>` : ''}
         <text x="${iz + w + 8}" y="${y + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5">${eur(f.importe)}</text></g>`;
     }).join('');
     return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(filas.map((f) => f.nombre + ' ' + eur(f.importe)).join(', '))}">
@@ -686,7 +893,7 @@
         const w = Math.max(1, ultimo ? ancho : ancho - 2);   // 2px de hueco entre tramos
         const d = barraH(x, y, w, grosor, ultimo);
         x += ancho;
-        return `<path d="${d}" fill="${SERIES[si][2]}" data-tip="${esc(`${c.categoria} · ${SERIES[si][1]}: ${v}`)}"/>`;
+        return `<path class="barra-h" style="--i:${i + j * 1.6}" d="${d}" fill="${SERIES[si][2]}" data-tip="${esc(`${c.categoria} · ${SERIES[si][1]}: ${v}`)}"/>`;
       }).join('');
       return `<text x="${iz - 10}" y="${4 + i * fila + fila / 2 + 4}" fill="var(--suave)" font-size="12.5" text-anchor="end">${esc(corta(c.categoria, iz - 12))}</text>
         ${segs}<text x="${iz + largo(c) / max * (W - iz - de) + 8}" y="${4 + i * fila + fila / 2 + 4}" fill="var(--tinta)" font-size="12.5">${c.total}${
@@ -723,52 +930,54 @@
       : '<div class="nada">✓ Nada pendiente: nadie te debe, no hay prendas paradas ni errores.</div>';
     el('v-resumen').innerHTML = `
       <div class="mando-top">
-        <div class="reactor caja">
+        <div class="reactor caja" style="--i:0">
           <div class="etq">Recuperado del pedido</div>
           <svg viewBox="0 0 200 200" role="img" aria-label="${pct} % recuperado">
             <defs><filter id="brillo"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-            <circle cx="100" cy="100" r="92" fill="none" stroke="var(--linea)" stroke-width="1"/>
+            <circle class="marcas" cx="100" cy="100" r="96" fill="none" stroke="rgba(53,201,238,.35)" stroke-width="3" stroke-dasharray="1.2 8.85"/>
+            <circle cx="100" cy="100" r="91" fill="none" stroke="var(--linea)" stroke-width="1"/>
             <circle cx="100" cy="100" r="${radio}" fill="none" stroke="rgba(53,201,238,.12)" stroke-width="12"/>
-            <circle cx="100" cy="100" r="${radio}" fill="none" stroke="var(--cian)" stroke-width="12" stroke-linecap="round"
+            <circle class="anillo-luz" cx="100" cy="100" r="${radio}" fill="none" stroke="var(--cian)" stroke-width="12" stroke-linecap="round"
               stroke-dasharray="${(vuelta * r.recuperado).toFixed(1)} ${vuelta.toFixed(1)}" transform="rotate(-90 100 100)" filter="url(#brillo)"/>
+            <circle class="marcas-2" cx="100" cy="100" r="64" fill="none" stroke="rgba(53,201,238,.3)" stroke-width="1" stroke-dasharray="26 14 4 14"/>
             <circle cx="100" cy="100" r="56" fill="rgba(53,201,238,.05)" stroke="var(--linea-2)" stroke-width="1"/>
-            <text x="100" y="110" text-anchor="middle" class="pct" font-size="30">${pct} %</text>
+            <text x="100" y="110" text-anchor="middle" class="pct" font-size="30" data-n="${pct}" data-f="pct">${pct} %</text>
           </svg>
           <div class="d">${eur(r.neto)} de ${eur(r.desembolso)}<br>${r.faltaRecuperar > 0 ? 'faltan ' + eur(r.faltaRecuperar) : 'pedido recuperado'}</div>
         </div>
         <div class="tiles">
-          <div class="tile caja bien"><div class="etq">Neto para ti</div><div class="v">${eur(r.neto)}</div>
+          <div class="tile caja bien" style="--i:1"><div class="etq">Neto para ti</div><div class="v" data-n="${r.neto}" data-f="eur">${eur(r.neto)}</div>
             <div class="d">vendido ${eur(r.ingresado)} − comisiones ${eur(r.comisiones)}</div></div>
-          <div class="tile caja ${r.teDeben > 0.005 ? 'debe' : ''}"><div class="etq">Te deben tus amigos</div><div class="v">${eur(r.teDeben)}</div>
+          <div class="tile caja ${r.teDeben > 0.005 ? 'debe' : ''}" style="--i:2"><div class="etq">Te deben tus amigos</div><div class="v" data-n="${r.teDeben}" data-f="eur">${eur(r.teDeben)}</div>
             <div class="d">ya te han pagado ${eur(r.cobrado)}</div></div>
-          <div class="tile caja"><div class="etq">Si se vende lo que queda</div><div class="v">${eur(r.beneficioSiTodo)}</div>
+          <div class="tile caja" style="--i:3"><div class="etq">Si se vende lo que queda</div><div class="v" data-n="${r.beneficioSiTodo}" data-f="eur">${eur(r.beneficioSiTodo)}</div>
             <div class="d">de beneficio, a precio de tus amigos</div></div>
-          <div class="tile caja"><div class="etq">Disponibles</div><div class="v">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
-          <div class="tile caja"><div class="etq">Vendidas</div><div class="v">${r.vendidas}</div><div class="d">${r.reservadas} reservadas</div></div>
-          <div class="tile caja"><div class="etq">En casa de tus amigos</div><div class="v">${r.enLaCalle}</div><div class="d">prendas en consigna</div></div>
+          <div class="tile caja" style="--i:2.5"><div class="etq">Disponibles</div><div class="v" data-n="${r.disponibles}">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
+          <div class="tile caja" style="--i:3.5"><div class="etq">Vendidas</div><div class="v" data-n="${r.vendidas}">${r.vendidas}</div><div class="d">${r.reservadas} reservadas</div></div>
+          <div class="tile caja" style="--i:4.5"><div class="etq">En casa de tus amigos</div><div class="v" data-n="${r.enLaCalle}">${r.enLaCalle}</div><div class="d">prendas en consigna</div></div>
         </div>
       </div>
       <div class="dos-col">
         <div>
           <h2 class="sec">Para hoy</h2>
-          <div class="avisos caja" id="avisos">${avisosHtml}</div>
+          <div class="avisos caja" id="avisos" style="--i:5">${avisosHtml}</div>
         </div>
         <div>
           <h2 class="sec">Ritmo de ventas</h2>
           <div class="ritmo">
-            <div class="tile caja"><div class="etq">Hoy</div><div class="v">${eur(rt.hoy.importe)}</div><div class="d">${uds(rt.hoy.uds)}</div></div>
-            <div class="tile caja"><div class="etq">Últimos 7 días</div><div class="v">${eur(rt.semana.importe)}</div>
+            <div class="tile caja" style="--i:5.5"><div class="etq">Hoy</div><div class="v" data-n="${rt.hoy.importe}" data-f="eur">${eur(rt.hoy.importe)}</div><div class="d">${uds(rt.hoy.uds)}</div></div>
+            <div class="tile caja" style="--i:6"><div class="etq">Últimos 7 días</div><div class="v" data-n="${rt.semana.importe}" data-f="eur">${eur(rt.semana.importe)}</div>
               <div class="d">${cambio == null ? uds(rt.semana.uds) : `<span class="${cambio >= 0 ? 'sube' : 'baja'}">${cambio >= 0 ? '↑' : '↓'} ${Math.abs(cambio)} %</span> frente a los 7 de antes`}</div></div>
-            <div class="tile caja"><div class="etq">Este mes</div><div class="v">${eur(rt.mes.importe)}</div><div class="d">${uds(rt.mes.uds)}</div></div>
+            <div class="tile caja" style="--i:6.5"><div class="etq">Este mes</div><div class="v" data-n="${rt.mes.importe}" data-f="eur">${eur(rt.mes.importe)}</div><div class="d">${uds(rt.mes.uds)}</div></div>
           </div>
         </div>
       </div>
       <h2 class="sec">Estadísticas</h2>
       <div class="graficas">
-        <div class="grafica caja ancha"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
-        <div class="grafica caja"><h3>Por canal</h3><p class="nota">Dónde se vende más, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', media)}</div>
-        <div class="grafica caja"><h3>Por vendedor</h3><p class="nota">Lo que ha vendido cada uno, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', media)}</div>
-        <div class="grafica caja ancha"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus amigos y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), ancha)}</div>
+        <div class="grafica caja ancha" style="--i:7"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
+        <div class="grafica caja" style="--i:8"><h3>Por canal</h3><p class="nota">Dónde se vende más, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', media)}</div>
+        <div class="grafica caja" style="--i:8.5"><h3>Por vendedor</h3><p class="nota">Lo que ha vendido cada uno, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', media)}</div>
+        <div class="grafica caja ancha" style="--i:9"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus amigos y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), ancha)}</div>
       </div>`;
   }
 
@@ -802,7 +1011,7 @@
   const hace = (d) => (d == null ? '' : d === 0 ? 'hoy' : d === 1 ? 'ayer' : 'hace ' + d + ' días');
   function pintarReparto() {
     const fichas = S.fichas.filter((f) => !f.propio || f.uds || f.udsEnCasa);
-    el('v-reparto').innerHTML = fichas.length ? `<div class="vendedores">${fichas.map((f) => {
+    el('v-reparto').innerHTML = fichas.length ? `<div class="vendedores">${fichas.map((f, n) => {
       const debe = !f.propio && f.pendiente > 0.005;
       const chips = [
         f.propio ? '<span class="chip">tú</span>' : '',
@@ -827,7 +1036,7 @@
           : !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto, 'Hola ' + f.nombre + ', '))}">WhatsApp</a>` : '',
         f.propio ? '' : `<button class="btn" type="button" data-jarvis="${esc('¿Cómo va ' + f.nombre + '? Qué ha vendido, qué tiene en casa y qué me debe.')}">Preguntar a JARVIS</button>`,
       ].join('');
-      return `<div class="vend caja">
+      return `<div class="vend caja" style="--i:${Math.min(n, 10)}">
         <div class="cab"><h3>${esc(f.nombre)} <span class="suave">${esc(f.id)}${tel ? ' · ' + esc(f.contacto) : ''}</span></h3><div class="chips">${chips}</div></div>
         <div class="datos">${datos.map(([k, v]) => `<div><div class="etq">${k}</div><b>${esc(v)}</b></div>`).join('')}</div>
         ${(() => {
@@ -1018,10 +1227,11 @@
         <div class="suave" style="white-space:normal">${prendas ? `${prendas} ${prendas === 1 ? 'venta sin pagar' : 'ventas sin pagar'}${vieja ? `; la más antigua, del ${fechaCorta(vieja.venta.fecha)} (${esc(nombreDe(vieja.venta.vendedor))})` : ''}.
           Los pagos se cuentan primero para la prenda que digan y, si no dicen ninguna, para las ventas más antiguas.` : 'Nadie te debe nada.'}</div>
       </div>`;
-    const ficha = (c) => {
+    const ficha = (c, n) => {
       const nombre = nombreDe(c.vendedor);
+      const orden = ` style="--i:${Math.min(n + 1, 10)}"`;
       if (c.propio) {
-        return `<div class="cobro caja al-dia"><div class="cab"><h3>${esc(nombre)} <span class="suave">${esc(c.vendedor)}</span></h3>
+        return `<div class="cobro caja al-dia"${orden}><div class="cab"><h3>${esc(nombre)} <span class="suave">${esc(c.vendedor)}</span></h3>
           <div class="chips"><span class="chip">tus ventas</span></div></div>
           <div class="cifras"><span>Vendido <b>${eur(c.bruto)}</b></span><span>${c.uds} ${c.uds === 1 ? 'prenda' : 'prendas'}</span><span>sin comisión: es todo tuyo</span></div></div>`;
       }
@@ -1038,7 +1248,7 @@
             title="Apuntar que te ha pagado esta prenda">Cobrar</button></li>`;
       });
       const copiar = dd.pendientes.map((x) => '· ' + Panel.lineaDeuda(x)).join('\n') + '\nTotal: ' + eur(dd.debe);
-      return `<div class="cobro caja${dd.debe > 0.004 ? '' : ' al-dia'}">
+      return `<div class="cobro caja${dd.debe > 0.004 ? '' : ' al-dia'}"${orden}>
         <div class="cab"><h3>${esc(nombre)} <span class="suave">${esc(c.vendedor)}</span></h3><div class="chips">${chip}</div></div>
         <div class="cifras"><span>Vendido <b>${eur(c.bruto)}</b></span><span>Su comisión <b>${eur(c.comision)}</b></span>
           <span>Te tocan <b>${eur(c.tuParte)}</b></span><span>Te ha pagado <b>${eur(c.liquidado)}</b></span>
@@ -1157,8 +1367,11 @@
   let pensando = false;
   const guardarChat = () => guardar('chat_jarvis', JSON.stringify(CHAT.slice(-40)));
 
+  let pintados = CHAT.length;   // las que ya estaban no vuelven a entrar al repintar
   function pintarChat() {
     const log = el('j-log');
+    const desde = pintados;
+    pintados = CHAT.length;
     const inicio = !CHAT.length ? `<div class="burbuja asistente">Hola, Juan. Pregúntame cómo va el negocio o pídeme que apunte algo:
 te lo preparo y tú lo confirmas.</div>` : '';
     log.innerHTML = inicio + CHAT.map((m, i) => {
@@ -1169,9 +1382,10 @@ te lo preparo y tú lo confirmas.</div>` : '';
           : `<div class="estado">${p.estado === 'hecha' ? '✓ Hecho' + (p.resultado ? ': ' + esc(p.resultado) : '') :
             p.estado === 'descartada' ? 'Descartada' : p.estado === 'confirmando' ? '<span class="puntos">Confirmando</span>' : '✗ ' + esc(p.resultado || 'No se ha podido')}</div>`}
       </div>`).join('');
-      return `<div class="burbuja ${m.rol}">${esc(m.texto)}${props}</div>`;
-    }).join('') + (pensando ? '<div class="burbuja asistente"><span class="puntos">Pensando</span></div>' : '');
-    log.scrollTop = log.scrollHeight || 0;
+      return `<div class="burbuja ${m.rol}${i >= desde ? ' nueva' : ''}">${esc(m.texto)}${props}</div>`;
+    }).join('') + (pensando ? '<div class="burbuja asistente nueva"><span class="ondas" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="puntos">Pensando</span></div>' : '');
+    if (log.scrollTo && !quieto()) log.scrollTo({ top: log.scrollHeight, behavior: 'smooth' });
+    else log.scrollTop = log.scrollHeight || 0;
     el('j-ojo').className = 'ojo' + (pensando ? ' piensa' : '');
     pintarOrbe();
     el('j-estado').textContent = pensando ? 'pensando…' : 'a tu servicio';
@@ -1328,8 +1542,73 @@ te lo preparo y tú lo confirmas.</div>` : '';
     if (v === 'resumen' && S.calc && anchoVistas() !== anchoPintado) pintarResumen();
     pref('panel_vista', v);   // al volver, la misma pestaña
     try { if (window.history && window.history.replaceState && hashVista() !== v) window.history.replaceState(null, '', '#' + v); } catch (e) { /* nada */ }
+    moverLuz(true);
     setTimeout(marcarDesbordes, 0);
   }
+  // La luz bajo la pestaña activa: se desliza hasta ella (y en el móvil, la pestaña se asoma).
+  function moverLuz(asomar) {
+    const luz = el('nav-luz');
+    if (!luz || !luz.style) return;
+    const b = [...document.querySelectorAll('#pestanas button')].find((x) => x.getAttribute && x.getAttribute('aria-selected') === 'true');
+    if (!b || !b.offsetWidth) return;
+    luz.style.width = b.offsetWidth + 'px';
+    luz.style.transform = `translateX(${b.offsetLeft}px)`;
+    clase(el('pestanas'), 'con-luz', true);
+    if (asomar && b.scrollIntoView) { try { b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: quieto() ? 'auto' : 'smooth' }); } catch (e) { /* nada */ } }
+  }
+
+  // ---- El arranque: la primera vez tras la clave, el sistema se enciende ----
+  // Un barrido cruza la pantalla, las pestañas y las tarjetas entran en cascada, el anillo del
+  // reactor se dibuja, las barras crecen y las cifras cuentan desde 0. Solo una vez por
+  // entrada: el panel se repinta cada minuto y eso no debe repetirse.
+  let arrancado = false;
+  function arrancar() {
+    if (arrancado) return;
+    arrancado = true;
+    if (quieto()) return;
+    const vista = VISTAS.map((x) => el('v-' + x)).find((s) => s && !s.hidden);
+    const nav = el('pestanas'), barrido = el('barrido');
+    clase(nav, 'arranque', true);
+    clase(vista, 'arranque', true);
+    if (barrido) barrido.hidden = false;
+    contarCifras();
+    setTimeout(() => {
+      clase(nav, 'arranque', false);
+      clase(vista, 'arranque', false);
+      if (barrido) barrido.hidden = true;
+    }, 2000);
+  }
+  // Las cifras del Mando cuentan desde 0 hasta su valor (el texto final ya está puesto: si
+  // esto no corre, se ve el número de siempre).
+  function contarCifras() {
+    if (!window.requestAnimationFrame || !document.querySelector) return;
+    const nodos = [...(el('v-resumen').querySelectorAll ? el('v-resumen').querySelectorAll('[data-n]') : [])];
+    if (!nodos.length) return;
+    const fmt = (n, f) => (f === 'eur' ? eur(n) : f === 'pct' ? Math.round(n) + ' %' : String(Math.round(n)));
+    const fin = nodos.map((n) => Number(n.getAttribute('data-n')) || 0);
+    const t0 = Date.now() + 350, dura = 1400;   // al compás del anillo del reactor (.anillo-luz)
+    const paso = () => {
+      const t = Math.min(1, Math.max(0, (Date.now() - t0) / dura));
+      const k = t === 1 ? 1 : 1 - Math.pow(1 - t, 4);   // frena al final, como el anillo
+      nodos.forEach((n, i) => {
+        if (!n.isConnected) return;
+        n.textContent = fmt(fin[i] * k, n.getAttribute('data-f'));
+      });
+      if (t < 1) window.requestAnimationFrame(paso);
+    };
+    paso();
+  }
+  // Un foco de luz sigue al ratón por dentro de la tarjeta que tiene debajo (solo el CSS con
+  // ratón lo enseña). Se escribe en la propia tarjeta, no en un contenedor: así no se
+  // recalculan los estilos de todo lo demás en cada movimiento.
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    const c = e.target && e.target.closest && e.target.closest('.caja');
+    if (!c || !c.style || !c.getBoundingClientRect) return;
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', Math.round(e.clientX - r.left) + 'px');
+    c.style.setProperty('--my', Math.round(e.clientY - r.top) + 'px');
+  }, { passive: true });
   function mostrarPanel(si) {
     el('entrar').hidden = si;
     el('pestanas').hidden = !si;
@@ -1349,12 +1628,19 @@ te lo preparo y tú lo confirmas.</div>` : '';
     } else VISTAS.forEach((x) => { el('v-' + x).hidden = true; });
   }
   async function entrar(clave) {
-    const btn = el('entrar-btn'), campo = el('clave');
+    const btn = el('entrar-btn'), campo = el('clave'), form = el('entrar'), estado = el('entrar-estado');
     if (btn.disabled) return false;   // ya está entrando: un segundo clic no hace nada
     CLAVE = clave;
     el('entrar-err').textContent = '';
     btn.disabled = true; campo.disabled = true; btn.setAttribute('aria-busy', 'true');
     btn.innerHTML = '<span class="girando" aria-hidden="true"></span> Entrando…';
+    clase(form, 'conectando', true);
+    // Google a veces tarda: mejor decirlo que dejar el botón girando sin explicación.
+    let esperando = true;
+    const decir = (t) => { if (esperando && estado) estado.textContent = t; };
+    setTimeout(() => decir('Conectando con tu hoja de Google…'), 2500);
+    setTimeout(() => decir('Google está tardando más de lo normal. Sigue conectando…'), 9000);
+    setTimeout(() => decir('Aún conectando. A veces Google tarda hasta un minuto.'), 25000);
     try {
       const j = await google({ params: { modo: 'privado', clave } }, 3, () => {
         btn.innerHTML = '<span class="girando" aria-hidden="true"></span> Sigue intentando…';
@@ -1363,18 +1649,29 @@ te lo preparo y tú lo confirmas.</div>` : '';
       guardar('clave_privada', clave);
       mostrarPanel(true);
       procesarDatos(j);   // ya han llegado los datos al comprobar la clave: no hace falta pedirlos otra vez
+      arrancar();
       return true;
     } catch (e) {
       CLAVE = null;
       el('entrar-err').textContent = e.message;
+      // La tarjeta tiembla: no ha entrado (con Web Animations, para no repetir su entrada).
+      if (form && form.animate && !quieto()) {
+        form.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(7px)' },
+          { transform: 'translateX(-4px)' }, { transform: 'translateX(2px)' }, { transform: 'translateX(0)' }],
+        { duration: 400, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+      }
       return false;
     } finally {
+      esperando = false;
+      if (estado) estado.textContent = '';
+      clase(form, 'conectando', false);
       btn.disabled = false; campo.disabled = false; btn.setAttribute('aria-busy', 'false');
       btn.textContent = 'Entrar';
     }
   }
   function salir(motivo) {
     CLAVE = null; DATOS = null;
+    arrancado = false;   // la próxima entrada vuelve a encender el sistema
     olvidar('clave_privada');
     mostrarPanel(false);
     el('entrar-err').textContent = motivo || '';
@@ -1447,8 +1744,10 @@ te lo preparo y tú lo confirmas.</div>` : '';
   let redibujo = 0;
   if (window.addEventListener) window.addEventListener('resize', () => {
     clearTimeout(redibujo);
-    redibujo = setTimeout(() => { if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen(); marcarDesbordes(); }, 200);
+    redibujo = setTimeout(() => { if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen(); marcarDesbordes(); moverLuz(); }, 200);
   });
+  // Cuando llegan las letras de verdad las pestañas cambian de ancho: la luz se recoloca.
+  try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moverLuz()); } catch (e) { /* nada */ }
 
   // Al momento: se pide a Google cada minuto mientras la página está a la vista, y al volver a ella.
   setInterval(() => { if (CLAVE && document.visibilityState !== 'hidden' && !pensando) cargar(); }, 60000);
