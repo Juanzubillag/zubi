@@ -806,6 +806,7 @@
   // espera sin saber si ha pasado algo.
   async function google(opciones, intentos = 3, onReintento) {
     if (!CFG.registroUrl) throw new Error('Falta el enlace de Google (registroUrl) en config.js.');
+    if (opciones.cuerpo && opciones.cuerpo.accion === 'privado') return googleLectura(opciones.cuerpo, intentos, onReintento);
     let ultimo = null;
     for (let intento = 0; intento < intentos; intento++) {
       if (intento) { if (onReintento) onReintento(intento); await espera(intento === 1 ? 1500 : 4000); }
@@ -817,6 +818,49 @@
       } catch (e) { ultimo = e; }
     }
     throw new Error('Google no responde ahora mismo (' + ((ultimo && ultimo.message) || 'sin respuesta') + '). Vuelve a intentarlo en un momento.');
+  }
+
+  // Pedir tus datos no cambia nada, así que se puede pedir dos veces sin riesgo. Google a veces
+  // se queda 10–40 s con una petición (medido) mientras la siguiente contesta en 2–4 s: si a los
+  // 6 s no ha contestado, sale otra igual en paralelo y vale la primera que llegue bien. Si una
+  // devuelve la página de error de Google, sale otra en el acto (sin esperar). Como mucho
+  // `intentos` a la vez, y un tope de 45 s para todo. Las peticiones que escriben (apuntar,
+  // JARVIS, confirmar) siguen yendo de una en una, como antes.
+  const ESPERA_OTRA_MS = 6000, TOPE_LECTURA_MS = 45000;
+  function googleLectura(cuerpo, intentos, onReintento) {
+    return new Promise((resolver, rechazar) => {
+      let lanzadas = 0, fallidas = 0, hecho = false, ultimo = null, otra = 0;
+      const cancelar = [];
+      const acabar = (f, v) => {
+        if (hecho) return;
+        hecho = true;
+        clearTimeout(otra); clearTimeout(tope);
+        cancelar.forEach((c) => { try { c.abort(); } catch (e) { /* ya acabó */ } });
+        f(v);
+      };
+      const lanzar = () => {
+        if (hecho || lanzadas >= intentos) return;
+        lanzadas++;
+        if (lanzadas > 1 && onReintento) onReintento(lanzadas - 1);
+        const ctl = window.AbortController ? new window.AbortController() : null;
+        if (ctl) cancelar.push(ctl);
+        fetch(CFG.registroUrl, { method: 'POST', body: JSON.stringify(cuerpo), signal: ctl ? ctl.signal : undefined })
+          .then((r) => r.text())
+          .then((t) => acabar(resolver, JSON.parse(t)))   // la página de error de Google no es JSON
+          .catch((e) => {
+            if (hecho) return;
+            ultimo = e; fallidas++;
+            if (fallidas >= intentos) {
+              acabar(rechazar, new Error('Google no responde ahora mismo (' + ((ultimo && ultimo.message) || 'sin respuesta') + '). Vuelve a intentarlo en un momento.'));
+            } else lanzar();
+          });
+        clearTimeout(otra);
+        otra = setTimeout(lanzar, ESPERA_OTRA_MS);
+      };
+      let tope = 0;
+      lanzar();   // primero la petición y su relevo; el tope general, después
+      tope = setTimeout(() => acabar(rechazar, new Error('Google está tardando demasiado (más de 45 s). Vuelve a intentarlo en un momento.')), TOPE_LECTURA_MS);
+    });
   }
 
   // ---- Estado ----
