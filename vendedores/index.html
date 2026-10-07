@@ -598,6 +598,7 @@
   }
 
   // ---- Arranque ----
+  let reintento = null;   // el reintento por detrás si Google falla al abrir (ver al final)
   const listo = (async () => {
     document.title = CFG.titulo || document.title;
     el('titulo').textContent = CFG.titulo || 'Catálogo';
@@ -751,10 +752,34 @@
     });
 
     pintarTodo();
+
+    // Si Google ha fallado (a veces contesta «No se puede abrir el archivo»), ya se ve lo de la
+    // última visita o el pedido inicial; por detrás se reintenta dos veces más y, si contesta, se
+    // cambia al stock en directo. Con tu clave ya puesta, tus datos (más completos) no se tocan.
+    if (datos.fuente !== 'directo' && CFG.registroUrl) {
+      reintento = (async () => {
+        for (const espera of [1500, 4000]) {
+          await new Promise((r) => setTimeout(r, espera));
+          let j = null;
+          try { j = await pedir({ modo: 'catalogo' }); } catch (e) { continue; }
+          if (!j || !j.ok || !Array.isArray(j.productos)) continue;
+          guardarCache(j.productos);
+          if (!PRIV) {
+            const prods = j.productos.map(prodPublico);
+            ESTADO = { prods, grupos: agrupar(prods) };
+            prepararFiltros();
+            pintarTodo();
+          }
+          el('subtitulo').textContent = `Stock en directo · ${CFG.ciudad || ''}`.replace(/ · $/, '');
+          el('aviso-fuente').hidden = true;
+          return;
+        }
+      })();
+    }
   })();
 
   // Para las pruebas (scripts/test.js): esperar a que cargue y mirar el estado.
-  window.CATALOGO = { listo, estado: () => ESTADO, privado: () => PRIV, intentarClave: desbloquear };
+  window.CATALOGO = { listo, estado: () => ESTADO, privado: () => PRIV, intentarClave: desbloquear, reintento: () => reintento };
 })();
 </script>
 </body>
