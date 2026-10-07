@@ -127,17 +127,12 @@ a{color:var(--azul); text-underline-offset:3px; text-decoration-thickness:1px}
 
 /* ---------- hero ---------- */
 .hero{border-bottom:1px solid var(--line); padding-block:44px 0; position:relative; overflow:hidden}
-/* La «ZUBI» gigante del fondo sale cuando ya ha llegado Archivo (clase f-ok, la pone el arranque):
-   con la letra de reserva tenía otro ancho y, al cambiar, era el mayor salto de la página en escritorio.
-   Aparecer no es saltar: no empuja nada. */
-.hero::before{
-  content:none; position:absolute; top:-.14em; right:-.03em; z-index:0;
-  font-family:var(--display); font-weight:900; font-stretch:125%; font-size:min(32vw,320px); line-height:1;
-  color:transparent; -webkit-text-stroke:1.5px var(--line-2); letter-spacing:-.04em;
-  white-space:nowrap; pointer-events:none; user-select:none;
-}
-.f-ok .hero::before{content:"ZUBI"; content:"ZUBI" / ""; animation:zubiFondo .6s var(--ease-out)}
-@keyframes zubiFondo{from{opacity:0}}
+/* La «ZUBI» gigante del fondo es un dibujo (las letras de Archivo 900 al 125 %, -.04em, pasadas a
+   trazos): se ve igual que el texto de antes, pero está desde el primer pintado, no cambia de ancho al
+   llegar la letra (no salta) y el navegador no la cuenta como «lo más grande» de la página. */
+.hero .fondo{position:absolute; top:-.14em; right:-.03em; z-index:0; font-size:min(32vw,320px);
+  width:3.031em; height:1em; overflow:visible; pointer-events:none}
+.hero .fondo path{fill:none; stroke:var(--line-2); stroke-width:1.5px; vector-effect:non-scaling-stroke}
 .hero .wrap{position:relative; z-index:1}
 .hero h1{font-size:clamp(40px,8.8vw,74px); font-weight:900; font-stretch:125%; letter-spacing:-.035em; text-transform:uppercase;
   /* Su alto, reservado: mientras llega la fuente Archivo (más ancha que la de reserva), el titular
@@ -352,7 +347,7 @@ body.dopen .toast.on{transform:translate(-50%,0)}
   .manifest span::after{content:none}
   [id]{scroll-margin-top:calc(70px + env(safe-area-inset-top,0px))}
   footer{margin-top:36px}
-  .hero::before{display:none}
+  .hero .fondo{display:none}
 }
 /* Respuesta al pulsar: la interfaz confirma que te ha oído */
 .chip,.sz,.add,.btn,.icon-btn,.cart-btn,.qty button{transition:background .16s var(--ease-out), color .16s var(--ease-out), border-color .16s var(--ease-out), transform .16s var(--ease-out)}
@@ -422,6 +417,7 @@ body::after{
 
 <main id="top">
   <section class="hero">
+    <svg class="fondo" viewBox="0 0 3031 1000" aria-hidden="true" focusable="false"><path d="M24 834L24 763L423 317L54 317L54 146L836 146L836 217L436 663L846 663L846 834ZM1331 846Q1189 846 1096 807Q1003 767 957 691Q911 614 911 503L911 146L1158 146L1158 492Q1158 578 1204 626Q1249 674 1331 674Q1414 674 1460 626Q1505 578 1505 492L1505 146L1752 146L1752 503Q1752 614 1706 691Q1660 767 1567 807Q1473 846 1331 846ZM1860 834L1860 146L2454 146Q2511 146 2558 168Q2604 189 2632 227Q2659 265 2659 315Q2659 365 2642 397Q2625 429 2597 448Q2568 466 2534 475L2534 479Q2573 487 2605 507Q2637 526 2656 561Q2675 596 2675 651Q2675 706 2647 747Q2618 788 2569 811Q2520 834 2460 834ZM2107 674L2361 674Q2389 674 2406 658Q2422 642 2422 610Q2422 595 2414 583Q2406 570 2393 563Q2379 556 2361 556L2107 556ZM2107 414L2345 414Q2364 414 2378 407Q2391 399 2399 385Q2406 371 2406 350Q2406 328 2389 313Q2371 297 2345 297L2107 297ZM2750 834L2750 146L2997 146L2997 834Z"/></svg>
     <div class="wrap">
       <h1>Ropa de calle<br>a precio de<br><em>mercadillo</em></h1>
       <p>Fútbol retro, punto, sudaderas, técnico y zapatilla. Lo que ves es lo que hay: stock real por talla, sin reposición. Cuando se acaba una talla, se acaba.</p>
@@ -1302,7 +1298,7 @@ async function stockEnDirecto(){
 /* ---------- arranque ---------- */
 {
   const letraLista = () => document.documentElement.classList.add("f-ok");
-  // Solo si llega de verdad: si no llega, se queda todo como con la letra de reserva.
+  // Solo si llega de verdad: si no llega, los botones de categoría se quedan como con la de reserva.
   try{ document.fonts.load('900 1em "Archivo"').then(letraLista, () => {}); }catch(e){ letraLista(); }
 }
 try{
@@ -1320,10 +1316,20 @@ buildChips();
 if (STOCK.fecha) fechaStock("al " + new Date(STOCK.fecha + "T12:00:00").toLocaleDateString("es-ES", {day:"numeric", month:"short"}));
 renderGrid();
 renderCart(false);
-// El stock de Google y la visita, justo después del primer pintado: la tienda ya enseña su foto de
-// stock, y así esas peticiones no compiten con lo que hace falta para pintar (Google puede tardar
-// varios segundos en contestar, sobre todo justo después de subir una versión).
-requestAnimationFrame(() => setTimeout(() => { stockEnDirecto(); evento("visita"); }, 0));
+// El stock de Google y la visita, en cuanto la primera pantalla está pintada (el navegador avisa con
+// «first-contentful-paint»; si no avisa, a los 1,5 s): la tienda ya enseña su foto de stock, y así
+// esas peticiones no compiten con lo que hace falta para pintar (Google puede tardar varios segundos
+// en contestar, sobre todo justo después de subir una versión).
+{
+  let pedido = false;
+  const pedirStock = () => { if (pedido) return; pedido = true; stockEnDirecto(); evento("visita"); };
+  try{
+    new PerformanceObserver((lista, obs) => {
+      if (lista.getEntriesByName("first-contentful-paint").length){ obs.disconnect(); setTimeout(pedirStock, 0); }
+    }).observe({ type: "paint", buffered: true });
+  }catch(e){}
+  setTimeout(pedirStock, 1500);
+}
 </script>
 
 </body></html>
