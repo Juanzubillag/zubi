@@ -29,25 +29,6 @@
 @font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-400.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-500.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-600.woff2) format("woff2");font-weight:600;font-style:normal;font-display:swap}
-/* Mientras llega Archivo, el navegador escribe con otra letra (Arial; Roboto en Android) que ocupa
-   algo distinto: los botones de categoría cambiaban de fila al llegar Archivo y empujaban el catálogo.
-   Estas reservas son esas letras con las medidas de Archivo, grosor a grosor (medido en Chrome con
-   los textos de la tienda, 7-10-2026; el 500 con las palabras de los botones de categoría, que son
-   las que cambiaban de fila). Si una no está en el móvil, se salta sola. */
-@font-face{font-family:"Archivo Reserva";src:local("Arial"),local("ArialMT");font-weight:100 450;size-adjust:97.91%;ascent-override:89.67%;descent-override:21.45%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva";src:local("Arial"),local("ArialMT");font-weight:451 550;size-adjust:102.74%;ascent-override:85.46%;descent-override:20.44%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva";src:local("Arial Bold"),local("Arial-BoldMT");font-weight:551 650;size-adjust:95.06%;ascent-override:92.36%;descent-override:22.09%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva";src:local("Arial Bold"),local("Arial-BoldMT");font-weight:651 750;size-adjust:98.60%;ascent-override:89.05%;descent-override:21.30%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva";src:local("Arial Black"),local("Arial-Black");font-weight:751 1000;size-adjust:95.16%;ascent-override:92.27%;descent-override:22.07%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva Android";src:local("Roboto"),local("Roboto-Regular");font-weight:100 450;size-adjust:98.93%;ascent-override:88.75%;descent-override:21.23%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva Android";src:local("Roboto Medium"),local("Roboto-Medium");font-weight:451 550;size-adjust:102.17%;ascent-override:85.94%;descent-override:20.55%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva Android";src:local("Roboto Bold"),local("Roboto-Bold");font-weight:551 650;size-adjust:101.61%;ascent-override:86.41%;descent-override:20.67%;line-gap-override:0%}
-@font-face{font-family:"Archivo Reserva Android";src:local("Roboto Bold"),local("Roboto-Bold");font-weight:651 1000;size-adjust:102.12%;ascent-override:85.98%;descent-override:20.56%;line-gap-override:0%}
-/* Mientras llega Plex Mono, Windows usa Consolas, un 9 % más estrecha: la línea de cifras de arriba
-   se partía distinto al llegar la buena y empujaba la página. Esta reserva es Consolas con las medidas
-   de Plex Mono (0,6 em por letra, ascenso 1,025 y descenso 0,275; medido en Chrome). */
-@font-face{font-family:"Plex Mono Reserva";src:local("Consolas");font-weight:100 500;size-adjust:109.13%;ascent-override:93.92%;descent-override:25.2%;line-gap-override:0%}
-@font-face{font-family:"Plex Mono Reserva";src:local("Consolas Bold"),local("Consolas-Bold");font-weight:600 900;size-adjust:109.13%;ascent-override:93.92%;descent-override:25.2%;line-gap-override:0%}
 </style>
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 </head>
@@ -62,9 +43,13 @@
   --azul:#1B3FCC; --ok:#1B6E48; --warn:#8A5100; --on-warn:#FFFFFF;
   --focus:#1B3FCC;
   --shadow:0 2px 4px -2px rgba(20,24,28,.14), 0 18px 40px -22px rgba(20,24,28,.55);
-  --display:"Archivo","Archivo Reserva","Archivo Reserva Android","Helvetica Neue",Arial,sans-serif;
-  --body:"Archivo","Archivo Reserva","Archivo Reserva Android","Helvetica Neue",Arial,sans-serif;
-  --mono:"IBM Plex Mono","Plex Mono Reserva",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  /* Courier New antes que «monospace»: mide lo mismo que Plex Mono (0,6 em por letra), así la línea
+     de cifras no se parte distinto al llegar la buena (con Consolas, la de Windows, sí). Reservas
+     ajustadas con @font-face y local() quedaban aún mejor, pero retrasaban el primer pintado unos
+     400 ms en Windows (medido el 8-10-2026): no merece la pena. */
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,"Courier New",monospace;
   --panel:#F4F3EF;
   --ease:cubic-bezier(.23,1,.32,1);
   --ease-out:cubic-bezier(.23,1,.32,1);
@@ -184,6 +169,10 @@ a{color:var(--azul); text-underline-offset:3px; text-decoration-thickness:1px}
 .filters{position:sticky; top:calc(58px + env(safe-area-inset-top,0px)); z-index:50; background:var(--paper); border-bottom:1px solid var(--line); padding-block:11px}
 .frow{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 .chips{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+/* Mientras no ha llegado Archivo (sin la clase f-ok), los botones de categoría van con la letra de
+   reserva, que en sus palabras ocupa un 2-3 % menos (Arial y Roboto): con algo de espacio entre
+   letras miden lo mismo y, al llegar Archivo, no cambian de fila ni empujan el catálogo. */
+html:not(.f-ok) .chip:not(.sz-chip){letter-spacing:.011em}
 .chip{font-size:12.5px; font-weight:500; padding:5px 12px; border:1px solid var(--line-2); background:var(--surface); border-radius:999px; cursor:pointer; color:var(--ink-2); white-space:nowrap; transition:background .15s var(--ease), color .15s var(--ease)}
 @media (hover:hover) and (pointer:fine){.chip:hover{border-color:var(--ink); color:var(--ink)}}
 .chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper)}
@@ -609,7 +598,7 @@ const TIENDA = {
 };
 
 /* ===== FOTO DE STOCK · la escribe `npm run tienda`: no la edites a mano ===== */
-const STOCK = {"fecha":"2026-10-07","fuente":"Google","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
+const STOCK = {"fecha":"2026-09-30","fuente":"pedido inicial","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
 /* ===== FIN DE LA FOTO DE STOCK ===== */
 /* ===== FOTOS PROPIAS · las pone `npm run web` con lo que haya en tienda/fotos/ (ZB-001.jpg…) ===== */
 const FOTOS = {};
@@ -1313,7 +1302,8 @@ async function stockEnDirecto(){
 /* ---------- arranque ---------- */
 {
   const letraLista = () => document.documentElement.classList.add("f-ok");
-  try{ document.fonts.load('900 1em "Archivo"').then(letraLista, letraLista); }catch(e){ letraLista(); }
+  // Solo si llega de verdad: si no llega, se queda todo como con la letra de reserva.
+  try{ document.fonts.load('900 1em "Archivo"').then(letraLista, () => {}); }catch(e){ letraLista(); }
 }
 try{
   const th = localStorage.getItem("zubi_theme");
@@ -1330,8 +1320,10 @@ buildChips();
 if (STOCK.fecha) fechaStock("al " + new Date(STOCK.fecha + "T12:00:00").toLocaleDateString("es-ES", {day:"numeric", month:"short"}));
 renderGrid();
 renderCart(false);
-stockEnDirecto();
-evento("visita");
+// El stock de Google y la visita, justo después del primer pintado: la tienda ya enseña su foto de
+// stock, y así esas peticiones no compiten con lo que hace falta para pintar (Google puede tardar
+// varios segundos en contestar, sobre todo justo después de subir una versión).
+requestAnimationFrame(() => setTimeout(() => { stockEnDirecto(); evento("visita"); }, 0));
 </script>
 
 </body></html>
