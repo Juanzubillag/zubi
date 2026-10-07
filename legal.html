@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Plantilla: los huecos entre llaves dobles los rellena `npm run web` con tienda/legal.json (y los
+     trozos marcados «si:dato» solo salen si ese dato está). Sin titular, NIF, email o teléfono, esta
+     página no se publica (y la tienda sale sin los enlaces a ella). -->
+<title>Aviso legal, privacidad y condiciones de venta · ZUBI</title>
+<meta name="description" content="Quién vende en ZUBI, qué se hace con tus datos y las condiciones de compra: envíos, devoluciones en 14 días y garantía.">
+<!-- Lleva tu NIF y tu dirección: la ley pide que estén en la web, no que salgan en Google. -->
+<meta name="robots" content="noindex">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8E9E3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14171A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314181C'/%3E%3Cpath fill='%23F7F7F4' d='M13 15h32v8L26 41h19v8H13v-8l19-18H13z'/%3E%3Ccircle cx='52' cy='45' r='5' fill='%23C42E16'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<script>
+// El mismo tema (claro u oscuro) que elegiste en la tienda.
+try{ var th = localStorage.getItem("zubi_theme"); if (th === "dark" || th === "light") document.documentElement.setAttribute("data-theme", th); }catch(e){}
+</script>
+<style>
+@font-face{font-family:"Archivo";src:url(fonts/archivo.woff2) format("woff2");font-weight:400 900;font-stretch:75% 125%;font-style:normal;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-400.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-600.woff2) format("woff2");font-weight:600;font-style:normal;font-display:swap}
+:root{
+  color-scheme:light;
+  --paper:#E8E9E3; --surface:#F7F7F4;
+  --ink:#14181C; --ink-2:#444D48; --ink-3:#5E6862;
+  --line:#C9CCC3; --line-2:#A9AEA3;
+  --signal:#C42E16; --on-signal:#FFFFFF;
+  --azul:#1B3FCC; --ok:#1B6E48; --focus:#1B3FCC;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#14171A; --surface:#1D2126;
+    --ink:#ECEDE8; --ink-2:#A8B1AC; --ink-3:#8D9691;
+    --line:#2F353B; --line-2:#454D54;
+    --signal:#FF5A3C; --on-signal:#1A0D09;
+    --azul:#8AA5FF; --ok:#45C387; --focus:#8AA5FF;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#14171A; --surface:#1D2126;
+  --ink:#ECEDE8; --ink-2:#A8B1AC; --ink-3:#8D9691;
+  --line:#2F353B; --line-2:#454D54;
+  --signal:#FF5A3C; --on-signal:#1A0D09;
+  --azul:#8AA5FF; --ok:#45C387; --focus:#8AA5FF;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--display); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased}
+a{color:var(--azul); text-underline-offset:3px; text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:2px}
+::selection{background:var(--signal); color:var(--on-signal)}
+[id]{scroll-margin-top:76px}
+.wrap{max-width:760px; margin-inline:auto; padding-inline:16px}
+.hdr{position:sticky; top:0; z-index:5; background:var(--paper); border-bottom:1px solid var(--line)}
+.hdr-in{display:flex; align-items:center; justify-content:space-between; gap:14px; height:58px}
+.logo{font-weight:900; font-stretch:125%; font-size:27px; letter-spacing:-.025em; text-decoration:none; color:var(--ink); display:flex; align-items:baseline; gap:7px}
+.logo .dot{width:8px; height:8px; background:var(--signal); display:inline-block; border-radius:50%}
+.volver{font-size:14px; font-weight:500; color:var(--ink-2); padding:8px 0}
+main{padding-block:40px 8px}
+.kicker{font-family:var(--mono); font-size:11.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--signal); margin:0 0 10px}
+h1,h2,h3{line-height:1.1; text-wrap:balance; margin:0}
+h1{font-size:clamp(30px, 7vw, 44px); font-weight:900; font-stretch:112%; letter-spacing:-.02em}
+.lead{color:var(--ink-2); margin:12px 0 0}
+.toc{display:flex; flex-wrap:wrap; gap:8px; margin:24px 0 0}
+.toc a{font-size:13.5px; font-weight:600; color:var(--ink); text-decoration:none; border:1px solid var(--line-2); border-radius:999px; padding:7px 13px; background:var(--surface)}
+section{border-top:2px solid var(--ink); margin-top:44px; padding-top:22px}
+h2{font-size:clamp(24px, 5vw, 30px); font-weight:800; font-stretch:110%; letter-spacing:-.015em; margin-bottom:14px}
+h3{font-size:17px; font-weight:700; margin:26px 0 6px}
+p,ul,ol{margin:0 0 12px; max-width:68ch}
+ul,ol{padding-left:22px}
+li{margin-bottom:6px}
+.resumen{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--signal); padding:12px 14px; border-radius:3px}
+.datos{display:grid; grid-template-columns:max-content 1fr; gap:6px 18px; margin:0 0 14px; padding:14px 16px; background:var(--surface); border:1px solid var(--line); border-radius:3px}
+.datos dt{font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); padding-top:3px}
+.datos dd{margin:0; overflow-wrap:anywhere}
+@media (max-width:480px){ .datos{grid-template-columns:1fr; gap:0} .datos dt{padding-top:10px} .datos dt:first-child{padding-top:0} }
+.modelo{font-family:var(--mono); font-size:13.5px; line-height:1.75; white-space:pre-wrap; overflow-wrap:anywhere; background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:16px; margin:0 0 12px}
+.btn{font:inherit; font-weight:600; font-size:14.5px; background:var(--ink); color:var(--paper); border:0; border-radius:4px; padding:11px 18px; cursor:pointer; touch-action:manipulation; transition:background .16s cubic-bezier(.23,1,.32,1), transform .16s cubic-bezier(.23,1,.32,1)}
+.btn:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){ .btn:hover{background:var(--signal); color:var(--on-signal)} .toc a:hover{border-color:var(--ink)} .volver:hover{color:var(--ink)} }
+.hecho{font-size:13.5px; color:var(--ok); min-height:1.6em; margin:8px 0 0}
+footer{border-top:1px solid var(--line); margin-top:48px; padding-block:22px 36px; font-size:13px; color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){ .btn{transition:none} .btn:active{transform:none} }
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a class="logo" href="./" aria-label="ZUBI, ir a la tienda">ZUBI<span class="dot"></span></a>
+    <a class="volver" href="./">Volver a la tienda</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="kicker">Información legal</p>
+  <h1>Quién vende, tus datos y cómo comprar</h1>
+  <p class="lead">Lo que la ley pide que sepas antes de comprar en ZUBI, dicho en claro. Texto revisado el 7 de octubre de 2026.</p>
+  <nav class="toc" aria-label="En esta página">
+    <a href="#aviso-legal">Aviso legal</a>
+    <a href="#privacidad">Privacidad</a>
+    <a href="#condiciones">Condiciones de venta</a>
+    <a href="#formulario">Formulario de devolución</a>
+  </nav>
+
+  <section id="aviso-legal" aria-labelledby="t-aviso">
+    <h2 id="t-aviso">Aviso legal</h2>
+    <p>Esta web, la tienda ZUBI, es de:</p>
+    <dl class="datos">
+      <dt>Titular</dt><dd>Juan Zubillaga</dd>
+      <dt>NIF</dt><dd>06592900L</dd>
+      
+      <dt>Email</dt><dd><a href="mailto:juan.zubillagamenis@gmail.com">juan.zubillagamenis@gmail.com</a></dd>
+      <dt>Teléfono</dt><dd><a href="tel:+34626270026">+34 626 27 00 26</a></dd>
+      
+      <dt>Actividad</dt><dd>Venta a distancia de ropa, calzado y complementos, con el nombre comercial ZUBI.</dd>
+    </dl>
+    <p>Son los datos que pide el artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico (LSSI-CE).</p>
+    <h3>Uso de la web</h3>
+    <p>La tienda enseña las prendas, su precio y lo que queda de cada talla, y te ayuda a preparar el pedido. El stock se pone al día al abrirla, pero puede cambiar mientras eliges: lo que vale es la confirmación de tu pedido (lo explican las <a href="#condiciones">condiciones de venta</a>).</p>
+    <p>Los textos, el diseño y las fotos propias de esta web son de su titular: no los uses para otro negocio sin permiso. Los enlaces a WhatsApp e Instagram llevan a servicios de Meta, con sus propias condiciones.</p>
+  </section>
+
+  <section id="privacidad" aria-labelledby="t-privacidad">
+    <h2 id="t-privacidad">Privacidad</h2>
+    <p class="resumen">En corto: <b>esta web no usa cookies</b>, no guarda tus datos en ningún servidor y no te sigue por internet. Tus datos solo le llegan a ZUBI en el mensaje del pedido que tú decides enviar.</p>
+
+    <h3>Quién es el responsable</h3>
+    <p>Juan Zubillaga (NIF 06592900L). Para cualquier cosa sobre tus datos: <a href="mailto:juan.zubillagamenis@gmail.com">juan.zubillagamenis@gmail.com</a>.</p>
+
+    <h3>Tu pedido</h3>
+    <p><b>Qué datos:</b> los que escribes al hacer el pedido (nombre y apellidos, teléfono, email si lo pones, dirección si es envío, forma de pago y notas) y las prendas que pides.</p>
+    <p><b>Cómo llegan:</b> el formulario no los manda a ningún servidor. Solo prepara el mensaje que tú envías por WhatsApp o Instagram, o que copias para mandarlo por donde quieras.</p>
+    <p><b>Para qué:</b> confirmar el pedido, cobrarlo, enviártelo o quedar para la recogida, y atenderte después (cambios, devoluciones y garantía). Base legal: la compra que tú pides (art. 6.1.b del Reglamento General de Protección de Datos) y las obligaciones contables y fiscales (art. 6.1.c).</p>
+    <p><b>Cuánto tiempo:</b> mientras duren la compra y sus plazos de devolución y garantía. Lo que la ley obliga a guardar para Hacienda, el tiempo que marca (hasta 6 años).</p>
+
+    <h3>Cuántos visitan la tienda, sin cookies</h3>
+    <p>Para saber si la tienda funciona se cuentan, una vez por visita, cuatro pasos: entrar, añadir algo, abrir el pedido y enviarlo. Si llegaste con el enlace de un amigo, se suman también a su código. Solo se guardan los totales de cada día, que se borran a los 90 días: ni tu IP, ni tu navegador, ni nada que te identifique. Base legal: el interés legítimo en saber cómo se usa la tienda (art. 6.1.f del Reglamento).</p>
+
+    <h3>Lo que se queda en tu navegador</h3>
+    <p>No son cookies y no sale de tu dispositivo:</p>
+    <ul>
+      <li>Tu pedido a medias (prendas y tallas), hasta que lo envías o lo vacías.</li>
+      <li>El último pedido que enviaste, durante 24 horas, por si WhatsApp no llegó a abrirse y quieres mandarlo otra vez. Lleva lo que escribiste en el formulario.</li>
+      <li>El código del amigo que te pasó el enlace, durante 30 días, para que tu pedido cuente a su nombre.</li>
+      <li>Si elegiste el tema claro o el oscuro.</li>
+      <li>Mientras la pestaña sigue abierta, una marca para no contar dos veces la misma visita.</li>
+    </ul>
+    <p>Puedes borrarlo cuando quieras desde los ajustes de tu navegador (datos de los sitios).</p>
+
+    <h3>Quién más ve algún dato</h3>
+    <ul>
+      <li><b>GitHub</b> (Microsoft), que aloja la web, y <b>Google</b>, que da el stock al momento y lleva los contadores: como cualquier servidor, reciben la dirección IP de quien abre la tienda.</li>
+      <li><b>WhatsApp o Instagram</b> (Meta), si mandas el pedido por ahí, con sus propias políticas.</li>
+      <li><b>La empresa de transporte</b>, si es envío: nombre, dirección y teléfono, para entregarlo.</li>
+      <li><b>Los bancos</b>, si pagas por Bizum o transferencia.</li>
+    </ul>
+    <p>GitHub, Google y Meta pueden tratar datos en Estados Unidos, con las garantías del Marco de Privacidad de Datos UE-EE. UU. o las cláusulas tipo de la Comisión Europea. A nadie más se le dan tus datos, salvo que lo pida la ley.</p>
+
+    <h3>Tus derechos</h3>
+    <p>Puedes pedir ver tus datos, corregirlos, borrarlos, oponerte a que se usen, limitar su uso o llevártelos, escribiendo a <a href="mailto:juan.zubillagamenis@gmail.com">juan.zubillagamenis@gmail.com</a>. Si crees que no se han tratado bien, puedes reclamar ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" rel="noopener">aepd.es</a>).</p>
+  </section>
+
+  <section id="condiciones" aria-labelledby="t-condiciones">
+    <h2 id="t-condiciones">Condiciones de venta</h2>
+
+    <h3>Quién vende</h3>
+    <p>ZUBI es el nombre comercial de Juan Zubillaga. Sus datos están en el <a href="#aviso-legal">aviso legal</a>.</p>
+
+    <h3>Cómo se compra</h3>
+    <ol>
+      <li>Eliges las prendas y las tallas en la tienda y rellenas tus datos.</li>
+      <li>Envías el pedido por WhatsApp o Instagram (o lo copias y lo mandas por donde prefieras). Desde la web no se cobra nada.</li>
+      <li>ZUBI te contesta por el mismo chat con el stock, el total y cómo pagar. <b>La compra queda hecha con esa confirmación.</b></li>
+    </ol>
+    <p>Si una talla se ha agotado entre que envías el pedido y la confirmación, se te dice y no la pagas.</p>
+
+    <h3>Precios y pago</h3>
+    <p>Los precios están en euros e incluyen los impuestos aplicables. Los gastos de envío se suman antes de enviar el pedido y se ven en el total; los de cada momento están en «Envíos y pago», en la tienda. Vale el precio que había cuando enviaste el pedido.</p>
+    <p>Se paga por Bizum o transferencia, o en efectivo si es recogida en mano. Los datos para pagar se dan en el chat al confirmar.</p>
+
+    <h3>Entrega</h3>
+    <p>Envíos a toda España, en el plazo que indica la tienda desde que se confirma el pedido; si alguna vez fuera a tardar más, se te avisa. Como mucho, 30 días: pasado ese plazo puedes cancelar la compra y se te devuelve todo lo pagado. La recogida en mano en Madrid se acuerda por el chat.</p>
+    <p>Al recibir el paquete, revísalo: si llega dañado o falta algo, avisa cuanto antes (mejor con fotos).</p>
+
+    <h3 id="devoluciones">Devoluciones: 14 días para cambiar de opinión</h3>
+    <p>Puedes devolver tu compra <b>sin dar explicaciones</b> en los 14 días naturales siguientes a recibirla. Es el derecho de desistimiento de la Ley de Consumidores (artículos 102 a 108).</p>
+    <ul>
+      <li><b>Avisa dentro del plazo</b> por WhatsApp, Instagram o email, con una frase clara («Quiero devolver el pedido ZB-…») o con el <a href="#formulario">formulario de abajo</a>. Basta con mandarlo antes de que acaben los 14 días.</li>
+      <li><b>Devuelve las prendas</b> en los 14 días siguientes a tu aviso. El envío de vuelta lo pagas tú; si compraste con recogida en Madrid, puedes devolverlas en mano.</li>
+      <li><b>Se te devuelve todo lo pagado</b>, también el envío, en un máximo de 14 días desde tu aviso y por el mismo medio con el que pagaste, salvo que pidas otro. Se puede esperar a recibir las prendas o el justificante de que las has enviado.</li>
+      <li>Puedes probarte la ropa como en una tienda. Si vuelve usada, lavada o dañada, se descuenta lo que haya perdido de valor.</li>
+      <li>No se pueden devolver así los <b>perfumes, la ropa interior y otros productos que se entreguen precintados</b> por higiene, si se ha abierto el precinto (artículo 103 de la Ley de Consumidores).</li>
+    </ul>
+    <p>Si lo que quieres es otra talla, dilo: los cambios de talla son como pone en «Envíos y pago».</p>
+
+    <h3>Garantía</h3>
+    <p>Todo lo que compras tiene 3 años de garantía legal. Si una prenda tiene un defecto o no es lo que pediste, tienes derecho a que se cambie o se arregle sin coste y, si no se puede, a una rebaja o a que se te devuelva el dinero. En los 2 primeros años se da por hecho que el defecto venía de origen. Escribe con fotos del problema.</p>
+
+    <h3>Reclamaciones</h3>
+    <p>Escribe a <a href="mailto:juan.zubillagamenis@gmail.com">juan.zubillagamenis@gmail.com</a> o llama al <a href="tel:+34626270026">+34 626 27 00 26</a>. Si no quedas conforme, puedes pedir una hoja de reclamaciones o acudir a la oficina de consumo de tu ayuntamiento o de tu comunidad autónoma, y al arbitraje de consumo.</p>
+    <p>Estas condiciones se rigen por la ley española. Si hubiera un conflicto, decide el juzgado de tu domicilio.</p>
+  </section>
+
+  <section id="formulario" aria-labelledby="t-formulario">
+    <h2 id="t-formulario">Formulario de devolución</h2>
+    <p>No hace falta usarlo: basta con decirlo claro. Si lo prefieres, cópialo, rellénalo y mándalo por WhatsApp o por email. Es el modelo de la Ley de Consumidores.</p>
+    <pre class="modelo" id="modelo">A la atención de Juan Zubillaga (ZUBI)
+juan.zubillagamenis@gmail.com
+
+Por la presente le comunico que desisto de mi contrato de venta de las siguientes prendas:
+__________________________________________
+
+Pedido el: ____________  Recibido el: ____________
+Referencia del pedido (si la tienes): ____________
+Nombre: __________________________________
+Domicilio: ________________________________
+Firma (solo si lo envías en papel): ____________
+Fecha: ____________</pre>
+    <button class="btn" type="button" id="copiar">Copiar el formulario</button>
+    <p class="hecho" id="hecho" role="status"></p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">ZUBI · Madrid · <a href="./">Volver a la tienda</a></div>
+</footer>
+
+<script>
+document.getElementById("copiar").addEventListener("click", async () => {
+  const t = document.getElementById("modelo").textContent, hecho = document.getElementById("hecho");
+  let ok = false;
+  try{ await navigator.clipboard.writeText(t); ok = true; }catch(e){
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); ta.remove();
+    }catch(e2){}
+  }
+  hecho.textContent = ok ? "Copiado. Pégalo en WhatsApp o en un email y rellénalo." : "No se ha podido copiar: selecciónalo a mano.";
+});
+</script>
+</body>
+</html>

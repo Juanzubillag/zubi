@@ -68,8 +68,17 @@ var Panel = (function () {
 
   // Lo que pide atención, de más a menos urgente. Cada aviso dice a qué pestaña lleva.
   // nivel: 'mal' (dinero o un error), 'aviso' (hay que hacer algo) o 'info'.
-  function avisos(calc, deudas, fichas, nombres, hoy) {
+  // `filas` (opcional): {usadas, maximo} de MOVIMIENTOS, para avisar antes de que se llene.
+  function avisos(calc, deudas, fichas, nombres, hoy, filas) {
     var out = [];
+    // MOVIMIENTOS tiene un límite de filas (las cuentas no ven más allá): mejor saberlo antes.
+    if (filas && filas.maximo > 0 && filas.usadas >= filas.maximo * 0.85) {
+      var quedan = Math.max(0, filas.maximo - filas.usadas);
+      out.push({ nivel: filas.usadas >= filas.maximo * 0.95 ? 'mal' : 'aviso', peso: 1e6, vista: 'resumen',
+        texto: 'MOVIMIENTOS va por la fila ' + (filas.usadas + 1) + ' de ' + (filas.maximo + 1) + ': ' +
+          (quedan ? 'caben ' + quedan + (quedan === 1 ? ' apunte más' : ' apuntes más') : 'ya no cabe ningún apunte más') +
+          '. Hay que ampliar la hoja antes de que se llene.' });
+    }
     var nombre = function (id) { return (nombres && nombres.get && nombres.get(id)) || id; };
     deudas.forEach(function (d) {
       if (!(d.debe >= 0.5)) return;

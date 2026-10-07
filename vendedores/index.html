@@ -5,27 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Catálogo — China al por mayor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f6f4f'/%3E%3Cpath fill='%23fff' d='M23 14l5 3h8l5-3 11 7-5 9-5-3v24H22V27l-5 3-5-9z'/%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #fbfaf8; --panel: #fff; --ink: #1a1a19; --muted: #6b6a66;
-    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed;
+    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed; --on-accent: #fff;
     --warn: #a8541c; --warn-soft: #fdf1e6; --radius: 10px;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
-      --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25;
+      --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25; --on-accent: #0d2219;
       --warn: #e0a06a; --warn-soft: #2e2419;
     }
   }
   :root[data-theme="light"] {
     --bg: #fbfaf8; --panel: #fff; --ink: #1a1a19; --muted: #6b6a66;
-    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed;
+    --line: #e5e2dc; --accent: #1f6f4f; --accent-soft: #e8f3ed; --on-accent: #fff;
     --warn: #a8541c; --warn-soft: #fdf1e6;
   }
   :root[data-theme="dark"] {
     --bg: #161715; --panel: #1f211e; --ink: #eceae5; --muted: #9b9a94;
-    --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25;
+    --line: #32352f; --accent: #6bbf95; --accent-soft: #1d2c25; --on-accent: #0d2219;
     --warn: #e0a06a; --warn-soft: #2e2419;
   }
 
@@ -41,6 +42,7 @@
   .head-in { max-width: 1100px; margin: 0 auto; padding: 18px 16px 0; }
   h1 { font-size: 20px; margin: 0 0 2px; letter-spacing: -0.01em; }
   .sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .sub .act { color: var(--accent); }
 
   nav { display: flex; gap: 4px; overflow-x: auto; }
   nav button {
@@ -95,7 +97,7 @@
     font-weight: 620; text-decoration: none;
   }
   .acciones a:hover { filter: brightness(1.05); }
-  .vender { background: var(--accent); color: #fff; }
+  .vender { background: var(--accent); color: var(--on-accent); }
   .compartir { background: #25d366; color: #063d1e; }
   .foto img { cursor: zoom-in; }
   #lightbox {
@@ -128,7 +130,7 @@
   .resumen-deudas .rojo { color: #c0392b; }
   .resumen-deudas .verde { color: var(--accent); }
   .pago-btn {
-    display: inline-block; padding: 5px 11px; background: var(--accent); color: #fff;
+    display: inline-block; padding: 5px 11px; background: var(--accent); color: var(--on-accent);
     border-radius: 7px; font-size: 12px; font-weight: 620; text-decoration: none; white-space: nowrap;
   }
   .pago-btn:hover { filter: brightness(1.05); }
@@ -152,7 +154,7 @@
   .lock p { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
   .lock-row { display: flex; gap: 8px; }
   .lock input { flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; }
-  .lock button { padding: 10px 16px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 620; cursor: pointer; }
+  .lock button { padding: 10px 16px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 620; cursor: pointer; }
   .lock .err { color: #c0392b; font-size: 13px; margin-top: 10px; min-height: 16px; }
   [hidden] { display: none !important; }
 </style>
@@ -291,6 +293,38 @@
     a.hidden = false;
   }
 
+  // ---- Fotos: solo las que existen ----
+  // Al publicar (npm run web) se pone aquí la lista de las fotos de img/, para no pedir las que no
+  // hay (cada una que faltaba era un error 404 en cada visita). Abriendo la web desde tu
+  // ordenador la lista no está, y se prueba img/<codigo>.jpg como siempre.
+  /* ===== FOTOS DEL CATÁLOGO · las pone `npm run web` ===== */
+  const FOTOS_CATALOGO = ["CALC-RL.jpg","CARD-MIX.jpg","CHAQ-RL.jpg","GORE-ARC.jpg","JER-LAC.jpg","JER-RL.jpg","PERF-BDC.jpg","PERF-LOE.jpg","PERF-TF.jpg","POLO-LAC.jpg","POLO-RL.jpg","ROPI-CK.jpg"];
+  /* ===== FIN DE LAS FOTOS DEL CATÁLOGO ===== */
+  const hayFoto = (archivo) => !Array.isArray(FOTOS_CATALOGO) || FOTOS_CATALOGO.indexOf(archivo) >= 0;
+
+  // ---- La última visita: para enseñar algo al momento ----
+  // Google tarda unos segundos. Mientras, se enseña el stock de la última vez que se abrió el
+  // catálogo en este móvil (marcado «actualizando…»), y se cambia en cuanto llega el de ahora.
+  // Solo lo público (lo mismo que ve cualquiera): nada de costes ni de tus cifras.
+  const CACHE_CAT = 'zubi_catalogo';
+  const DIAS_CACHE = 14;
+  const leerCache = () => {
+    try {
+      const c = JSON.parse(localStorage.getItem(CACHE_CAT) || 'null');
+      return c && Array.isArray(c.productos) && c.productos.length && c.t > Date.now() - DIAS_CACHE * 864e5 ? c : null;
+    } catch (e) { return null; }
+  };
+  const guardarCache = (productos) => {
+    try { localStorage.setItem(CACHE_CAT, JSON.stringify({ t: Date.now(), productos })); } catch (e) { /* sin almacenamiento */ }
+  };
+  const hace = (t) => {
+    const min = Math.max(0, Math.round((Date.now() - t) / 60000));
+    if (min < 1) return 'hace un momento';
+    if (min < 60) return `hace ${min} min`;
+    if (min < 48 * 60) return `hace ${Math.round(min / 60)} h`;
+    return `del ${new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`;
+  };
+
   // ---- Catálogo público: stock en directo, o el pedido inicial si no hay conexión ----
   const prodPublico = (p) => {
     const sku = String(p.sku || '').trim();
@@ -301,14 +335,21 @@
       disponible: Calculo.num(p.disponible), vendido: Calculo.num(p.vendido),
     };
   };
-  async function cargarCatalogo() {
+  // `cache`: la última visita (si la hay), que vale más que el pedido inicial si Google falla.
+  async function cargarCatalogo(cache) {
     if (CFG.registroUrl) {
       try {
         const j = await pedir({ modo: 'catalogo' });
         if (!j.ok || !Array.isArray(j.productos)) throw new Error(j.error || 'respuesta inesperada');
+        guardarCache(j.productos);
         return { prods: j.productos.map(prodPublico), fuente: 'directo' };
       } catch (e) {
         console.warn('No se pudo leer el stock de Google:', e);
+        if (cache) {
+          avisar(`No se ha podido leer el stock de Google (${e.message}). Mostrando el de tu última visita
+            (${hace(cache.t)}), que puede estar desactualizado.`);
+          return { prods: cache.productos.map(prodPublico), fuente: 'cache', t: cache.t };
+        }
         avisar(`No se ha podido leer el stock de Google (${e.message}). Mostrando el pedido
           inicial guardado en la web, que puede estar desactualizado.`);
       }
@@ -384,11 +425,11 @@
       const chips = g.variantes.map((v) =>
         `<span class="talla ${v.disponible > 0 ? 'hay' : 'no'}">${esc(v.talla)}${
           v.disponible > 0 ? ` <b>${v.disponible}</b>` : ''}</span>`).join('');
-      // Foto: la de imagen_url si la hay; si no, se prueba web/img/<codigo>.jpg. Si ese
-      // archivo no existe, el onerror deja el hueco "sin foto". Para completar una ficha
-      // basta con guardar la foto en web/img/ con el nombre del codigo (ej. BOTA-NIK.jpg)
-      // y recargar: no hay que tocar ningun archivo ni regenerar nada.
-      const src = g.imagen || (g.cod ? `img/${g.cod}.jpg` : '');
+      // Foto: la de imagen_url si la hay; si no, web/img/<codigo>.jpg si existe (ver
+      // FOTOS_CATALOGO). Si ese archivo no existe, el onerror deja el hueco "sin foto". Para
+      // completar una ficha basta con guardar la foto en web/img/ con el nombre del codigo
+      // (ej. BOTA-NIK.jpg): en tu ordenador sale al recargar; en la web, al publicar.
+      const src = g.imagen || (g.cod && hayFoto(`${g.cod}.jpg`) ? `img/${g.cod}.jpg` : '');
       const foto = src
         ? `<img src="${esc(src)}" data-cod="${esc(g.cod)}" alt="${esc(g.producto)} ${esc(g.modelo)}" loading="lazy"
              onerror="this.onerror=null;this.replaceWith('sin foto')">`
@@ -561,24 +602,50 @@
     document.title = CFG.titulo || document.title;
     el('titulo').textContent = CFG.titulo || 'Catálogo';
 
-    const datos = await cargarCatalogo();
+    // Los desplegables de categoría y talla, con los productos que haya. Se rehacen cuando llega
+    // el stock de Google (puede traer una categoría que la última visita no tenía) y lo que
+    // estuviera elegido se mantiene. Los avisos de cambio, una sola vez.
+    const primeraOpcion = {};
+    let filtrosListos = false;
+    const prepararFiltros = () => {
+      const opciones = (id, valores) => {
+        const s = el(id), elegido = s.value;
+        if (!(id in primeraOpcion)) primeraOpcion[id] = s.innerHTML;   // «Todas las …»
+        s.innerHTML = primeraOpcion[id] + valores.map((v) => `<option>${esc(v)}</option>`).join('');
+        s.value = valores.includes(elegido) ? elegido : '';
+      };
+      opciones('f-cat', [...new Set(ESTADO.prods.map((p) => p.categoria))].sort());
+      opciones('f-talla', [...new Set(ESTADO.prods.map((p) => p.talla))].sort((a, b) => ordenTalla(a) - ordenTalla(b)));
+      if (filtrosListos) return;
+      filtrosListos = true;
+      for (const id of ['q', 'f-cat', 'f-talla', 'f-hay']) {
+        el(id).addEventListener('input', pintarCatalogo);
+      }
+    };
+
+    // Al momento: lo de la última visita, marcado «actualizando…». Sin última visita, se espera
+    // a Google (antes de inventar un stock, mejor decir que está cargando).
+    const cache = CFG.registroUrl ? leerCache() : null;
+    if (cache) {
+      const prods = cache.productos.map(prodPublico);
+      ESTADO = { prods, grupos: agrupar(prods) };
+      el('subtitulo').innerHTML = `Stock de tu última visita (${esc(hace(cache.t))}) · <span class="act">actualizando…</span>`;
+      prepararFiltros();
+      pintarTodo();
+    } else {
+      el('subtitulo').textContent = 'Cargando el stock…';
+    }
+
+    const datos = await cargarCatalogo(cache);
     ESTADO = { prods: datos.prods, grupos: agrupar(datos.prods) };
 
     el('subtitulo').textContent = datos.fuente === 'directo'
       ? `Stock en directo · ${CFG.ciudad || ''}`.replace(/ · $/, '')
-      : `Pedido inicial${datos.generado ? ' del ' + datos.generado : ''} · sin conexión con Google`;
+      : datos.fuente === 'cache'
+        ? `Stock de tu última visita (${hace(datos.t)}) · sin conexión con Google`
+        : `Pedido inicial${datos.generado ? ' del ' + datos.generado : ''} · sin conexión con Google`;
 
-    const cats = [...new Set(ESTADO.prods.map((p) => p.categoria))].sort();
-    el('f-cat').insertAdjacentHTML('beforeend',
-      cats.map((c) => `<option>${esc(c)}</option>`).join(''));
-    const tallas = [...new Set(ESTADO.prods.map((p) => p.talla))]
-      .sort((a, b) => ordenTalla(a) - ordenTalla(b));
-    el('f-talla').insertAdjacentHTML('beforeend',
-      tallas.map((t) => `<option>${esc(t)}</option>`).join(''));
-
-    for (const id of ['q', 'f-cat', 'f-talla', 'f-hay']) {
-      el(id).addEventListener('input', pintarCatalogo);
-    }
+    prepararFiltros();
 
     // ---- Candado de las secciones privadas (Comisiones y Quién tiene qué) ----
     const PRIVADAS = ['comisiones', 'reparto'];
@@ -650,7 +717,7 @@
       renderGaleria();
     };
     const buscarMas = (cod, n) => {
-      if (!cod) return;
+      if (!cod || !hayFoto(`${cod}-${n}.jpg`)) return;
       const url = `img/${cod}-${n}.jpg`;
       const im = new Image();
       im.onload = () => { galeria.fotos.push(url); renderGaleria(); buscarMas(cod, n + 1); };
