@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-TWA67iJknoqmvs35NxgWGDJPEpfoNsHGkXNIfGLOdBY='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Catálogo — China al por mayor</title>
@@ -258,6 +259,12 @@
   const LOCAL = window.DATOS_LOCALES || { productos: [] };
   const eur = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
   const el = (id) => document.getElementById(id);
+  // Fotos que no cargan: en su lugar, "sin foto". Va aquí y no en un atributo on… de cada foto
+  // porque la página publicada solo ejecuta su propio código (scripts/seguridad-web.js).
+  document.addEventListener('error', (e) => {
+    const img = e.target;
+    if (img && img.tagName === 'IMG' && img.hasAttribute('data-sinfoto')) img.replaceWith('sin foto');
+  }, true);
   // Todo lo que viene de la hoja (nombres, canales, notas…) se escapa antes de meterlo
   // en la página: un texto con "<" no puede convertirse en código.
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
@@ -436,13 +443,12 @@
         `<span class="talla ${v.disponible > 0 ? 'hay' : 'no'}">${esc(v.talla)}${
           v.disponible > 0 ? ` <b>${v.disponible}</b>` : ''}</span>`).join('');
       // Foto: la de imagen_url si la hay; si no, web/img/<codigo>.jpg si existe (ver
-      // FOTOS_CATALOGO). Si ese archivo no existe, el onerror deja el hueco "sin foto". Para
+      // FOTOS_CATALOGO). Si ese archivo no existe, queda el hueco "sin foto" (ver fotoRota). Para
       // completar una ficha basta con guardar la foto en web/img/ con el nombre del codigo
       // (ej. BOTA-NIK.jpg): en tu ordenador sale al recargar; en la web, al publicar.
       const src = g.imagen || (g.cod && hayFoto(`${g.cod}.jpg`) ? `img/${g.cod}.jpg` : '');
       const foto = src
-        ? `<img src="${esc(src)}" data-cod="${esc(g.cod)}" alt="${esc(g.producto)} ${esc(g.modelo)}" loading="lazy"
-             onerror="this.onerror=null;this.replaceWith('sin foto')">`
+        ? `<img src="${esc(src)}" data-cod="${esc(g.cod)}" alt="${esc(g.producto)} ${esc(g.modelo)}" loading="lazy" data-sinfoto>`
         : 'sin foto';
       const comision = g.pvp * comisionPct(g.pvp) / 100;
       // Coste y margen solo con tu clave (vienen de Google, no de esta web).
@@ -450,15 +456,19 @@
       const margen = PRIV
         ? `<div class="nota">Coste ${eur(g.coste)} · margen ${eur(g.pvp - comision - g.coste)}</div>`
         : '';
-      // Botón "Lo vendí": abre el formulario (Apps Script) con este producto elegido.
-      // Solo si hay registroUrl configurada y aún queda algo disponible.
-      const primera = g.variantes.find((v) => v.disponible > 0) || g.variantes[0];
-      const vender = (CFG.registroUrl && g.disponible)
-        ? `<a class="vender" target="_blank" rel="noopener" href="${esc(enlace({ sku: primera.sku }))}">Lo vendí</a>`
+      // Botón «Avisar a Juan»: tus amigos no apuntan nada; te escriben por WhatsApp con la prenda
+      // ya puesta (y huecos para la talla, el precio y dónde) y tú lo apuntas. Solo si hay número
+      // en config.js y aún queda algo disponible.
+      const libres = g.variantes.filter((v) => v.disponible > 0).map((v) => v.talla);
+      const tallasHay = libres.join(', ');
+      const aviso = `Hola Juan, he vendido:\n👕 ${g.producto} — ${g.modelo}${g.cod ? ` (${g.cod})` : ''}\n` +
+        `Talla: ${libres.length === 1 ? libres[0] : `___ (quedan ${tallasHay})`}\nPrecio: ___ €\nDónde: ___ (Vinted, Wallapop, en mano…)`;
+      const tuWhatsapp = String(CFG.whatsapp || '').replace(/\D/g, '');
+      const vender = (tuWhatsapp && g.disponible)
+        ? `<a class="vender" target="_blank" rel="noopener" href="https://wa.me/${tuWhatsapp}?text=${encodeURIComponent(aviso)}">Avisar a Juan</a>`
         : '';
       // Compartir por WhatsApp: mensaje listo para mandar a un comprador. Incluye la foto
       // (como enlace absoluto) solo si el producto tiene foto de verdad.
-      const tallasHay = g.variantes.filter((v) => v.disponible > 0).map((v) => v.talla).join(', ');
       const linkFoto = g.imagen ? '\n' + new URL(g.imagen, location.href).href : '';
       const msg = `👕 ${g.producto} — ${g.modelo}\nTallas: ${tallasHay || '—'}\nPrecio: ${eur(g.pvp)}${linkFoto}`;
       const compartir = `<a class="compartir" target="_blank" rel="noopener"

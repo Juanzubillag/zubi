@@ -8,8 +8,13 @@ window.CONFIG_WEB = {
   titulo: 'Catálogo — China al por mayor',
   ciudad: 'Madrid',
 
+  // Tu WhatsApp, con prefijo y sin + ni espacios (el mismo de la tienda). El botón «Avisar a
+  // Juan» de cada prenda abre un mensaje para ti con la prenda ya puesta: tus amigos no
+  // apuntan nada, te escriben y lo apuntas tú. Si lo dejas vacío, el botón no sale.
+  whatsapp: '34626270026',
+
   // Enlace de la aplicación web de Google (Apps Script → Implementar). Da el stock en
-  // directo, el botón "Lo vendí" de cada ficha y las pestañas privadas. Si lo dejas
-  // vacío, la web enseña el pedido inicial guardado en datos.js y nada más.
+  // directo y las pestañas privadas. Si lo dejas vacío, la web enseña el pedido inicial
+  // guardado en datos.js y nada más.
   registroUrl: 'https://script.google.com/macros/s/AKfycby_SHA25U7-AxU0Pkl0ffH7Bl2dmYt0s0nEhjjQPkoI8Y7XI-cCXldb9jNyV3uPZOwQ/exec',
 };
