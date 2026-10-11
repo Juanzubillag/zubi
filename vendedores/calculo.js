@@ -11,7 +11,8 @@
 var Calculo = (function () {
   'use strict';
 
-  var TRAMOS_POR_DEFECTO = [{ hasta: 25, pct: 20 }, { hasta: 45, pct: 15 }, { hasta: null, pct: 10 }];
+  // Los de scripts/catalogo.js (hoy, el 20 % a cualquier precio): solo se usan si no llegan otros.
+  var TRAMOS_POR_DEFECTO = [{ hasta: null, pct: 20 }];
 
   function txt(v) { return String(v == null ? '' : v).trim(); }
 

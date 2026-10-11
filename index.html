@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-dKSvmRAFhOqJvAHHaYj2Tu/yJUnLMO8TSVmjyJJK0cE='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-SHqpirF39W5JwNHnwyitRt4X88XgiKJSkTKd9NEluQc='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>ZUBI · Ropa de calle en Madrid a precio de mercadillo</title>
 <meta name="description" content="Fútbol retro, punto, sudaderas, chaquetas y zapatillas en Madrid. Stock real por talla, pedido por WhatsApp en un minuto, envío a toda España en 24-48 h y recogida en mano gratis.">
@@ -137,13 +137,13 @@ a{color:var(--azul); text-underline-offset:3px; text-decoration-thickness:1px}
 .hero .wrap{position:relative; z-index:1}
 .hero h1{font-size:clamp(40px,8.8vw,74px); font-weight:900; font-stretch:125%; letter-spacing:-.035em; text-transform:uppercase;
   /* Su alto, reservado: mientras llega la fuente Archivo (más ancha que la de reserva), el titular
-     ocupa una línea menos, y al llegar empujaba toda la página. Medido con este texto: 3 líneas
-     desde 429 px de ancho, 4 hasta 428 px y 5 hasta 350 px. Si cambias el titular, vuelve a medirlo.
+     ocupa una línea menos, y al llegar empujaba toda la página. En el móvil la letra es más pequeña
+     (ver el bloque de 620 px) para que la primera prenda se vea al entrar. Medido con este texto:
+     3 líneas desde 270 px de ancho y 4 por debajo. Si cambias el titular o su tamaño, vuelve a medirlo.
      El <br> antes de «mercadillo» no cambia nada con Archivo (ya partía ahí) y hace que la letra de
      reserva también ocupe 3 líneas en pantallas anchas. */
   min-height:calc(3 * 1.02em)}
-@media (max-width:428px){ .hero h1{min-height:calc(4 * 1.02em)} }
-@media (max-width:350px){ .hero h1{min-height:calc(5 * 1.02em)} }
+@media (max-width:269px){ .hero h1{min-height:calc(4 * 1.02em)} }
 .hero h1 em{font-style:normal; color:var(--on-signal); background:var(--signal); padding:0 .12em; box-decoration-break:clone; -webkit-box-decoration-break:clone}
 .hero p{max-width:50ch; margin-top:18px; color:var(--ink-2); font-size:16.5px; line-height:1.55}
 .hero p.manifest{max-width:none}
@@ -173,6 +173,12 @@ html:not(.f-ok) .chip:not(.sz-chip){letter-spacing:.011em}
 @media (hover:hover) and (pointer:fine){.chip:hover{border-color:var(--ink); color:var(--ink)}}
 .chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper)}
 .chip.sz-chip{font-family:var(--mono); font-size:11.5px; min-width:34px; justify-content:center}
+/* En el ordenador, la fila de categorías es parte de la fila de filtros y el botón «Filtros» no se ve.
+   En el móvil (bloque de 620 px), categorías en una sola fila que se desliza, y el resto, tras el botón. */
+.fila-cat{display:contents}
+.mas-filtros{display:none; align-items:center; gap:6px; font-weight:600; color:var(--ink); border-color:var(--ink)}
+.mas-filtros[aria-expanded="true"]{background:var(--ink); color:var(--paper)}
+.mas-filtros .nf{font-family:var(--mono); font-size:11px; line-height:16px; min-width:16px; padding:0 4px; border-radius:999px; background:var(--signal); color:var(--on-signal); text-align:center}
 .spacer{flex:1 1 auto; min-width:0}
 .field{display:flex; align-items:center; gap:7px; border:1px solid var(--line-2); border-radius:4px; padding:0 10px; height:38px; background:var(--surface); cursor:text}
 .field:focus-within{border-color:var(--focus)}
@@ -256,9 +262,6 @@ footer{border-top:2px solid var(--ink); padding-block:36px 44px; margin-top:52px
 .foot a{display:block; color:var(--ink); text-decoration:none; font-size:14px; padding:3px 0}
 @media (hover:hover) and (pointer:fine){.foot a:hover{color:var(--signal); text-decoration:underline}}
 .legal{margin-top:30px; padding-top:17px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3); display:flex; gap:16px; flex-wrap:wrap; justify-content:space-between}
-.legal-links{display:flex; gap:6px 16px; flex-wrap:wrap}
-.legal-links a{color:var(--ink-2); text-decoration:underline; text-decoration-color:var(--line-2)}
-@media (hover:hover) and (pointer:fine){.legal-links a:hover{color:var(--signal); text-decoration-color:currentColor}}
 
 /* ---------- cart drawer ---------- */
 .scrim{position:fixed; inset:0; background:rgba(10,12,14,.42); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); z-index:90; opacity:0; pointer-events:none; transition:opacity .28s var(--ease)}
@@ -337,14 +340,29 @@ body.dopen .toast.on{transform:translate(-50%,0)}
 
 @media (max-width:620px){
   .nav{display:none}
-  .hero{padding-block:32px 0}
-  .filters{position:static}
+  /* Que la primera prenda se vea al entrar: titular, texto y cifras más compactos, y los filtros en
+     una sola fila (las categorías se deslizan; buscar, ordenar y tallas, tras el botón «Filtros»). */
+  .hero{padding-block:20px 0}
+  .hero h1{font-size:clamp(24px,8.2vw,40px)}
+  .hero p{font-size:14px; line-height:1.45; margin-top:10px}
+  .filters{position:static; padding-block:9px}
   .field input{width:100%}
   .frow > .field{flex:1 1 120px}
   .frow > .field:has(#q){flex-grow:1.4}
+  .fila-cat{display:flex; flex:1 1 100%; min-width:0; gap:6px; align-items:center}
+  #catChips{flex:1 1 auto; min-width:0; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent); mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}
+  #catChips::-webkit-scrollbar{display:none}
+  #catChips::after{content:""; flex:0 0 16px}
+  .mas-filtros{display:inline-flex; flex:none}
+  .frow:first-child > .spacer{display:none}
+  .filters:not(.abierto) .frow > .field, .filters:not(.abierto) .frow + .frow{display:none}
   .grid{grid-template-columns:repeat(auto-fill,minmax(158px,1fr))}
   .shot svg{width:58%; height:58%}
-  .manifest{display:grid; grid-template-columns:1fr 1fr; gap:2px 12px; font-size:11.5px}
+  /* .hero p.manifest, no .manifest: si no, el tamaño de «.hero p» le gana y las cifras salen como el texto */
+  .hero p.manifest{display:grid; grid-template-columns:1fr 1fr; gap:0 12px; font-size:11px; line-height:1.45; margin-top:14px; padding-block:7px}
+  .manifest span{padding-block:1px}
+  .manifest b{font-size:12.5px}
   .manifest span::after{content:none}
   [id]{scroll-margin-top:calc(70px + env(safe-area-inset-top,0px))}
   footer{margin-top:36px}
@@ -436,7 +454,7 @@ body::after{
   <div class="filters" id="tienda">
     <div class="wrap">
       <div class="frow">
-        <div class="chips" id="catChips" role="group" aria-label="Filtrar por categoría"><button class="chip" type="button" data-cat="Todo" aria-pressed="true">Todo</button><button class="chip" type="button" data-cat="Camisetas" aria-pressed="false">Camisetas</button><button class="chip" type="button" data-cat="Punto" aria-pressed="false">Punto</button><button class="chip" type="button" data-cat="Sudaderas" aria-pressed="false">Sudaderas</button><button class="chip" type="button" data-cat="Chaquetas" aria-pressed="false">Chaquetas</button><button class="chip" type="button" data-cat="Chándales" aria-pressed="false">Chándales</button><button class="chip" type="button" data-cat="Zapatillas" aria-pressed="false">Zapatillas</button><button class="chip" type="button" data-cat="Accesorios" aria-pressed="false">Accesorios</button></div>
+        <div class="fila-cat"><div class="chips" id="catChips" role="group" aria-label="Filtrar por categoría"><button class="chip" type="button" data-cat="Todo" aria-pressed="true">Todo</button><button class="chip" type="button" data-cat="Camisetas" aria-pressed="false">Camisetas</button><button class="chip" type="button" data-cat="Punto" aria-pressed="false">Punto</button><button class="chip" type="button" data-cat="Sudaderas" aria-pressed="false">Sudaderas</button><button class="chip" type="button" data-cat="Chaquetas" aria-pressed="false">Chaquetas</button><button class="chip" type="button" data-cat="Chándales" aria-pressed="false">Chándales</button><button class="chip" type="button" data-cat="Zapatillas" aria-pressed="false">Zapatillas</button><button class="chip" type="button" data-cat="Accesorios" aria-pressed="false">Accesorios</button></div><button class="chip mas-filtros" id="masFiltros" type="button" aria-expanded="false"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filtros<span class="nf" id="nFiltros" hidden></span></button></div>
         <span class="spacer"></span>
         <div class="field">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -561,7 +579,6 @@ body::after{
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> ZUBI · Madrid</span>
-      <nav class="legal-links" aria-label="Información legal"><a href="legal.html#aviso-legal">Aviso legal</a><a href="legal.html#privacidad">Privacidad</a><a href="legal.html#condiciones">Condiciones de venta</a></nav>
       <span>Prendas sin marca. Todos los artículos son producto genérico sin licencia de terceros.</span>
     </div>
   </div>
@@ -595,14 +612,11 @@ const TIENDA = {
 };
 
 /* ===== FOTO DE STOCK · la escribe `npm run tienda`: no la edites a mano ===== */
-const STOCK = {"fecha":"2026-10-08","fuente":"Google","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
+const STOCK = {"fecha":"2026-10-11","fuente":"Google","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
 /* ===== FIN DE LA FOTO DE STOCK ===== */
 /* ===== FOTOS PROPIAS · las pone `npm run web` con lo que haya en tienda/fotos/ (ZB-001.jpg…) ===== */
 const FOTOS = {};
 /* ===== FIN DE LAS FOTOS ===== */
-// Las páginas legales (aviso legal, privacidad y condiciones): `npm run web` pone aquí
-// "legal.html" cuando tienda/legal.json tiene tus datos completos. Mientras, no se enlazan.
-const LEGAL = "legal.html";
 const IG_PLACEHOLDER = "zubi.madrid", MAIL_PLACEHOLDER = "hola@zubi.es";
 
 /* ---------- catálogo ---------- */
@@ -770,6 +784,10 @@ function renderGrid(swap){
   if (swap) g.classList.add("swapping");
   document.getElementById("resCount").textContent =
     list.length + (list.length === 1 ? " referencia" : " referencias");
+  // En el móvil, buscar, ordenar y tallas van tras el botón «Filtros»: su número dice cuántos hay puestos.
+  const nf = fSizes.size + (fQ ? 1 : 0) + (fSort !== "destacado" ? 1 : 0) + (fAvail ? 0 : 1);
+  const nfEl = document.getElementById("nFiltros");
+  nfEl.textContent = nf; nfEl.hidden = !nf;
 
   if(!list.length){
     g.innerHTML = '<div class="empty-state"><p style="font-weight:600; color:var(--ink); font-size:16px">Nada con esos filtros.</p>'+
@@ -938,9 +956,7 @@ function renderForm(){
       '<button class="btn ghost" type="button" data-send="copy">Copiar pedido</button>'+
     '</div>'+
     '<button class="btn link" type="button" data-step="cart" style="margin-top:4px">Volver al carrito</button>'+
-    '<p class="notice">No se cobra nada desde la web. Te confirmo stock y te paso los datos de pago al recibir el pedido.'+
-      // En otra pestaña: aquí se perdería lo que lleva escrito en el formulario.
-      (LEGAL ? ' Tus datos solo van en ese mensaje: <a href="'+LEGAL+'#privacidad" target="_blank" rel="noopener">privacidad</a> · <a href="'+LEGAL+'#condiciones" target="_blank" rel="noopener">condiciones y devoluciones</a>.' : '')+'</p>';
+    '<p class="notice">No se cobra nada desde la web. Te confirmo stock y te paso los datos de pago al recibir el pedido.</p>';
 
   document.getElementById("chk").addEventListener("input", () => { cliente = readForm(); });
   document.getElementById("chk").addEventListener("change", e => {
@@ -1206,6 +1222,10 @@ document.getElementById("q").addEventListener("input", e => {
 });
 document.getElementById("sort").addEventListener("change", e => { fSort = e.target.value; renderGrid(true); });
 document.getElementById("onlyAvail").addEventListener("change", e => { fAvail = e.target.checked; renderGrid(true); });
+document.getElementById("masFiltros").addEventListener("click", e => {
+  const abierto = document.querySelector(".filters").classList.toggle("abierto");
+  e.currentTarget.setAttribute("aria-expanded", String(abierto));
+});
 
 const themeBtn = document.getElementById("theme");
 function isDark(){

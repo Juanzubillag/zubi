@@ -1,17 +1,9 @@
 window.DATOS_LOCALES = {
- "generado": "2026-09-30",
+ "generado": "2026-10-10",
  "comisionTramos": [
   {
-   "hasta": 25,
-   "pct": 20
-  },
-  {
-   "hasta": 45,
-   "pct": 15
-  },
-  {
    "hasta": null,
-   "pct": 10
+   "pct": 20
   }
  ],
  "propio": "V1",

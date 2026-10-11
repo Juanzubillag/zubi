@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-PWGZaAN/eSU2+sCwfbYZH8xCg9LcgT4UTzbGpwsjII8='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-b4inLSF4hi0UiR0ict91Uf7tkwFnr6g1p3IV2XYww8g='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8E9E3">
@@ -379,7 +379,8 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-  // Comisión por tramos de PRECIO DE VENTA. Los tramos vienen de Google (o de datos.js).
+  // Comisión: un % del PRECIO DE VENTA (hoy el 20 % a cualquier precio; admite tramos). Viene de
+  // Google (o de datos.js).
   let TRAMOS = LOCAL.comisionTramos;
   let PROPIO = LOCAL.propio || 'V1';
   const comisionPct = (precio) => Calculo.comisionPct(precio, TRAMOS);
