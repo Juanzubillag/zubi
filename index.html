@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-SHqpirF39W5JwNHnwyitRt4X88XgiKJSkTKd9NEluQc='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-VgQ8mSM5HJQaDvNiDpI3VvWcjNU5bkHT1+hdpfiigQ8=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>ZUBI · Ropa de calle en Madrid a precio de mercadillo</title>
 <meta name="description" content="Fútbol retro, punto, sudaderas, chaquetas y zapatillas en Madrid. Stock real por talla, pedido por WhatsApp en un minuto, envío a toda España en 24-48 h y recogida en mano gratis.">
@@ -263,6 +263,52 @@ footer{border-top:2px solid var(--ink); padding-block:36px 44px; margin-top:52px
 @media (hover:hover) and (pointer:fine){.foot a:hover{color:var(--signal); text-decoration:underline}}
 .legal{margin-top:30px; padding-top:17px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3); display:flex; gap:16px; flex-wrap:wrap; justify-content:space-between}
 
+/* ---------- ficha de cada prenda ---------- */
+/* Se abre al tocar la foto o el nombre. Las fotos se pasan con el dedo (scroll-snap: sin código);
+   en el ordenador, también con las flechas y las miniaturas. */
+.card a{color:inherit; text-decoration:none}
+a.shot{cursor:pointer}
+@media (hover:hover) and (pointer:fine){.name a:hover{text-decoration:underline; text-underline-offset:3px}}
+.ficha{position:fixed; inset:0; z-index:105; display:grid; place-items:center; padding:24px; visibility:hidden; opacity:0; transition:opacity .2s var(--ease), visibility 0s .2s}
+.ficha.on{visibility:visible; opacity:1; transition:opacity .22s var(--ease)}
+.ficha .fondo-f{position:absolute; inset:0; background:rgba(10,12,14,.5); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px)}
+.ficha-caja{position:relative; width:min(1000px,100%); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); background:var(--paper); box-shadow:var(--shadow); border-radius:4px; overflow:hidden; transform:translateY(10px); transition:transform .3s var(--ease-out)}
+.ficha.on .ficha-caja{transform:none}
+.f-cerrar{position:absolute; top:12px; right:12px; z-index:3; background:var(--surface); box-shadow:var(--shadow)}
+.galeria{position:relative; min-width:0; background:var(--panel)}
+.fotos{display:flex; height:min(680px, calc(100dvh - 48px)); overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior-x:contain}
+.fotos::-webkit-scrollbar{display:none}
+.fotos:focus-visible{outline:2px solid var(--focus); outline-offset:-2px}
+.fotos figure{flex:0 0 100%; margin:0; scroll-snap-align:start; display:grid; place-items:center; background:radial-gradient(120% 120% at 28% 16%, color-mix(in srgb, currentColor 20%, var(--panel)) 0%, var(--panel) 60%)}
+.fotos img{width:100%; height:100%; object-fit:contain}
+.fotos svg{width:60%; height:60%}
+.g-flecha{position:absolute; top:50%; translate:0 -50%; z-index:2; width:40px; height:40px; border-radius:50%; border:1px solid var(--line-2); background:var(--surface); color:var(--ink); display:grid; place-items:center; cursor:pointer}
+.g-flecha.ant{left:12px} .g-flecha.sig{right:12px}
+.g-flecha:disabled{opacity:.3; cursor:default}
+.g-cuenta{position:absolute; bottom:12px; left:50%; translate:-50% 0; z-index:2; font-family:var(--mono); font-size:11.5px; background:var(--surface); color:var(--ink-2); padding:2px 9px; border-radius:999px}
+.ficha-info{min-width:0; max-height:min(680px, calc(100dvh - 48px)); overflow-y:auto; overscroll-behavior:contain; padding:26px 26px 22px; display:flex; flex-direction:column; gap:16px}
+.ficha-info h2{font-size:24px; font-weight:800; font-stretch:112%; letter-spacing:-.02em; line-height:1.15; margin-top:4px; padding-right:40px}
+.miniaturas{display:flex; gap:6px; flex-wrap:wrap}
+.miniaturas button{width:56px; height:56px; padding:0; border:1px solid var(--line-2); border-radius:3px; overflow:hidden; background:var(--panel); cursor:pointer}
+.miniaturas button[aria-current="true"]{outline:2px solid var(--ink); outline-offset:1px}
+.miniaturas img{width:100%; height:100%; object-fit:cover}
+.sz.agot{color:var(--ink-3); text-decoration:line-through; background:transparent; border-style:dashed; cursor:help}
+.f-extra{display:flex; gap:6px 10px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--ink-2)}
+.f-extra a,.f-link{color:var(--ink-2); text-decoration:underline; text-decoration-color:var(--line-2); text-underline-offset:3px}
+.f-link{background:none; border:0; padding:0; font:inherit; cursor:pointer}
+body.fopen{overflow:hidden}
+
+/* ---------- aviso de cookies ---------- */
+/* Abajo y fijo (no empuja nada al cargar); «Aceptar» y «No, gracias» igual de fáciles, como pide la ley. */
+.cookies{position:fixed; left:16px; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:120; max-width:560px; margin-inline:auto; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:6px; box-shadow:var(--shadow); padding:16px 16px 14px; font-size:13.5px; line-height:1.5}
+.cookies[hidden]{display:none}
+.cookies b{font-weight:700}
+.cookies details{margin-top:8px; color:var(--ink-2); font-size:12.5px}
+.cookies summary{cursor:pointer; text-decoration:underline; text-decoration-color:var(--line-2); text-underline-offset:3px; width:max-content}
+.cookies details p{margin-top:6px}
+.ck-botones{display:flex; gap:8px; margin-top:12px}
+.ck-botones .btn{flex:1; height:40px; font-size:13.5px}
+
 /* ---------- cart drawer ---------- */
 .scrim{position:fixed; inset:0; background:rgba(10,12,14,.42); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); z-index:90; opacity:0; pointer-events:none; transition:opacity .28s var(--ease)}
 .scrim.on{opacity:1; pointer-events:auto}
@@ -337,6 +383,8 @@ a.btn{text-decoration:none}
 .toast.on{opacity:1; transform:translate(-50%,0)}
 body.dopen .toast{bottom:auto; top:calc(74px + env(safe-area-inset-top,0px)); transform:translate(-50%,-16px); z-index:210}
 body.dopen .toast.on{transform:translate(-50%,0)}
+body.fopen .toast{bottom:auto; top:calc(64px + env(safe-area-inset-top,0px)); transform:translate(-50%,-16px)}
+body.fopen .toast.on{transform:translate(-50%,0)}
 
 @media (max-width:620px){
   .nav{display:none}
@@ -367,6 +415,15 @@ body.dopen .toast.on{transform:translate(-50%,0)}
   [id]{scroll-margin-top:calc(70px + env(safe-area-inset-top,0px))}
   footer{margin-top:36px}
   .hero .fondo{display:none}
+  /* La ficha, a pantalla completa: fotos arriba (se pasan con el dedo) y «Añadir» siempre a mano. */
+  .ficha{padding:0; place-items:stretch}
+  .ficha-caja{width:100%; height:100dvh; grid-template-columns:1fr; grid-template-rows:auto 1fr; border-radius:0; overflow-y:auto; overscroll-behavior:contain; transform:translateY(24px)}
+  .fotos{height:auto; aspect-ratio:4/5; max-height:70dvh}
+  .ficha-info{max-height:none; overflow:visible; padding:18px 16px 0}
+  .ficha-info h2{font-size:21px; padding-right:0}
+  .f-cerrar{position:fixed; top:calc(10px + env(safe-area-inset-top,0px))}
+  .g-flecha,.miniaturas{display:none}
+  .f-comprar{position:sticky; bottom:0; margin-inline:-16px; padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px)); background:var(--paper); border-top:1px solid var(--line)}
 }
 /* Respuesta al pulsar: la interfaz confirma que te ha oído */
 .chip,.sz,.add,.btn,.icon-btn,.cart-btn,.qty button{transition:background .16s var(--ease-out), color .16s var(--ease-out), border-color .16s var(--ease-out), transform .16s var(--ease-out)}
@@ -386,6 +443,7 @@ body.dopen .toast.on{transform:translate(-50%,0)}
   .drawer.on{opacity:1; pointer-events:auto}
   .scrim{backdrop-filter:none; -webkit-backdrop-filter:none}
   .freebar i{transition:none !important}
+  .ficha-caja,.ficha.on .ficha-caja{transform:none !important}
 }
 
 /* Grano sutil: textura de superficie en toda la página, no decoración de marca */
@@ -578,7 +636,7 @@ body::after{
       </div>
     </div>
     <div class="legal">
-      <span>© <span id="yr"></span> ZUBI · Madrid</span>
+      <span>© <span id="yr"></span> ZUBI · Madrid · <button class="f-link" id="verCookies" type="button">Cookies</button></span>
       <span>Prendas sin marca. Todos los artículos son producto genérico sin licencia de terceros.</span>
     </div>
   </div>
@@ -596,6 +654,30 @@ body::after{
   <div class="dfoot" id="dFoot"></div>
 </div>
 
+<div class="ficha" id="ficha" role="dialog" aria-modal="true" aria-labelledby="fNombre" aria-hidden="true" inert>
+  <div class="fondo-f" data-fcerrar></div>
+  <div class="ficha-caja">
+    <button class="icon-btn f-cerrar" id="fichaCerrar" type="button" aria-label="Cerrar la ficha" data-fcerrar>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="galeria" id="fGaleria"></div>
+    <div class="ficha-info" id="fInfo"></div>
+  </div>
+</div>
+
+<div class="cookies" id="cookies" role="region" aria-label="Aviso de cookies" hidden>
+  <p><b>¿Nos dejas usar cookies?</b> <span id="ckTexto">Sirven para saber cómo se usa la tienda y mejorarla: si vuelves y qué prendas miras.</span> No sabemos quién eres. Puedes cambiarlo cuando quieras en «Cookies», abajo del todo.</p>
+  <details><summary>Más información</summary>
+    <p><b>De la tienda (ZUBI):</b> en tu navegador, durante un año, cuándo viniste la primera vez, cuántas visitas llevas y qué prendas has mirado. Solo nos llega un resumen («segunda visita»), nunca quién eres.</p>
+    <p id="ckGa" hidden><b>Google Analytics (de Google):</b> sus cookies <code>_ga</code> y <code>_ga_…</code>, hasta 2 años, para contar visitas, de dónde llegan y qué se mira. Los datos los trata Google.</p>
+    <p>Si dices que no, la tienda funciona igual y solo contamos, sin cookies, cuántas visitas hay cada día.</p>
+  </details>
+  <div class="ck-botones">
+    <button class="btn primary" type="button" data-ck="si">Aceptar</button>
+    <button class="btn primary" type="button" data-ck="no">No, gracias</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -606,15 +688,19 @@ const TIENDA = {
   whatsapp : "34626270026",   // con prefijo, sin + ni espacios
   instagram: "zubi.madrid",   // usuario de Instagram, sin @
   email    : "hola@zubi.es",
+  // Google Analytics: el «ID de medición» de tu propiedad (empieza por G-). Vacío: no se carga nada
+  // de Google Analytics y el aviso de cookies solo habla de las de la tienda.
+  analytics: "",
   // Stock en directo: el mismo enlace de Google que web/config.js (registroUrl). Dentro de
   // claude.ai la página no puede conectar con Google y usa la foto de stock de abajo.
   stockUrl : "https://script.google.com/macros/s/AKfycby_SHA25U7-AxU0Pkl0ffH7Bl2dmYt0s0nEhjjQPkoI8Y7XI-cCXldb9jNyV3uPZOwQ/exec"
 };
 
 /* ===== FOTO DE STOCK · la escribe `npm run tienda`: no la edites a mano ===== */
-const STOCK = {"fecha":"2026-10-11","fuente":"Google","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
+const STOCK = {"fecha":"2026-10-12","fuente":"Google","disponible":{"MUN-ESP-S":3,"MUN-ESP-M":8,"MUN-ESP-L":4,"MUN-ARG-S":2,"MUN-ARG-M":4,"MUN-ARG-L":2,"MUN-POR-S":1,"MUN-POR-M":4,"MUN-POR-L":2,"RET-MUN-M":1,"RET-MUN-L":1,"RET-RMA-M":3,"RET-RMA-L":1,"RET-MIL-M":1,"RET-ALE-M":1,"RET-FER-M":2,"JER-RL-S":5,"JER-RL-M":7,"JER-RL-L":3,"JER-LAC-S":3,"JER-LAC-M":5,"JER-LAC-L":2,"CARD-MIX-S":7,"CARD-MIX-M":5,"CARD-MIX-L":2,"POLO-RL-S":3,"POLO-RL-M":10,"POLO-RL-L":8,"POLO-LAC-S":3,"POLO-LAC-M":7,"POLO-LAC-L":4,"CHAQ-RL-S":3,"CHAQ-RL-M":4,"CHAQ-RL-L":3,"GORE-ARC-S":3,"GORE-ARC-M":4,"GORE-ARC-L":3,"CHAL-RL-S":3,"CHAL-RL-M":4,"CHAL-RL-L":3,"CHAN-NIK-S":3,"CHAN-NIK-M":4,"CHAN-NIK-L":3,"CHAN-FUT-S":4,"CHAN-FUT-M":6,"CHAN-FUT-L":4,"HOOD-RL-S":2,"HOOD-RL-M":6,"HOOD-RL-L":2,"HALF-RL-S":2,"HALF-RL-M":6,"HALF-RL-L":2,"ZIP-ADI-S":2,"ZIP-ADI-M":6,"ZIP-ADI-L":2,"ZAP-NB-42":2,"ZAP-NB-43":2,"ZAP-NB-44":2,"ZAP-ASI-42":2,"ZAP-ASI-43":2,"ZAP-ASI-44":2,"BOTA-NIK-42":2,"BOTA-NIK-43":4,"BOTA-NIK-44":4,"PERF-TF-Única":6,"PERF-LOE-Única":2,"PERF-BDC-Única":2,"BUF-RL-Única":10,"CALC-RL-Única":20,"ROPI-CK-Única":30}};
 /* ===== FIN DE LA FOTO DE STOCK ===== */
-/* ===== FOTOS PROPIAS · las pone `npm run web` con lo que haya en tienda/fotos/ (ZB-001.jpg…) ===== */
+/* ===== FOTOS PROPIAS · las pone `npm run web` con lo que haya en tienda/fotos/ (ZB-001.jpg, ZB-001-2.jpg…):
+   {"ZB-001": ["ZB-001-1", "ZB-001-2"]} → fotos/ZB-001-1.webp (grande) y fotos/ZB-001-1-p.webp (pequeña) ===== */
 const FOTOS = {};
 /* ===== FIN DE LAS FOTOS ===== */
 const IG_PLACEHOLDER = "zubi.madrid", MAIL_PLACEHOLDER = "hola@zubi.es";
@@ -734,9 +820,10 @@ function load(){
   }catch(e){ cart = []; }
 }
 const svg = (id) => '<svg aria-hidden="true"><use href="#'+id+'"/></svg>';
-// La foto propia de la prenda si la hay (tienda/fotos/), si no el dibujo.
-const imagen = (p) => FOTOS[p.r]
-  ? '<img src="fotos/'+esc(FOTOS[p.r])+'" alt="'+esc(p.name)+'" loading="lazy" decoding="async">'
+// La portada de la prenda, en pequeño, si tiene fotos (tienda/fotos/); si no, el dibujo.
+const fotosDe = (r) => Array.isArray(FOTOS[r]) ? FOTOS[r] : [];
+const imagen = (p) => fotosDe(p.r).length
+  ? '<img src="fotos/'+esc(fotosDe(p.r)[0])+'-p.webp" alt="'+esc(p.name)+'" loading="lazy" decoding="async">'
   : svg(p.g);
 const fold = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -759,6 +846,7 @@ function buildChips(){
     const s = b.dataset.size;
     fSizes.has(s) ? fSizes.delete(s) : fSizes.add(s);
     b.setAttribute("aria-pressed", String(fSizes.has(s)));
+    if (fSizes.has(s)) evento("talla", { talla: s });   // qué tallas busca la gente
     renderGrid(true);
   });
 }
@@ -780,6 +868,7 @@ function filtered(){
 
 /* ---------- grid ---------- */
 function renderGrid(swap){
+  if (fichaRef) pintarInfo();   // la ficha abierta, con el stock y la talla elegida de ahora
   const list = filtered(), g = document.getElementById("grid");
   if (swap) g.classList.add("swapping");
   document.getElementById("resCount").textContent =
@@ -809,10 +898,11 @@ function renderGrid(swap){
         'aria-label="Talla '+esc(s)+(l===0?', agotada':', quedan '+l)+'">'+esc(s)+'</button>';
     }).join("");
 
+    // La foto y el nombre abren su ficha (#p=ZB-001). La foto, sin tabulador: el nombre ya es el enlace.
     return '<article class="card'+(rem===0?' out':'')+'">'+
-      '<div class="shot" style="color:'+p.tint+'">'+badge+imagen(p)+'<span class="ref">'+p.r+'</span></div>'+
+      '<a class="shot" href="#p='+p.r+'" tabindex="-1" aria-hidden="true" style="color:'+p.tint+'">'+badge+imagen(p)+'<span class="ref">'+p.r+'</span></a>'+
       '<div class="body">'+
-        '<div><p class="cat">'+esc(p.cat)+'</p><h3 class="name">'+esc(p.name)+'</h3></div>'+
+        '<div><p class="cat">'+esc(p.cat)+'</p><h3 class="name"><a href="#p='+p.r+'">'+esc(p.name)+'</a></h3></div>'+
         '<div class="priceline"><span class="price">'+eur(p.price)+'</span>'+
           '<span class="unit">'+(rem>0 ? rem+' en stock' : 'sin stock')+'</span></div>'+
         '<div class="sizes">'+sizes+'</div>'+
@@ -822,6 +912,28 @@ function renderGrid(swap){
   }).join("");
   justAdded = null;
   if (swap){ void g.offsetWidth; g.classList.remove("swapping"); }
+  // Hasta dónde baja la gente: la mitad y el final del catálogo entero (con filtros puestos no cuenta).
+  if (hitos && fCat === "Todo" && !fQ && !fSizes.size && g.children.length >= 6){
+    hitos.disconnect();
+    const c = g.children, mitad = c[Math.floor(c.length / 2)], fin = c[c.length - 1];
+    mitad.dataset.hito = "mitad"; fin.dataset.hito = "final";
+    hitos.observe(mitad); hitos.observe(fin);
+  }
+}
+
+// Añade a la cesta la talla elegida de una prenda (desde su tarjeta o desde su ficha).
+function anadir(r){
+  const s = sel[r], p = byRef(r);
+  if (!s || left(r,s) <= 0) return false;
+  const line = cart.find(i => i.r===r && i.size===s);
+  line ? line.qty++ : cart.push({r, size:s, qty:1});
+  justAdded = r + "|" + s;
+  save(); renderGrid(); renderCart(true);
+  recordarVista(p.cod);
+  evento("carrito");
+  evento("anade", { cod: p.cod });
+  toast(p.name + " · talla " + s + " añadida");
+  return true;
 }
 
 document.getElementById("grid").addEventListener("click", e => {
@@ -831,16 +943,7 @@ document.getElementById("grid").addEventListener("click", e => {
     renderGrid(); return;
   }
   const add = e.target.closest("[data-add]");
-  if (add && !add.disabled){
-    const r = add.dataset.add, s = sel[r], p = byRef(r);
-    if (!s || left(r,s) <= 0) return;
-    const line = cart.find(i => i.r===r && i.size===s);
-    line ? line.qty++ : cart.push({r, size:s, qty:1});
-    justAdded = r + "|" + s;
-    save(); renderGrid(); renderCart(true);
-    evento("carrito");
-    toast(p.name + " · talla " + s + " añadida");
-  }
+  if (add && !add.disabled) anadir(add.dataset.add);
 });
 
 /* ---------- barra de stock ---------- */
@@ -1045,11 +1148,141 @@ function amigoDelEnlace(){
 /* ---------- analítica, sin cookies ---------- */
 // Cuántos visitan, añaden algo, abren el pedido y lo envían. Lo cuenta Google (en la hoja no
 // entra nada de nadie), una vez por visita. Dentro del panel de Juan (Webs y hoja) no se cuenta.
-function evento(tipo){
+// Además (desde el 12-10-2026): de dónde llega, móvil u ordenador, hasta dónde baja, si abre
+// «Filtros», qué prendas abre y añade y qué tallas busca. Solo totales por día.
+
+// De dónde llega la visita: lo dice el enlace (…/zubi/?o=wa: WhatsApp; ig: Instagram; tt: TikTok…;
+// los copia Juan en su panel) y, si no, la web de la que viene. WhatsApp casi nunca lo dice: sin
+// enlace marcado, esas visitas salen como «directo». Se recuerda solo mientras dura la visita.
+function origenDeLaVisita(){
+  try{ const g = sessionStorage.getItem("zubi_origen"); if (g) return g; }catch(e){}
+  let o = "";
+  try{ o = String(new URLSearchParams(location.search).get("o") || "").toLowerCase(); }catch(e){}
+  if (!/^[a-z]{1,10}$/.test(o)){
+    let h = "";
+    try{ h = new URL(document.referrer).hostname; }catch(e){}
+    o = !h || h === location.hostname ? (amigoDeLaDireccion() ? "amigo" : "directo")
+      : /instagram\./.test(h) ? "ig" : /facebook\.|(^|\.)fb\.me$/.test(h) ? "fb" : /tiktok\./.test(h) ? "tt"
+      : /whatsapp\./.test(h) ? "wa" : /(^|\.)t\.co$|twitter\.|(^|\.)x\.com$/.test(h) ? "x"
+      : /google\.|bing\.|duckduckgo\.|ecosia\.|yahoo\./.test(h) ? "buscador" : "otra";
+  }
+  try{ sessionStorage.setItem("zubi_origen", o); }catch(e){}
+  return o;
+}
+const aparato = () => { try{ return matchMedia("(pointer: coarse)").matches ? "movil" : "ordenador"; }catch(e){ return ""; } };
+// La mitad y el final del catálogo, cuando llegan a la pantalla (los marca renderGrid).
+let hitos = null;
+try{
+  hitos = new IntersectionObserver(lista => lista.forEach(x => {
+    if (x.isIntersecting && x.target.dataset.hito) evento(x.target.dataset.hito);
+  }), { threshold: 0.4 });
+}catch(e){ hitos = null; }
+
+/* ---------- cookies: el aviso, la memoria de la tienda y Google Analytics ---------- */
+// Solo con permiso (el aviso de abajo, una vez al año):
+//  - la tienda recuerda en este navegador cuándo vino la primera vez, cuántas visitas lleva y qué
+//    prendas ha mirado; a Google le llega solo el resumen («vuelve», «3-5», «4-7 días»), nunca un
+//    identificador: así Juan sabe cuántos vuelven y qué miran los que acaban pidiendo;
+//  - Google Analytics, si TIENDA.analytics tiene el código (G-…).
+// Sin permiso, nada de eso: solo los totales de siempre, sin cookies.
+const PERMISO = "zubi_cookies", MEMORIA = "zubi_visitante";
+function permiso(){
+  try{ const p = JSON.parse(localStorage.getItem(PERMISO) || "null"); return p && p.hasta > Date.now() ? p.v : null; }catch(e){ return null; }
+}
+const conPermiso = () => permiso() === "si";
+const gaId = () => /^G-[A-Z0-9]{4,15}$/.test(TIENDA.analytics || "") ? TIENDA.analytics : "";
+function memoria(){ try{ return JSON.parse(localStorage.getItem(MEMORIA) || "null"); }catch(e){ return null; } }
+// Cuenta la visita (una por sesión) y la devuelve: { primera, visitas, vistas: [cod…] }.
+function memoriaDeLaVisita(){
+  if (!conPermiso()) return null;
+  let m = memoria();
+  if (!m || !m.primera) m = { primera: Date.now(), visitas: 0, vistas: [] };
+  try{
+    if (!sessionStorage.getItem("zubi_visita_contada")){ m.visitas++; sessionStorage.setItem("zubi_visita_contada", "1"); }
+  }catch(e){ if (!m.visitas) m.visitas = 1; }
+  try{ localStorage.setItem(MEMORIA, JSON.stringify(m)); }catch(e){}
+  return m;
+}
+function recordarVista(cod){
+  const m = memoriaDeLaVisita(); if (!m) return;
+  m.vistas = [cod].concat((m.vistas || []).filter(c => c !== cod)).slice(0, 12);
+  try{ localStorage.setItem(MEMORIA, JSON.stringify(m)); }catch(e){}
+}
+const tramoVisitas = (n) => n <= 1 ? "1" : n === 2 ? "2" : n <= 5 ? "3-5" : "6+";
+const tramoDias = (ms) => { const d = Math.floor(ms / 864e5); return d < 1 ? "0" : d <= 3 ? "1-3" : d <= 7 ? "4-7" : d <= 30 ? "8-30" : "31+"; };
+
+// Google Analytics: se carga al aceptar (nunca antes). Los enlaces marcados (?o=wa) le llegan como
+// su fuente (utm_source=whatsapp), para que también él sepa de dónde viene cada visita.
+let gaCargado = false;
+const FUENTES = { wa: "whatsapp", ig: "instagram", tt: "tiktok", fb: "facebook", x: "x" };
+function cargarAnalytics(){
+  const id = gaId(); if (!id || gaCargado || !conPermiso()) return;
+  try{ if (window.top !== window.self) return; }catch(e){ return; }
+  gaCargado = true;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function(){ window.dataLayer.push(arguments); };
+  window.gtag("js", new Date());
+  const cfg = {};
+  let o = ""; try{ o = String(new URLSearchParams(location.search).get("o") || "").toLowerCase(); }catch(e){}
+  if (/^[a-z]{1,10}$/.test(o)) cfg.page_location = location.origin + location.pathname + "?utm_source=" + (FUENTES[o] || o) + "&utm_medium=enlace";
+  window.gtag("config", id, cfg);
+  const s = document.createElement("script");
+  s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id);
+  document.head.appendChild(s);
+}
+// Lo que la tienda ya cuenta, también a Google Analytics, con los nombres de su informe de tienda.
+const GA_EVENTOS = { ficha: "view_item", anade: "add_to_cart", checkout: "begin_checkout", pedido: "generate_lead",
+  filtros: "abrir_filtros", talla: "filtrar_talla", agotada: "talla_agotada", mitad: "mitad_catalogo", final: "final_catalogo" };
+function aGoogleAnalytics(tipo, extra){
+  if (!gaCargado || !GA_EVENTOS[tipo] || typeof window.gtag !== "function") return;
+  const p = extra.cod ? CATALOGO.find(x => x.cod === extra.cod) : null;
+  const datos = {};
+  if (p){ datos.currency = "EUR"; datos.value = p.price; datos.items = [{ item_id: p.r, item_name: p.name, item_category: p.cat, price: p.price }]; }
+  if (extra.talla) datos.talla = extra.talla;
+  if (tipo === "pedido"){ datos.currency = "EUR"; datos.value = Math.round((extra.valor || 0) * 100) / 100; }
+  window.gtag("event", GA_EVENTOS[tipo], datos);
+}
+// Al decir que no después de haber dicho que sí: fuera las cookies de Google Analytics y lo recordado.
+function borrarCookies(){
+  try{ localStorage.removeItem(MEMORIA); }catch(e){}
+  const id = gaId(); if (id) window["ga-disable-" + id] = true;
+  document.cookie.split(";").map(c => c.split("=")[0].trim()).filter(n => /^_ga/.test(n)).forEach(n => {
+    for (const dominio of ["", "; domain=" + location.hostname, "; domain=." + location.hostname])
+      document.cookie = n + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/" + dominio;
+  });
+}
+const avisoCookies = document.getElementById("cookies");
+function mostrarAvisoCookies(){
+  document.getElementById("ckGa").hidden = !gaId();
+  if (gaId()) document.getElementById("ckTexto").textContent = "Sirven para saber cómo se usa la tienda y mejorarla: si vuelves, qué prendas miras y, con Google Analytics, de dónde llegas.";
+  avisoCookies.hidden = false;
+}
+avisoCookies.addEventListener("click", e => {
+  const b = e.target.closest("[data-ck]"); if (!b) return;
+  try{ localStorage.setItem(PERMISO, JSON.stringify({ v: b.dataset.ck, hasta: Date.now() + 365 * 864e5 })); }catch(e){}
+  avisoCookies.hidden = true;
+  if (b.dataset.ck === "si"){ memoriaDeLaVisita(); cargarAnalytics(); }
+  else borrarCookies();
+});
+document.getElementById("verCookies").addEventListener("click", mostrarAvisoCookies);
+
+// extra: { cod } de una prenda, { talla } o { valor } del pedido. Cada cosa, una sola vez por visita.
+function evento(tipo, extra){
+  extra = extra || {};
   if (!TIENDA.stockUrl) return;
   try{ if (window.top !== window.self) return; }catch(e){ return; }
-  try{ if (sessionStorage.getItem("zubi_ev_" + tipo)) return; sessionStorage.setItem("zubi_ev_" + tipo, "1"); }catch(e){}
-  const cuerpo = JSON.stringify({ accion: "evento", tipo, vendedor: amigoDelEnlace() });
+  const una = "zubi_ev_" + tipo + (extra.cod ? "_" + extra.cod : "") + (extra.talla ? "_" + extra.talla : "");
+  try{ if (sessionStorage.getItem(una)) return; sessionStorage.setItem(una, "1"); }catch(e){}
+  aGoogleAnalytics(tipo, extra);
+  // Con permiso, el resumen de la memoria de la tienda: ¿primera visita?, y en el pedido, en qué
+  // visita, a los cuántos días y qué había mirado.
+  const m = memoriaDeLaVisita(), mem = {};
+  if (m){
+    mem.r = m.visitas <= 1 ? "nueva" : "vuelve";
+    if (tipo === "pedido"){ mem.vn = tramoVisitas(m.visitas); mem.dias = tramoDias(Date.now() - m.primera); mem.vistas = (m.vistas || []).slice(0, 12); }
+  }
+  const cuerpo = JSON.stringify({ accion: "evento", tipo, vendedor: amigoDelEnlace(), o: origenDeLaVisita(), d: aparato(),
+    cod: extra.cod || "", talla: extra.talla || "", ...mem });
   try{ if (navigator.sendBeacon && navigator.sendBeacon(TIENDA.stockUrl, new Blob([cuerpo], { type: "text/plain" }))) return; }catch(e){}
   try{ fetch(TIENDA.stockUrl, { method: "POST", body: cuerpo, keepalive: true }).catch(() => {}); }catch(e){}
 }
@@ -1145,13 +1378,137 @@ async function send(how){
     if (w){ try{ w.opener = null; }catch(e){} }
     ultimoEnvio = { ref, txt, destino, abierta: !!w, pegar, canal: how === "wa" ? "WhatsApp" : "Instagram" };
     guardarEnviado();
-    evento("pedido");
+    evento("pedido", { valor: subtotal() });
     step = "enviado"; renderCart(false);
     return;
   }
   const ok = await copyText(txt);
   toast(ok ? "Pedido copiado al portapapeles." : "No se ha podido copiar. Selecciónalo a mano.");
 }
+
+/* ---------- ficha de cada prenda ---------- */
+// Se abre al tocar la foto o el nombre: todas sus fotos (se pasan con el dedo, con las flechas o
+// con las miniaturas), sus tallas y «Añadir». Cada ficha tiene su dirección (…/zubi/#p=ZB-001):
+// sirve para mandarla por WhatsApp, y el botón «atrás» del móvil la cierra.
+const ficha = document.getElementById("ficha");
+let fichaRef = null, fichaDesdeTienda = false, focoFicha = null;
+const refDeLaDireccion = () => {
+  const m = /^#p=(ZB-\d{3})$/i.exec(location.hash), r = m && m[1].toUpperCase();
+  return r && byRef(r) ? r : null;
+};
+const flecha = (d) => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>';
+function pintarGaleria(p){
+  const lista = fotosDe(p.r), g = document.getElementById("fGaleria");
+  g.style.color = p.tint;
+  g.innerHTML = '<div class="fotos" id="fFotos" tabindex="0" aria-label="Fotos de '+esc(p.name)+'">'+
+    (lista.length
+      ? lista.map((f,i) => '<figure><img src="fotos/'+esc(f)+'.webp" alt="'+esc(p.name)+', foto '+(i+1)+' de '+lista.length+'"'+
+          (i ? ' loading="lazy"' : '')+' decoding="async"></figure>').join("")
+      : '<figure>'+svg(p.g)+'</figure>')+'</div>'+
+    (lista.length > 1
+      ? '<button class="g-flecha ant" type="button" data-foto="-1" aria-label="Foto anterior">'+flecha("m15 18-6-6 6-6")+'</button>'+
+        '<button class="g-flecha sig" type="button" data-foto="1" aria-label="Foto siguiente">'+flecha("m9 18 6-6-6-6")+'</button>'+
+        '<span class="g-cuenta" id="fCuenta">1 / '+lista.length+'</span>'
+      : '');
+  document.getElementById("fFotos").addEventListener("scroll", fotoActual, { passive: true });
+}
+const fotosEl = () => document.getElementById("fFotos");
+const numFoto = () => { const f = fotosEl(); return f && f.clientWidth ? Math.round(f.scrollLeft / f.clientWidth) : 0; };
+// El contador, las flechas y la miniatura marcada, según la foto que se ve.
+function fotoActual(){
+  const n = fotosDe(fichaRef).length, i = Math.min(numFoto(), Math.max(0, n - 1));
+  const c = document.getElementById("fCuenta"); if (c) c.textContent = (i + 1) + " / " + n;
+  ficha.querySelectorAll("[data-foto]").forEach(b => { b.disabled = b.dataset.foto === "-1" ? i === 0 : i >= n - 1; });
+  ficha.querySelectorAll("[data-ir-foto]").forEach(b => b.setAttribute("aria-current", String(+b.dataset.irFoto === i)));
+}
+function irAFoto(i){
+  const f = fotosEl(), n = fotosDe(fichaRef).length; if (!f || n < 2) return;
+  i = Math.max(0, Math.min(n - 1, i));
+  f.scrollTo({ left: i * f.clientWidth, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+function pintarInfo(){
+  const p = byRef(fichaRef); if (!p) return;
+  const info = document.getElementById("fInfo"), foco = document.activeElement;
+  const volver = foco && info.contains(foco) ? (foco.dataset.fs ? '[data-fs="'+foco.dataset.fs+'"]' : foco.hasAttribute("data-fadd") ? "[data-fadd]" : null) : null;
+  const rem = totalLeft(p.r), chosen = sel[p.r], okSel = chosen && left(p.r, chosen) > 0, lista = fotosDe(p.r);
+  const tallas = Object.keys(p.sizes).map(s => {
+    const l = left(p.r, s);
+    return l === 0
+      ? '<button class="sz agot" type="button" data-fagot="'+esc(s)+'" aria-disabled="true" aria-label="Talla '+esc(s)+', agotada">'+esc(s)+'</button>'
+      : '<button class="sz" type="button" data-fs="'+esc(s)+'" data-n="'+l+'" aria-pressed="'+(chosen===s)+'" aria-label="Talla '+esc(s)+', quedan '+l+'">'+esc(s)+'</button>';
+  }).join("");
+  info.innerHTML =
+    '<div><p class="cat">'+esc(p.cat)+(p.note ? ' · '+esc(p.note) : '')+'</p><h2 id="fNombre">'+esc(p.name)+'</h2></div>'+
+    '<div class="priceline"><span class="price">'+eur(p.price)+'</span><span class="unit">'+(rem>0 ? rem+' en stock' : 'sin stock')+'</span></div>'+
+    (lista.length > 1 ? '<div class="miniaturas">'+lista.map((f,i) => '<button type="button" data-ir-foto="'+i+'" aria-label="Ver la foto '+(i+1)+'">'+
+      '<img src="fotos/'+esc(f)+'-p.webp" alt="" loading="lazy" decoding="async"></button>').join("")+'</div>' : '')+
+    '<div><p class="ctl-label">Talla</p><div class="sizes" style="margin-top:9px">'+tallas+'</div></div>'+
+    '<div class="f-comprar"><button class="add" type="button" data-fadd '+(okSel ? '' : 'disabled')+'>'+
+      (rem===0 ? 'Agotado' : okSel ? 'Añadir talla '+esc(chosen) : 'Elige una talla')+'</button></div>'+
+    '<p class="f-extra"><a href="#tallas">Guía de tallas</a><span aria-hidden="true">·</span><span>Envío gratis desde 50 €</span>'+
+      '<span aria-hidden="true">·</span><button class="f-link" type="button" data-fcompartir>Compartir</button></p>'+
+    '<p class="unit">'+p.r+'</p>';
+  fotoActual();
+  if (volver){ const b = info.querySelector(volver); if (b && !b.disabled) b.focus({ preventScroll: true }); }
+}
+function abrirFicha(r){
+  const p = byRef(r); if (!p) return;
+  if (!fichaRef) focoFicha = document.activeElement;
+  if (drawer.classList.contains("on")) closeCart();
+  fichaRef = r;
+  pintarGaleria(p); pintarInfo();
+  ficha.classList.add("on"); ficha.setAttribute("aria-hidden","false"); ficha.removeAttribute("inert");
+  document.body.classList.add("fopen");
+  document.getElementById("fichaCerrar").focus({ preventScroll: true });
+  recordarVista(p.cod);
+  evento("ficha", { cod: p.cod });
+}
+function cerrarFicha(){
+  if (!fichaRef) return;
+  fichaRef = null;
+  ficha.classList.remove("on"); ficha.setAttribute("aria-hidden","true"); ficha.setAttribute("inert","");
+  document.body.classList.remove("fopen");
+  if (focoFicha && document.contains(focoFicha)) focoFicha.focus({ preventScroll: true });
+}
+// Cerrar es quitar el #p=… de la dirección: «atrás» si la abrió desde la tienda; si llegó con el
+// enlace de la ficha, se queda en la tienda (sin salir de la página).
+function pedirCerrarFicha(){
+  if (fichaDesdeTienda){ fichaDesdeTienda = false; history.back(); return; }
+  try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+  cerrarFicha();
+}
+async function compartirFicha(){
+  const p = byRef(fichaRef); if (!p) return;
+  const url = location.origin + location.pathname + "#p=" + p.r;
+  try{ if (navigator.share){ await navigator.share({ title: p.name + " · ZUBI", url }); return; } }
+  catch(e){ if (e && e.name === "AbortError") return; }
+  const ok = await copyText(url);
+  toast(ok ? "Enlace de la prenda copiado." : url);
+}
+window.addEventListener("hashchange", () => {
+  const r = refDeLaDireccion();
+  if (r){ abrirFicha(r); return; }
+  const abierta = !!fichaRef;
+  fichaDesdeTienda = false; cerrarFicha();
+  // De la ficha a «Guía de tallas»: con la ficha ya cerrada, lleva a esa parte de la página.
+  const destino = abierta && location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (destino) destino.scrollIntoView();
+});
+document.addEventListener("click", e => {
+  if (e.target.closest && e.target.closest('a[href^="#p="]')) fichaDesdeTienda = true;
+});
+ficha.addEventListener("click", e => {
+  const t = e.target;
+  if (t.closest("[data-fcerrar]")) return pedirCerrarFicha();
+  const fl = t.closest("[data-foto]"); if (fl) return irAFoto(numFoto() + Number(fl.dataset.foto));
+  const mi = t.closest("[data-ir-foto]"); if (mi) return irAFoto(Number(mi.dataset.irFoto));
+  const s = t.closest("[data-fs]");
+  if (s){ sel[fichaRef] = sel[fichaRef] === s.dataset.fs ? null : s.dataset.fs; renderGrid(); return; }
+  const ag = t.closest("[data-fagot]");
+  if (ag){ toast("La talla " + ag.dataset.fagot + " está agotada."); evento("agotada", { cod: byRef(fichaRef).cod, talla: ag.dataset.fagot }); return; }
+  if (t.closest("[data-fadd]")) return void anadir(fichaRef);
+  if (t.closest("[data-fcompartir]")) compartirFicha();
+});
 
 /* ---------- drawer ---------- */
 let lastFocus = null;
@@ -1174,6 +1531,21 @@ document.getElementById("openCart").addEventListener("click", openCart);
 document.getElementById("closeCart").addEventListener("click", closeCart);
 document.getElementById("scrim").addEventListener("click", closeCart);
 document.addEventListener("keydown", e => {
+  // La ficha: Escape la cierra, las flechas pasan las fotos y el tabulador no se sale de ella.
+  if (fichaRef){
+    if (e.key === "Escape"){ pedirCerrarFicha(); return; }
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
+      e.preventDefault(); irAFoto(numFoto() + (e.key === "ArrowRight" ? 1 : -1)); return;
+    }
+    if (e.key === "Tab"){
+      const f = [...ficha.querySelectorAll('button:not([disabled]), a[href], [tabindex="0"]')].filter(x => x.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length-1];
+      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+    return;
+  }
   if (e.key === "Escape" && drawer.classList.contains("on")) closeCart();
   if (e.key === "Tab" && drawer.classList.contains("on")){
     const f = drawer.querySelectorAll('button:not([disabled]), input, select, textarea, a[href]');
@@ -1225,6 +1597,7 @@ document.getElementById("onlyAvail").addEventListener("change", e => { fAvail = 
 document.getElementById("masFiltros").addEventListener("click", e => {
   const abierto = document.querySelector(".filters").classList.toggle("abierto");
   e.currentTarget.setAttribute("aria-expanded", String(abierto));
+  if (abierto) evento("filtros");
 });
 
 const themeBtn = document.getElementById("theme");
@@ -1337,6 +1710,10 @@ buildChips();
 if (STOCK.fecha) fechaStock("al " + new Date(STOCK.fecha + "T12:00:00").toLocaleDateString("es-ES", {day:"numeric", month:"short"}));
 renderGrid();
 renderCart(false);
+{ const r = refDeLaDireccion(); if (r) abrirFicha(r); }   // llegó con el enlace de una prenda (…/zubi/#p=ZB-001)
+// Cookies: con permiso, Google Analytics; sin decidir aún (y fuera del panel), el aviso.
+if (conPermiso()) cargarAnalytics();
+else if (permiso() === null){ try{ if (window.top === window.self) mostrarAvisoCookies(); }catch(e){} }
 // El stock de Google y la visita, en cuanto la primera pantalla está pintada (el navegador avisa con
 // «first-contentful-paint»; si no avisa, a los 1,5 s): la tienda ya enseña su foto de stock, y así
 // esas peticiones no compiten con lo que hace falta para pintar (Google puede tardar varios segundos

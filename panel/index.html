@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-CD7+LONcUEQNmwiq3w2hFu5HVbewy/3k4wodLrTC9/o='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-P4EupP/uaI4q2Q3aaBXYtrRjTJzEwzQXG4jNoibu41U='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>JARVIS — China al por mayor</title>
@@ -802,6 +802,8 @@
     try { const u = new URL('../', window.location.href); if (/^https?:$/.test(u.protocol)) base = u.href; } catch (e) { /* sin dirección */ }
     return base + '?v=' + encodeURIComponent(id);
   };
+  // El enlace marcado de la tienda para un sitio (…/zubi/?o=wa): así se sabe de dónde llega cada visita.
+  const enlaceOrigen = (o) => enlaceTienda('').replace(/\?v=$/, '?o=' + o);
   // Pone o quita una clase sin pisar las demás (con classList si lo hay; si no, a mano).
   const clase = (n, c, si) => {
     if (!n) return;
@@ -1036,9 +1038,13 @@
   function pintarTienda() {
     const hoy = new Date();
     const t30 = Panel.tienda(S.tienda, 30, hoy), t7 = Panel.tienda(S.tienda, 7, hoy);
+    // Los enlaces marcados: cada sitio donde pongas la tienda, con el suyo.
+    const enlaces = `<div class="caja" style="margin-top:12px;padding:12px 14px"><div class="etq">Enlaces marcados: pon cada uno en su sitio y sabrás de dónde llega cada visita</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">${[['wa', 'WhatsApp'], ['ig', 'Instagram (bio)'], ['tt', 'TikTok']].map(([o, t]) =>
+        `<button class="btn" type="button" data-copiar-enlace="${esc(enlaceOrigen(o))}">Copiar enlace para ${t}</button>`).join('')}</div></div>`;
     if (!t30.visita && !t30.pedido) {
       return `<h2 class="sec">La tienda</h2><div class="vacia">Aún no hay visitas contadas. La tienda empieza a contarlas (sin cookies)
-        en cuanto publiques esta versión con npm run web.</div>`;
+        en cuanto publiques esta versión con npm run web.</div>${enlaces}`;
     }
     const pct = (a, b) => (b ? Math.round(a / b * 100) + ' %' : '—');
     const pasos = [['visita', 'Visitas', ''], ['carrito', 'Añadieron algo', 'visita'], ['checkout', 'Abrieron el pedido', 'carrito'],
@@ -1051,7 +1057,52 @@
         <th class="n">Visitas</th><th class="n">Añadieron</th><th class="n">Pedidos</th></tr></thead><tbody>${amigos.map(([id, a]) =>
           `<tr><td>${esc(nombreDe(id))}</td><td class="n">${a.visita}</td><td class="n">${a.carrito}</td><td class="n">${a.pedido}</td></tr>`).join('')}</tbody></table></div>` : ''}
       <p class="suave" style="white-space:normal;margin-top:8px">De cada 100 visitas, ${t30.conversion == null ? '—' : Math.round(t30.conversion * 100)}
-        envían un pedido. Se cuenta una vez por visita, sin cookies ni datos de nadie.</p>`;
+        envían un pedido. Se cuenta una vez por visita, sin cookies ni datos de nadie.</p>
+      ${t30.mitad || t30.final || t30.filtros ? `<p class="suave" style="white-space:normal;margin-top:4px">Hasta dónde bajan: ${pct(t30.mitad, t30.visita)} llegan a la mitad
+        del catálogo y ${pct(t30.final, t30.visita)} hasta la última prenda; ${pct(t30.filtros, t30.visita)} abren «Filtros» en el móvil.</p>` : ''}
+      ${tablaPasos('De dónde llegan', t30.porOrigen, Panel.nombreOrigen)}
+      ${tablaPasos('Aparato', t30.porAparato, (k) => (k === 'movil' ? 'Móvil' : 'Ordenador'))}
+      ${tablaPasos('Con cookies aceptadas', t30.porVuelta, (k) => (k === 'nueva' ? 'Primera visita' : 'Vuelven'))}
+      ${pintarQuienPide(t30)}
+      ${tablaPrendas(t30)}
+      ${t30.talla || t30.agotada ? `<p class="suave" style="white-space:normal;margin-top:8px">${t30.talla ? 'Tallas que buscan con el filtro: ' +
+        Object.entries(t30.tallas).sort((a, b) => b[1] - a[1]).map(([s, n]) => `<b>${esc(s)}</b> ${n}`).join(' · ') + '. ' : ''}${t30.agotada ? 'Tallas agotadas que intentan pedir: ' +
+        Object.entries(t30.agotadas).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, n]) => { const [cod, s] = k.split('|'); return `${esc(nombrePrenda(cod))} (<b>${esc(s)}</b>) ${n}`; }).join(' · ') + '.' : ''}</p>` : ''}
+      ${enlaces}`;
+  }
+  // Una tabla del embudo por grupos (de dónde llegan, aparato), de más visitas a menos.
+  function tablaPasos(titulo, grupo, nombre) {
+    const filas = Object.entries(grupo || {}).sort((a, b) => b[1].visita - a[1].visita || b[1].pedido - a[1].pedido);
+    if (!filas.length) return '';
+    const pct = (a, b) => (b ? Math.round(a / b * 100) + ' %' : '—');
+    return `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>${titulo}</th><th class="n">Visitas</th><th class="n">Añadieron</th>
+      <th class="n">Pedidos</th><th class="n">% con pedido</th></tr></thead><tbody>${filas.map(([k, a]) =>
+        `<tr><td>${esc(nombre(k))}</td><td class="n">${a.visita}</td><td class="n">${a.carrito}</td><td class="n">${a.pedido}</td><td class="n">${pct(a.pedido, a.visita)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  // El nombre de una prenda por su código de la hoja (MUN-ESP → «Mundial 2026 - camiseta fútbol España»).
+  function nombrePrenda(cod) {
+    const p = S.calc.prods.find((x) => x.sku.slice(0, x.sku.lastIndexOf('-')) === cod);
+    return p ? p.producto + (p.modelo ? ' ' + p.modelo : '') : cod;
+  }
+  // De los que piden (con cookies aceptadas): en qué visita, a los cuántos días de la primera y qué
+  // prendas habían mirado.
+  function pintarQuienPide(t) {
+    const total = Object.values(t.visitasHastaPedir).reduce((a, n) => a + n, 0);
+    if (!total) return '';
+    const lista = (obj, orden, nombre) => orden.filter((k) => obj[k]).map((k) => `${nombre(k)}: <b>${obj[k]}</b>`).join(' · ');
+    const miradas = Object.entries(t.miradoPorQuienPide).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    return `<p class="suave" style="white-space:normal;margin-top:8px">${total === 1 ? 'Del único pedido' : 'De los ' + total + ' pedidos'} con cookies aceptadas, en qué visita
+      pidieron: ${lista(t.visitasHastaPedir, ['1', '2', '3-5', '6+'], (k) => ({ 1: 'en la primera', 2: 'en la segunda', '3-5': 'entre la 3.ª y la 5.ª', '6+': 'en la 6.ª o después' })[k])}.
+      Cuánto tardaron desde la primera visita: ${lista(t.diasHastaPedir, ['0', '1-3', '4-7', '8-30', '31+'], (k) => (k === '0' ? 'el mismo día' : k === '31+' ? 'más de un mes' : k + ' días'))}.
+      ${miradas.length ? 'Lo que más habían mirado antes de pedir: ' + miradas.map(([cod, n]) => `${esc(nombrePrenda(cod))} <b>${n}</b>`).join(' · ') + '.' : ''}</p>`;
+  }
+  // Qué prendas abren y añaden (las 12 más miradas).
+  function tablaPrendas(t) {
+    const filas = Object.entries(t.porPrenda || {}).sort((a, b) => b[1].ficha - a[1].ficha || b[1].anade - a[1].anade).slice(0, 12);
+    if (!filas.length) return '';
+    return `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>Prendas más miradas</th><th class="n">Abrieron su ficha</th>
+      <th class="n">La añadieron</th><th class="n">Pidieron una talla agotada</th></tr></thead><tbody>${filas.map(([cod, a]) =>
+        `<tr><td>${esc(nombrePrenda(cod))}</td><td class="n">${a.ficha}</td><td class="n">${a.anade}</td><td class="n">${a.agotada}</td></tr>`).join('')}</tbody></table></div>`;
   }
 
   // ---- Mando ----
@@ -1929,6 +1980,15 @@ te lo preparo y tú lo confirmas.</div>` : '';
     try { await navigator.clipboard.writeText(b.dataset.enlace); b.textContent = '✓ Copiado'; }
     catch (err) { aviso('Su enlace de la tienda: ' + b.dataset.enlace); }
     setTimeout(() => { b.textContent = 'Copiar su enlace de la tienda'; }, 2000);
+  });
+  // Los enlaces marcados de la tienda (Mando → La tienda): se copian y el botón vuelve a su texto.
+  el('v-resumen').addEventListener('click', async (e) => {
+    const b = e.target.closest && e.target.closest('[data-copiar-enlace]');
+    if (!b) return;
+    const texto = b.textContent;
+    try { await navigator.clipboard.writeText(b.dataset.copiarEnlace); b.textContent = '✓ Copiado'; }
+    catch (err) { aviso('El enlace: ' + b.dataset.copiarEnlace); }
+    setTimeout(() => { b.textContent = texto; }, 2000);
   });
   // Botones que llevan a otra pestaña (los avisos de «Para hoy», «Ver todo en Cuentas»…) y
   // «Preguntar a JARVIS» desde una ficha o desde el segundo pedido.

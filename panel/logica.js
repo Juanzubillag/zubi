@@ -303,21 +303,52 @@ var Panel = (function () {
   // ---- La tienda: la analítica ----
   // Google la cuenta día a día (visitas, «añadir», pedido abierto y pedido enviado, sin
   // cookies); aquí se suma en los últimos `n` días, en total y por enlace de amigo.
+  // Desde el 12-10-2026, además: de dónde llegan (porOrigen), móvil u ordenador (porAparato), hasta
+  // dónde bajan (mitad, final), si abren «Filtros», qué prendas abren y añaden (porPrenda, por su
+  // código de la hoja), qué tallas filtran (tallas) y qué tallas agotadas intentan pedir (agotadas).
   var PASOS_TIENDA = ['visita', 'carrito', 'checkout', 'pedido'];
+  var OTROS_TIENDA = ['mitad', 'final', 'filtros', 'ficha', 'anade', 'talla', 'agotada'];
   function tienda(dias, n, hoy) {
     var desde = dia(new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - (n - 1)));
-    var r = { visita: 0, carrito: 0, checkout: 0, pedido: 0, porAmigo: {} };
+    // Con cookies aceptadas: porVuelta (nueva/vuelve), visitasHastaPedir, diasHastaPedir y lo que
+    // miraron los que pidieron (miradoPorQuienPide).
+    var r = { visita: 0, carrito: 0, checkout: 0, pedido: 0, porAmigo: {}, porOrigen: {}, porAparato: {},
+      porPrenda: {}, tallas: {}, agotadas: {}, porVuelta: {}, visitasHastaPedir: {}, diasHastaPedir: {}, miradoPorQuienPide: {} };
+    OTROS_TIENDA.forEach(function (k) { r[k] = 0; });
+    var pasos = function (grupo, destino) {
+      Object.keys(grupo || {}).forEach(function (id) {
+        var a = destino[id] || (destino[id] = { visita: 0, carrito: 0, checkout: 0, pedido: 0 });
+        PASOS_TIENDA.forEach(function (k) { a[k] += Number(grupo[id][k]) || 0; });
+      });
+    };
+    var sumar = function (grupo, destino) {
+      Object.keys(grupo || {}).forEach(function (k) { destino[k] = (destino[k] || 0) + (Number(grupo[k]) || 0); });
+    };
     (dias || []).forEach(function (d) {
       if (!d || String(d.dia) < desde) return;
-      PASOS_TIENDA.forEach(function (k) { r[k] += Number(d[k]) || 0; });
-      Object.keys(d.v || {}).forEach(function (id) {
-        var a = r.porAmigo[id] || (r.porAmigo[id] = { visita: 0, carrito: 0, checkout: 0, pedido: 0 });
-        PASOS_TIENDA.forEach(function (k) { a[k] += Number(d.v[id][k]) || 0; });
+      PASOS_TIENDA.concat(OTROS_TIENDA).forEach(function (k) { r[k] += Number(d[k]) || 0; });
+      pasos(d.v, r.porAmigo);
+      pasos(d.o, r.porOrigen);
+      pasos(d.d, r.porAparato);
+      Object.keys(d.p || {}).forEach(function (cod) {
+        var a = r.porPrenda[cod] || (r.porPrenda[cod] = { ficha: 0, anade: 0, agotada: 0 });
+        ['ficha', 'anade', 'agotada'].forEach(function (k) { a[k] += Number(d.p[cod][k]) || 0; });
       });
+      sumar(d.t, r.tallas);
+      sumar(d.x, r.agotadas);
+      pasos(d.r, r.porVuelta);
+      sumar(d.vp, r.visitasHastaPedir);
+      sumar(d.dp, r.diasHastaPedir);
+      sumar(d.pp, r.miradoPorQuienPide);
     });
     r.conversion = r.visita ? r.pedido / r.visita : null;
     return r;
   }
+  // Cómo se llama cada origen (lo que manda la tienda: ?o=wa en el enlace, o la web de la que llega).
+  var ORIGENES = { wa: 'WhatsApp', ig: 'Instagram', tt: 'TikTok', fb: 'Facebook', x: 'X (Twitter)',
+    buscador: 'Google u otro buscador', otra: 'Otra web', amigo: 'Enlace de un amigo',
+    directo: 'Directo (sin enlace marcado: escrito a mano, o WhatsApp sin marcar)' };
+  function nombreOrigen(o) { return ORIGENES[o] || 'Enlace marcado «' + o + '»'; }
 
   // ---- Contar la caja ----
   // `contados`: {sku: unidades contadas}. Devuelve las tallas contadas que no cuadran.
@@ -354,7 +385,7 @@ var Panel = (function () {
   return { resumen: resumen, mensajeDeuda: mensajeDeuda, enlaceWhatsApp: enlaceWhatsApp, idPeticion: idPeticion, eur: eur,
     ventasPorDia: ventasPorDia, ventasPor: ventasPor, stockPorCategoria: stockPorCategoria,
     fichas: fichas, rotacion: rotacion, recuento: recuento, textoRecuento: textoRecuento, diasDesde: diasDesde, DIAS_PARADA: DIAS_PARADA,
-    lineaDeuda: lineaDeuda, avisos: avisos, ritmo: ritmo, fechaCorta: fechaCorta, tienda: tienda };
+    lineaDeuda: lineaDeuda, avisos: avisos, ritmo: ritmo, fechaCorta: fechaCorta, tienda: tienda, nombreOrigen: nombreOrigen };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Panel;
