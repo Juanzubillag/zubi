@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-P4EupP/uaI4q2Q3aaBXYtrRjTJzEwzQXG4jNoibu41U='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-O880KU7ieQ+pBaUFE6HmVrx5+3JgbDY1mzRPTx51zJk='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>JARVIS — China al por mayor</title>
@@ -108,6 +108,70 @@
     box-shadow: 0 0 12px var(--cian), 0 -4px 14px -2px rgba(53, 201, 238, .55); opacity: 0; }
   nav.con-luz .nav-luz { opacity: 1; transition: transform .34s var(--ease-out), width .34s var(--ease-out); }
   nav.con-luz button[aria-selected="true"] { border-bottom-color: transparent; }
+
+
+  /* ---- Mapa: la constelación ---- */
+  .mp-todo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .mp-cielo { padding: 0; overflow: hidden; background: #04050D; border-radius: var(--r); }
+  .mp-cielo svg { display: block; width: 100%; height: auto; }
+  .mp-lista { display: none; }
+  .mp-pl { cursor: pointer; outline: none; }
+  .mp-pl:focus-visible { outline: 2px solid var(--cian); outline-offset: 4px; border-radius: 6px; }
+  .mp-halo { opacity: .5; transition: opacity .2s; }
+  .mp-pl:hover .mp-halo, .mp-pl:focus-visible .mp-halo { opacity: 1; }
+  .mp-cielo text { font-family: var(--hud); }
+  .mp-nom { fill: #fff; font-size: 16px; font-weight: 700; letter-spacing: .14em; }
+  .mp-det { fill: #9DB0E6; font-size: 13.5px; }
+  .mp-tit { fill: #8FB4FF; font-size: 12px; letter-spacing: .2em; font-family: var(--display); font-weight: 700; }
+  .mp-lab { fill: #E8EEFF; font-size: 13.5px; text-decoration: underline; text-decoration-color: rgba(200, 215, 255, .45); text-underline-offset: 4px; }
+  .mp-lab.a { fill: #FFC983; } .mp-lab.g { fill: #8FEBC2; }
+  .mp-pl:hover .mp-lab { fill: #fff; text-decoration-color: #fff; }
+  .mp-sol { fill: #04122A; font-size: 34px; font-weight: 700; font-family: var(--display); }
+  .mp-gira { transform-box: fill-box; transform-origin: center; animation: gira 90s linear infinite; }
+  .mp-gira2 { transform-box: fill-box; transform-origin: center; animation: gira 55s linear infinite reverse; }
+  .mp-flujo { stroke-dasharray: 2 14; stroke-linecap: round; fill: none; animation: mp-flujo 3s linear infinite; }
+  @keyframes mp-flujo { to { stroke-dashoffset: -64; } }
+  .mp-tw { animation: mp-tw 4s ease-in-out infinite; } .mp-tw2 { animation: mp-tw 6.5s ease-in-out infinite; }
+  @keyframes mp-tw { 50% { opacity: .3; } }
+  .mp-pulso { transform-box: fill-box; transform-origin: center; animation: mp-pulso 2.6s ease-out infinite; }
+  @keyframes mp-pulso { 0% { transform: scale(.7); opacity: .9; } 100% { transform: scale(2.3); opacity: 0; } }
+  .mp-flota { animation: mp-flota 7s ease-in-out infinite; }
+  @keyframes mp-flota { 50% { transform: translateY(-6px); } }
+  .mp-onda { stroke-dasharray: 6 4; animation: mp-flujo 5s linear infinite; }
+  .mp-lado { display: grid; gap: 14px; }
+  .mp-panel { display: block; box-sizing: border-box; border: 1px solid rgba(150, 180, 255, .2); background: linear-gradient(160deg, rgba(34, 40, 100, .5), rgba(12, 14, 40, .8));
+    border-radius: 14px; padding: 14px 16px; color: inherit; text-decoration: none; }
+  .mp-panel h3 { margin: 0 0 8px; font-family: var(--hud); font-size: 14px; font-weight: 600; color: #8FB4FF; letter-spacing: .04em; }
+  .mp-panel svg { width: 100%; height: auto; }
+  .mp-cifra { font-family: var(--display); font-weight: 700; font-size: 28px; margin-top: 4px; }
+  .mp-cifra small { font-family: var(--hud); font-size: 13px; color: #9DB0E6; font-weight: 400; }
+  .mp-aviso { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid rgba(150, 180, 255, .14); padding: 9px 2px; color: var(--tinta);
+    font-size: 14px; line-height: 1.4; cursor: pointer; }
+  .mp-aviso:first-of-type { border-top: 0; }
+  .mp-aviso.mal::before, .mp-aviso.aviso-n::before, .mp-aviso.info::before { content: "›  "; font-weight: 700; }
+  .mp-aviso.mal::before { color: var(--mal); } .mp-aviso.aviso-n::before { color: var(--aviso); } .mp-aviso.info::before { color: var(--cian); }
+  .mp-nada { color: var(--bien); font-size: 14px; }
+  .mp-frase { border-top: 1px solid rgba(150, 180, 255, .14); padding: 8px 2px; font-size: 14px; line-height: 1.4; color: var(--tinta); }
+  .mp-frase:first-of-type { border-top: 0; }
+  .mp-pregunta { width: 100%; text-align: left; border: 0; border-radius: 12px; padding: 12px 14px; background: linear-gradient(90deg, #EAF0FF, #B7C8F2); color: #33406A; font-size: 14.5px; cursor: pointer; }
+  .mp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .mp-chips button { border: 1px solid rgba(150, 180, 255, .3); background: none; color: #A9B8DE; border-radius: 14px; padding: 5px 11px; font-size: 13px; cursor: pointer; }
+  .mp-apuntar { padding: 14px; font-size: 15px; letter-spacing: .08em; }
+  @media (max-width: 1100px) { .mp-todo { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 760px) {
+    .mp-cielo { display: none; }
+    .mp-lista { order: -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mp-anillo { grid-column: 1 / -1; text-align: center; padding: 18px 10px; border: 1px solid rgba(150, 180, 255, .2); border-radius: 14px; background: radial-gradient(closest-side, rgba(54, 214, 255, .18), transparent); }
+    .mp-anillo b { display: block; font-family: var(--display); font-size: 46px; text-shadow: 0 0 20px rgba(54, 214, 255, .6); }
+    .mp-anillo span { color: var(--suave); font-size: 14px; }
+    .mp-carta { display: grid; gap: 4px; text-align: left; text-decoration: none; color: var(--tinta); cursor: pointer; border: 1px solid color-mix(in srgb, var(--c) 60%, #0A1622);
+      background: linear-gradient(160deg, color-mix(in srgb, var(--c) 16%, #0A1622), #07111B 70%); border-radius: 12px; padding: 12px; min-height: 92px; }
+    .mp-carta b { font-family: var(--display); font-size: 12px; letter-spacing: .12em; color: var(--c); }
+    .mp-carta span:last-child { font-size: 14px; color: #CBD8F5; }
+    .mp-ic { width: 12px; height: 12px; border-radius: 50%; }
+    .mp-carta.aviso { box-shadow: 0 0 0 1px var(--c), 0 0 18px -4px var(--c); }
+  }
+  @media (prefers-reduced-motion: reduce) { .mp-gira, .mp-gira2, .mp-flujo, .mp-tw, .mp-tw2, .mp-pulso, .mp-flota, .mp-onda { animation: none; } }
 
   main { padding-block: 20px 60px; }
   .aviso { border: 1px solid rgba(240, 180, 90, .6); background: rgba(240, 180, 90, .08); color: var(--aviso);
@@ -625,15 +689,16 @@
       </div>
     </div>
     <nav role="tablist" id="pestanas" hidden>
-      <button role="tab" data-vista="resumen" aria-selected="true" style="--i:0">Mando</button>
-      <button role="tab" data-vista="stock" aria-selected="false" style="--i:1">Stock</button>
-      <button role="tab" data-vista="reparto" aria-selected="false" style="--i:2">Amigos<span class="insignia aviso" id="ins-reparto" hidden></span></button>
-      <button role="tab" data-vista="cuentas" aria-selected="false" style="--i:3">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
-      <button role="tab" data-vista="movimientos" aria-selected="false" style="--i:4">Movimientos</button>
-      <button role="tab" data-vista="apuntar" aria-selected="false" style="--i:5">Apuntar</button>
-      <button role="tab" data-vista="recuento" aria-selected="false" style="--i:6">Contar la caja</button>
-      <button role="tab" data-vista="pedido" aria-selected="false" style="--i:7">Segundo pedido</button>
-      <button role="tab" data-vista="webs" aria-selected="false" style="--i:8">Webs y hoja</button>
+      <button role="tab" data-vista="mapa" aria-selected="true" style="--i:0">Mapa</button>
+      <button role="tab" data-vista="resumen" aria-selected="false" style="--i:1">Mando</button>
+      <button role="tab" data-vista="stock" aria-selected="false" style="--i:2">Stock</button>
+      <button role="tab" data-vista="reparto" aria-selected="false" style="--i:3">Amigos<span class="insignia aviso" id="ins-reparto" hidden></span></button>
+      <button role="tab" data-vista="cuentas" aria-selected="false" style="--i:4">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
+      <button role="tab" data-vista="movimientos" aria-selected="false" style="--i:5">Movimientos</button>
+      <button role="tab" data-vista="apuntar" aria-selected="false" style="--i:6">Apuntar</button>
+      <button role="tab" data-vista="recuento" aria-selected="false" style="--i:7">Contar la caja</button>
+      <button role="tab" data-vista="pedido" aria-selected="false" style="--i:8">Segundo pedido</button>
+      <button role="tab" data-vista="webs" aria-selected="false" style="--i:9">Webs y hoja</button>
       <span class="nav-luz" id="nav-luz" aria-hidden="true"></span>
     </nav>
   </div>
@@ -657,6 +722,7 @@
 
   <div class="rejilla" id="rejilla" hidden>
     <div class="vistas" id="vistas">
+      <section id="v-mapa" hidden></section>
       <section id="v-resumen" hidden></section>
       <section id="v-stock" hidden>
         <div class="filtros">
@@ -788,7 +854,7 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-  const VISTAS = ['resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'recuento', 'pedido', 'webs'];
+  const VISTAS = ['mapa', 'resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'recuento', 'pedido', 'webs'];
   const guardar = (k, v) => { try { window.sessionStorage.setItem(k, v); } catch (e) { /* sin almacenamiento */ } };
   const recordar = (k) => { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } };
   const olvidar = (k) => { try { window.sessionStorage.removeItem(k); } catch (e) { /* nada */ } };
@@ -1043,14 +1109,14 @@
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">${[['wa', 'WhatsApp'], ['ig', 'Instagram (bio)'], ['tt', 'TikTok']].map(([o, t]) =>
         `<button class="btn" type="button" data-copiar-enlace="${esc(enlaceOrigen(o))}">Copiar enlace para ${t}</button>`).join('')}</div></div>`;
     if (!t30.visita && !t30.pedido) {
-      return `<h2 class="sec">La tienda</h2><div class="vacia">Aún no hay visitas contadas. La tienda empieza a contarlas (sin cookies)
+      return `<h2 class="sec" id="la-tienda">La tienda</h2><div class="vacia">Aún no hay visitas contadas. La tienda empieza a contarlas (sin cookies)
         en cuanto publiques esta versión con npm run web.</div>${enlaces}`;
     }
     const pct = (a, b) => (b ? Math.round(a / b * 100) + ' %' : '—');
     const pasos = [['visita', 'Visitas', ''], ['carrito', 'Añadieron algo', 'visita'], ['checkout', 'Abrieron el pedido', 'carrito'],
       ['pedido', 'Enviaron el pedido', 'checkout']];
     const amigos = Object.entries(t30.porAmigo).sort((a, b) => b[1].pedido - a[1].pedido || b[1].visita - a[1].visita);
-    return `<h2 class="sec">La tienda · últimos 30 días</h2>
+    return `<h2 class="sec" id="la-tienda">La tienda · últimos 30 días</h2>
       <div class="embudo">${pasos.map(([k, t, antes], n) => `<div class="tile caja" style="--i:${6.5 + n * 0.5}"><div class="etq">${t}</div><div class="v" data-n="${t30[k]}">${t30[k]}</div>
         <div class="d">${antes ? pct(t30[k], t30[antes]) + ' del paso anterior' : t7.visita + ' en los últimos 7 días'}</div></div>`).join('')}</div>
       ${amigos.length ? `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>Por el enlace de un amigo</th>
@@ -1103,6 +1169,164 @@
     return `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>Prendas más miradas</th><th class="n">Abrieron su ficha</th>
       <th class="n">La añadieron</th><th class="n">Pidieron una talla agotada</th></tr></thead><tbody>${filas.map(([cod, a]) =>
         `<tr><td>${esc(nombrePrenda(cod))}</td><td class="n">${a.ficha}</td><td class="n">${a.anade}</td><td class="n">${a.agotada}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+
+  // ---- Mapa: la constelación del negocio ----
+  // El sol es lo recuperado del pedido; cada zona es un planeta que se toca y lleva a su pantalla
+  // (con sus satélites, que llevan a un detalle: las tallas agotadas, un amigo, el embudo…). Todo
+  // sale de los datos de verdad. En el móvil, en vez del dibujo, una cuadrícula de zonas.
+  const SOL = { x: 500, y: 420 };
+  function pintarMapa() {
+    if (!S.calc) return;
+    const r = S.resumen, hoy = new Date();
+    const t7 = Panel.tienda(S.tienda, 7, hoy);
+    const pct = Math.round(r.recuperado * 100);
+    const agotadas = S.calc.prods.filter((p) => p.inicial > 0 && p.disponible <= 0).length;
+    const amigos = S.fichas.filter((f) => !f.propio);
+    const enCasa = amigos.reduce((a, f) => a + f.udsEnCasa, 0), paradas = amigos.reduce((a, f) => a + f.paradas, 0);
+    const deben = amigos.map((f) => ({ f, d: deudaDe(f.id).debe })).filter((x) => x.d > 0.004).sort((a, b) => b.d - a.d);
+    const alDia = amigos.filter((f) => deudaDe(f.id).debe <= 0.004 && f.uds > 0);
+    const maxDeuda = deben.length ? deben[0].d : 1;
+    const R = Panel.rotacion(S.calc, DATOS.movimientos || [], DATOS.config || {}, hoy, SEMANAS);
+    const reponer = R.productos.filter((x) => x.sugerido > 0).sort((a, b) => b.sugerido - a.sugerido);
+    const origenes = Object.entries(t7.porOrigen).sort((a, b) => b[1].visita - a[1].visita).slice(0, 4);
+    const movil = (t7.porAparato.movil && t7.porAparato.movil.visita) || 0, totAp = movil + ((t7.porAparato.ordenador && t7.porAparato.ordenador.visita) || 0);
+    const vuelven = (t7.porVuelta.vuelve && t7.porVuelta.vuelve.visita) || 0, conCk = vuelven + ((t7.porVuelta.nueva && t7.porVuelta.nueva.visita) || 0);
+    const miradas = Object.entries(t7.porPrenda).filter(([, a]) => a.ficha).sort((a, b) => b[1].ficha - a[1].ficha).slice(0, 3);
+    const hoja = DATOS.hoja || '';
+    const recorta = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
+
+    // Cada zona: dónde está, su color, su cifra, adónde lleva y sus satélites ([dx, dy, radio, texto, lado, destino, color]).
+    const AV = { ir: 'resumen', ancla: 'la-tienda' };
+    const OFF_ORIGEN = [[-100, -80], [100, -110], [150, 70], [-95, 95]];
+    const zonas = [
+      { id: 'tienda', x: 160, y: 170, r: 34, c: '#6FA9FF', nombre: 'TIENDA', dato: `${t7.pedido} ${t7.pedido === 1 ? 'pedido' : 'pedidos'} · abre la web ↗`, href: '../',
+        sats: origenes.map(([o, a], i) => [OFF_ORIGEN[i][0], OFF_ORIGEN[i][1], 10 + Math.min(10, a.visita / 4), `${Panel.nombreOrigen(o).split(' (')[0]} ${a.visita}`, 'r', AV])
+          .concat([[10, 150, 9, 'Webs y hoja', 'r', { ir: 'webs' }]]) },
+      { id: 'visitas', x: 100, y: 470, r: 30, c: '#3FD8FF', nombre: 'VISITAS', dato: `${t7.visita} esta semana`, ir: 'resumen', ancla: 'la-tienda',
+        sats: [[80, -90, 9, t7.visita ? `Piden ${Math.round(t7.pedido / t7.visita * 100)} de cada 100` : 'Aún sin visitas', 'r', AV],
+          [90, 80, 10, totAp ? `Móvil ${Math.round(movil / totAp * 100)} %` : 'Móvil —', 'r', AV],
+          [10, 110, 8, conCk ? `Vuelven ${Math.round(vuelven / conCk * 100)} %` : 'Vuelven —', 'r', AV]] },
+      { id: 'almacen', x: 260, y: 720, r: 34, c: '#46E6A4', nombre: 'ALMACÉN', dato: `${r.disponibles} prendas`, ir: 'stock',
+        sats: [[-120, 60, 10, `${agotadas} ${agotadas === 1 ? 'talla agotada' : 'tallas agotadas'}`, 'l', { ir: 'stock', filtro: 'agotado' }, agotadas ? '#FFB44D' : ''],
+          [130, -20, 9, 'Contar la caja', 'r', { ir: 'recuento' }], [-110, -40, 8, `${r.reservadas} reservadas`, 'l', { ir: 'stock', filtro: 'reservado' }]] },
+      { id: 'pedido', x: 560, y: 90, r: 28, c: '#FFB44D', nombre: 'PRÓXIMO PEDIDO', dato: reponer.length ? `repón ${recorta(reponer[0].producto + ' ' + reponer[0].modelo, 26)}` : 'nada urgente', ir: 'pedido',
+        sats: reponer.slice(0, 2).map((x, i) => [[110, -40], [-110, 70]][i].concat([8, `${recorta(x.producto + ' ' + x.modelo, 17)}: ${x.sugerido}`, i ? 'l' : 'r', { ir: 'pedido' }])) },
+      { id: 'excel', x: 840, y: 110, r: 30, c: '#8BE58A', nombre: 'EXCEL', dato: 'tu hoja ↗', href: hoja, ir: 'webs',
+        sats: [[95, -60, 9, 'Movimientos', 'l', { ir: 'movimientos' }], [-20, 100, 8, 'Productos', 'r', { ir: 'stock' }]] },
+      { id: 'amigos', x: 860, y: 340, r: 34, c: '#B7A0FF', nombre: 'AMIGOS', dato: `${enCasa} prendas en su casa`, ir: 'reparto',
+        sats: [[80, -80, 9, `${paradas} ${paradas === 1 ? 'parada' : 'paradas'}`, 'l', { ir: 'reparto' }, paradas ? '#FFB44D' : ''], [60, 110, 8, `${amigos.length} amigos`, 'l', { ir: 'reparto' }]] },
+      { id: 'deudas', x: 800, y: 590, r: 40, c: '#FF7A6E', nombre: 'DEUDAS', dato: Panel.eur(r.teDeben), ir: 'cuentas', aviso: deben.length > 0,
+        sats: deben.slice(0, 4).map((x, i) => [[110, -80], [170, 70], [30, 150], [-120, 90]][i].concat([10 + 22 * x.d / maxDeuda, `${nombreDe(x.f.id)} ${Panel.eur(x.d)}`, 'l', { ir: 'cuentas' }]))
+          .concat(alDia.slice(0, 1).map((f) => [-150, -10, 8, `${nombreDe(f.id)} al día`, 'l', { ir: 'cuentas' }, '#46E6A4'])) },
+      { id: 'dinero', x: 560, y: 790, r: 32, c: '#D3C6FF', nombre: 'DINERO', dato: `${Panel.eur(r.cobrado)} cobrados`, ir: 'resumen',
+        sats: [[-110, 20, 9, `Invertido ${Panel.eur(r.desembolso)}`, 'l', { ir: 'resumen' }], [110, 20, 9, 'Pagos recibidos', 'r', { ir: 'movimientos', tipo: 'PAGO' }]] },
+    ];
+    const attrs = (d) => ` data-ir="${d.ir}"${d.ancla ? ` data-ancla="${d.ancla}"` : ''}${d.filtro ? ` data-filtro="${d.filtro}"` : ''}${d.tipo ? ` data-tipo="${d.tipo}"` : ''}`;
+    const esf = (x, y, rr, color) => `<use href="#mp-esf" x="${x - rr}" y="${y - rr}" width="${2 * rr}" height="${2 * rr}" style="color:${color}"/>`;
+    const camino = (z) => `M${SOL.x} ${SOL.y}L${z.x} ${z.y}`;
+
+    const lineas = zonas.map((z, i) => `<path id="mp-r${i}" d="${camino(z)}" stroke="${z.c}" stroke-opacity="${z.aviso ? 0.85 : 0.55}" stroke-width="${z.aviso ? 2 : 1.5}"/><path class="mp-flujo" d="${camino(z)}" stroke="${z.c}" stroke-width="${z.aviso ? 4 : 3}"/>`).join('');
+    const puntos = zonas.map((z, i) => `<circle r="${z.aviso ? 5 : 4}" fill="${z.c}"><animateMotion dur="${(4 + i * 0.7).toFixed(1)}s" repeatCount="indefinite"><mpath href="#mp-r${i}"/></animateMotion></circle>`).join('');
+    const lineasSat = zonas.map((z) => z.sats.map((s) => `<path d="M${z.x} ${z.y}L${z.x + s[0]} ${z.y + s[1]}" stroke="${s[6] || z.c}" stroke-opacity=".6"/>`).join('')).join('');
+    const planetas = zonas.map((z) => {
+      const cuerpo = `<g transform="translate(${z.x} ${z.y})"><circle r="${z.r + 18}" fill="none" stroke="${z.c}" class="mp-halo"/>${z.aviso ? `<circle class="mp-pulso" r="${z.r}" fill="none" stroke="${z.c}" stroke-width="2"/><circle r="${z.r + 28}" fill="none" stroke="${z.c}" stroke-width="2" stroke-dasharray="5 7" class="mp-gira"/>` : ''}${esf(0, 0, z.r + 6, z.c)}<text y="${z.r + 34}" text-anchor="middle" class="mp-nom">${esc(z.nombre)}</text><text y="${z.r + 52}" text-anchor="middle" class="mp-det">${esc(z.dato)}</text></g>`;
+      const tit = `${z.nombre}: ${z.dato}`;
+      return z.href ? `<a href="${esc(z.href)}" target="_blank" rel="noopener" class="mp-pl" aria-label="${esc(tit)} (se abre en otra pestaña)">${cuerpo}</a>`
+        : `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(tit)}"${attrs(z)}>${cuerpo}</g>`;
+    }).join('');
+    const satelites = zonas.map((z) => z.sats.map((s) => {
+      const [dx, dy, rr, txt, lado, dest, col] = s, x = z.x + dx, y = z.y + dy;
+      const color = col || z.c, tx = lado === 'r' ? x + rr + 8 : x - rr - 8;
+      return `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(txt)}"${attrs(dest)}>${esf(x, y, rr, color)}<text x="${tx}" y="${y + 5}" text-anchor="${lado === 'r' ? 'start' : 'end'}" class="mp-lab${col === '#FFB44D' ? ' a' : col === '#46E6A4' ? ' g' : ''}">${esc(txt)}</text></g>`;
+    }).join('')).join('');
+    const lunas = miradas.length ? `<text x="600" y="200" class="mp-tit">LO MÁS MIRADO</text>` + miradas.map(([cod, a], i) => {
+      const y = 232 + i * 40, fondo = ['#8A93A8', '#5C8BE0', '#D49A5A'][i];
+      return `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(nombrePrenda(cod))}: ${a.ficha} veces" data-ir="resumen" data-ancla="la-tienda"><circle cx="612" cy="${y}" r="12" fill="${fondo}"/><circle cx="612" cy="${y}" r="12" fill="url(#mp-brillo)"/><text x="632" y="${y + 5}" class="mp-lab" style="text-decoration:none">${esc(recorta(nombrePrenda(cod), 26))} · ${a.ficha}</text></g>`;
+    }).join('') : '';
+
+    const olas = (() => {
+      const dias = Panel.ventasPorDia(S.calc.ventas, 30, hoy), max = Math.max(1, ...dias.map((d) => d.importe));
+      const pts = dias.map((d, i) => [Math.round(i * 308 / Math.max(1, dias.length - 1)), Math.round(96 - d.importe / max * 84)]);
+      const suave = pts.map((p, i) => (i ? `L${p[0]} ${p[1]}` : `M${p[0]} ${p[1]}`)).join('');
+      const total = dias.reduce((a, d) => a + d.importe, 0), hoyImp = dias.length ? dias[dias.length - 1].importe : 0;
+      return { suave, total, hoyImp };
+    })();
+    const frasesSemana = Array.isArray(DATOS.analisis) ? DATOS.analisis.filter((x) => typeof x === 'string') : [];
+    const avisosHoy = Panel.avisos(S.calc, S.deudas, S.fichas, S.nombre, hoy, DATOS.filasMovimientos).slice(0, 4);
+    const cartas = zonas.map((z) => {
+      const cuerpo = `<span class="mp-ic" style="background:${z.c}"></span><b>${esc(z.nombre)}</b><span>${esc(z.dato)}</span>`;
+      return z.href ? `<a class="mp-carta" href="${esc(z.href)}" target="_blank" rel="noopener" style="--c:${z.c}">${cuerpo}</a>`
+        : `<button type="button" class="mp-carta${z.aviso ? ' aviso' : ''}" style="--c:${z.c}"${attrs(z)}>${cuerpo}</button>`;
+    }).join('');
+
+    el('v-mapa').innerHTML = `<h2 class="sr-only">Mapa del negocio</h2>
+    <div class="mp-todo">
+      <div class="mp-cielo caja">
+        <svg viewBox="0 0 1000 860" role="group" aria-label="Constelación del negocio: cada planeta es una zona">
+          <defs>
+            <filter id="mp-nA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0034 .005" numOctaves="5" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .26  0 0 0 0 .95  2.1 0 0 0 -.78"/></filter>
+            <filter id="mp-nB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .0036" numOctaves="5" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 .1  0 0 0 0 .45  0 0 0 0 .95  2.2 0 0 0 -.85"/></filter>
+            <filter id="mp-nC" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".006 .005" numOctaves="4" seed="23"/><feColorMatrix type="matrix" values="0 0 0 0 .95  0 0 0 0 .25  0 0 0 0 .62  2.2 0 0 0 -.9"/></filter>
+            <filter id="mp-eA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".42" numOctaves="1" seed="3"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  16 0 0 0 -11.9"/></filter>
+            <filter id="mp-eB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .8  0 0 0 0 .88  0 0 0 0 1  18 0 0 0 -13.6"/></filter>
+            <filter id="mp-plasma" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="4" seed="2"/><feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .85  0 0 0 0 1  1.8 0 0 0 -.2"/></filter>
+            <filter id="mp-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <radialGradient id="mp-m1" cx="14%" cy="20%" r="55%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+            <radialGradient id="mp-m2" cx="52%" cy="52%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+            <radialGradient id="mp-m3" cx="82%" cy="14%" r="40%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+            <mask id="mp-k1"><rect width="1000" height="860" fill="url(#mp-m1)"/></mask><mask id="mp-k2"><rect width="1000" height="860" fill="url(#mp-m2)"/></mask><mask id="mp-k3"><rect width="1000" height="860" fill="url(#mp-m3)"/></mask>
+            <radialGradient id="mp-flare"><stop offset="0" stop-color="#fff"/><stop offset=".15" stop-color="#CFE0FF" stop-opacity=".8"/><stop offset="1" stop-color="#7FA8FF" stop-opacity="0"/></radialGradient>
+            <radialGradient id="mp-brillo" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
+            <radialGradient id="mp-corona" r="1"><stop offset="0" stop-color="#BFEAFF" stop-opacity=".95"/><stop offset=".3" stop-color="#4FA8FF" stop-opacity=".5"/><stop offset="1" stop-color="#2A5BE0" stop-opacity="0"/></radialGradient>
+            <radialGradient id="mp-nuc" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9FE2FF"/><stop offset="1" stop-color="#2A74E8"/></radialGradient>
+            <clipPath id="mp-csol"><circle r="62"/></clipPath>
+            <symbol id="mp-esf" viewBox="-50 -50 100 100" overflow="visible"><circle r="46" fill="currentColor" fill-opacity=".28"/><circle r="46" fill="url(#mp-brillo)"/><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-opacity=".95"><circle r="46"/><ellipse rx="46" ry="14"/><ellipse rx="46" ry="30"/><ellipse rx="14" ry="46"/><ellipse rx="30" ry="46"/><path d="M-46 0H46M0 -46V46" stroke-opacity=".5"/></g></symbol>
+          </defs>
+          <rect width="1000" height="860" fill="#04050D"/>
+          <rect width="1000" height="860" filter="url(#mp-nA)" mask="url(#mp-k1)" opacity=".95"/>
+          <rect width="1000" height="860" filter="url(#mp-nB)" mask="url(#mp-k2)" opacity=".8"/>
+          <rect width="1000" height="860" filter="url(#mp-nC)" mask="url(#mp-k3)" opacity=".7"/>
+          <rect width="1000" height="860" filter="url(#mp-eB)" opacity=".75"/><rect width="1000" height="860" filter="url(#mp-eA)" opacity=".95"/>
+          <g class="mp-tw"><circle cx="330" cy="260" r="46" fill="url(#mp-flare)" opacity=".6"/><path d="M308 260H352M330 238V282" stroke="#fff" stroke-opacity=".6"/></g>
+          <g class="mp-tw2"><circle cx="700" cy="480" r="34" fill="url(#mp-flare)" opacity=".5"/></g>
+          <g class="mp-tw"><circle cx="930" cy="760" r="40" fill="url(#mp-flare)" opacity=".55"/><path d="M908 760H952M930 738V782" stroke="#fff" stroke-opacity=".5"/></g>
+          <g class="mp-tw2"><circle cx="60" cy="640" r="30" fill="url(#mp-flare)" opacity=".5"/></g>
+          <g fill="none" stroke="#9DB6FF" stroke-opacity=".14"><circle cx="500" cy="420" r="170"/><circle cx="500" cy="420" r="300"/><circle cx="500" cy="420" r="430" stroke-dasharray="3 9"/></g>
+          <g fill="none" stroke-linecap="round">${lineas}</g>
+          <g filter="url(#mp-glow)">${puntos}</g>
+          <g fill="none" stroke-width="1.2">${lineasSat}</g>
+          <g transform="translate(${SOL.x} ${SOL.y})">
+            <circle r="140" fill="url(#mp-corona)" class="mp-flota"/>
+            <g fill="none" stroke="#B5D8FF"><g transform="rotate(-28)"><path id="mp-o1" d="M-112 0a112 38 0 1 0 224 0a112 38 0 1 0 -224 0" stroke-opacity=".75" stroke-width="1.4"/></g><g transform="rotate(34)"><path id="mp-o2" d="M-98 0a98 32 0 1 0 196 0a98 32 0 1 0 -196 0" stroke-opacity=".6" stroke-width="1.2"/></g><g transform="rotate(90)"><path id="mp-o3" d="M-86 0a86 28 0 1 0 172 0a86 28 0 1 0 -172 0" stroke-opacity=".55" stroke-width="1.2"/></g></g>
+            <g class="mp-gira" fill="none" stroke="#9FD0FF" stroke-opacity=".5"><circle r="124" stroke-dasharray="2 9"/></g>
+            <g class="mp-gira2" fill="none" stroke="#7FA8FF" stroke-opacity=".8" stroke-width="2"><circle r="98" stroke-dasharray="70 24"/></g>
+            <circle r="62" fill="url(#mp-nuc)"/>
+            <g clip-path="url(#mp-csol)"><rect x="-66" y="-66" width="132" height="132" filter="url(#mp-plasma)" opacity=".85"/></g>
+            <circle r="62" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5" style="filter:drop-shadow(0 0 16px #6FD0FF)"/>
+            <circle r="92" fill="none" stroke="#5EC8FF" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(578 * pct / 100).toFixed(1)} 578" transform="rotate(-90)" style="filter:drop-shadow(0 0 8px #5EC8FF)"/>
+            <g filter="url(#mp-glow)"><circle r="4.5" fill="#fff"><animateMotion dur="7s" repeatCount="indefinite"><mpath href="#mp-o1"/></animateMotion></circle><circle r="4" fill="#FFD9A8"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#mp-o2"/></animateMotion></circle><circle r="3.5" fill="#CFE0FF"><animateMotion dur="5.5s" repeatCount="indefinite"><mpath href="#mp-o3"/></animateMotion></circle></g>
+            <text y="11" text-anchor="middle" class="mp-sol">${pct}%</text>
+            <text y="132" text-anchor="middle" class="mp-nom" style="font-size:18px;letter-spacing:.3em">ZUBI</text>
+            <text y="152" text-anchor="middle" class="mp-det">recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</text>
+          </g>
+          ${lunas}${planetas}${satelites}
+        </svg>
+      </div>
+      <div class="mp-lado">
+        <a class="mp-panel" href="#resumen" data-ir="resumen"><h3>Ventas · 30 días</h3>
+          <svg viewBox="0 0 308 104" role="img" aria-label="Ventas de los últimos 30 días"><path class="mp-onda" d="${olas.suave}" fill="none" stroke="#7F9BFF" stroke-width="2.4"/></svg>
+          <div class="mp-cifra">${esc(Panel.eur(olas.total))} <small>hoy ${esc(Panel.eur(olas.hoyImp))}</small></div></a>
+        <div class="mp-panel"><h3>Para hoy</h3>${avisosHoy.length ? avisosHoy.map((a) => `<button type="button" class="mp-aviso ${a.nivel}" data-ir="${a.vista}"${a.filtro ? ` data-filtro="${a.filtro}"` : ''}${a.tipo ? ` data-tipo="${a.tipo}"` : ''}>${esc(a.texto)}</button>`).join('')
+          : '<div class="mp-nada">✓ Nada pendiente.</div>'}</div>
+        ${frasesSemana.length ? `<a class="mp-panel" href="#resumen" data-ir="resumen" data-ancla="la-tienda"><h3>Lo importante esta semana</h3>${frasesSemana.slice(0, 4).map((x) => `<div class="mp-frase">${esc(x)}</div>`).join('')}</a>` : ''}
+        <div class="mp-panel"><h3>JARVIS</h3>
+          <button type="button" class="mp-pregunta" data-consola="1">Pregúntale a JARVIS…</button>
+          <div class="mp-chips"><button type="button" data-jarvis="¿Quién me debe más?">¿quién me debe más?</button><button type="button" data-jarvis="¿Qué debería reponer?">¿qué repongo?</button></div></div>
+        <button type="button" class="btn primario mp-apuntar" data-ir="apuntar">+ Apuntar venta</button>
+      </div>
+      <div class="mp-lista"><div class="mp-anillo"><b>${pct}%</b><span>recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</span></div>${cartas}</div>
+    </div>`;
   }
 
   // ---- Mando ----
@@ -1721,7 +1945,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
 
   // ---- Pintar, navegar, entrar y salir ----
   function pintarTodo() {
-    pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas(); pintarRecuento(); pintarPedido();
+    pintarMapa(); pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas(); pintarRecuento(); pintarPedido();
     const tipos = [...new Set((DATOS.movimientos || []).map((m) => String(m.tipo).toUpperCase()).filter(Boolean))];
     const mt = el('mov-tipo').value, mv = el('mov-vend').value;
     el('mov-tipo').innerHTML = '<option value="">Todos los tipos</option>' + tipos.map((x) => `<option>${esc(x)}</option>`).join('');
@@ -1754,7 +1978,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   let vistaActual = '';
   const hashVista = () => { try { return String((window.location && window.location.hash) || '').slice(1); } catch (e) { return ''; } };
   function verVista(v) {
-    if (VISTAS.indexOf(v) < 0) v = 'resumen';
+    if (VISTAS.indexOf(v) < 0) v = 'mapa';
     document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
     if (v === 'webs' && !el('web-marco').src) verWeb('../');
@@ -1878,7 +2102,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     el('j-abrir').hidden = !si;
     if (!si) { abrirConsola(false); el('j-hola').hidden = true; }
     if (si) {
-      verVista(hashVista() || pref('panel_vista') || 'resumen');
+      verVista(hashVista() || pref('panel_vista') || 'mapa');
       pintarChat();
       // La primera vez en esta pestaña, la bolita se presenta un momento.
       if (!recordar('jarvis_hola')) {
@@ -1998,13 +2222,22 @@ te lo preparo y tú lo confirmas.</div>` : '';
       if (ir.dataset.filtro) { el('stock-q').value = ''; el('stock-f').value = ir.dataset.filtro; pintarStock(); }
       if (ir.dataset.tipo) { el('mov-q').value = ''; el('mov-tipo').value = ir.dataset.tipo; pintarMovimientos(); }
       verVista(ir.dataset.ir);
-      if (window.scrollTo) window.scrollTo(0, 0);
+      // Un satélite puede llevar a un punto concreto de la pantalla (p. ej. la analítica de la tienda).
+      const ancla = ir.dataset.ancla && el(ir.dataset.ancla);
+      if (ancla && ancla.scrollIntoView) { try { ancla.scrollIntoView({ block: 'start', behavior: quieto() ? 'auto' : 'smooth' }); } catch (err) { /* nada */ } }
+      else if (window.scrollTo) window.scrollTo(0, 0);
       return;
     }
+    if (e.target.closest && e.target.closest('[data-consola]')) { abrirConsola(true); return; }
     const b = e.target.closest && e.target.closest('[data-jarvis]');
     if (!b) return;
     abrirConsola(true);
     preguntar(b.dataset.jarvis);
+  });
+  // Los planetas y satélites del mapa se pueden usar con el teclado (Intro o espacio).
+  el('v-mapa').addEventListener('keydown', (e) => {
+    const x = e.target && e.target.getAttribute && e.target.getAttribute('role') === 'link' && e.target;
+    if (x && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); if (x.dispatchEvent) x.dispatchEvent(new window.MouseEvent('click', { bubbles: true })); }
   });
   // Detalle de las gráficas al pasar por encima.
   el('v-resumen').addEventListener('mousemove', (e) => {
