@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-O880KU7ieQ+pBaUFE6HmVrx5+3JgbDY1mzRPTx51zJk='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cjkwZtJ02hi2EqteoOVgQGVzt4ovJbOuCvKzndVWHHk='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>JARVIS — China al por mayor</title>
@@ -110,23 +110,32 @@
   nav.con-luz button[aria-selected="true"] { border-bottom-color: transparent; }
 
 
-  /* ---- Mapa: la constelación ---- */
-  .mp-todo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
-  .mp-cielo { padding: 0; overflow: hidden; background: #04050D; border-radius: var(--r); }
-  .mp-cielo svg { display: block; width: 100%; height: auto; }
+  /* ---- Mapa: la constelación, a pantalla completa (es la portada y la forma de moverse) ---- */
+  /* Sin pestañas: a cada sitio se llega tocando un planeta, y de vuelta con «‹ Mapa». En el mapa
+     tampoco hay cabecera: la página entera es el cielo. */
+  nav#pestanas { display: none !important; }
+  body.en-mapa header.hud { display: none; }
+  body.en-mapa main.wrap { max-width: none; padding: 0; }
+  body.en-mapa .fondo { display: none; }
+  html:has(body.en-mapa) { background: #04050D; }
+  .volver-mapa { position: sticky; top: calc(76px + env(safe-area-inset-top, 0px)); z-index: 20; margin: 0 0 14px; }
+  .mp-todo { position: relative; height: 100vh; height: 100dvh; min-height: 560px; overflow: hidden; background: #04050D; }
+  .mp-cielo, .mp-cielo svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .mp-lista { display: none; }
   .mp-pl { cursor: pointer; outline: none; }
   .mp-pl:focus-visible { outline: 2px solid var(--cian); outline-offset: 4px; border-radius: 6px; }
-  .mp-halo { opacity: .5; transition: opacity .2s; }
-  .mp-pl:hover .mp-halo, .mp-pl:focus-visible .mp-halo { opacity: 1; }
+  .mp-halo { opacity: .45; transition: opacity .2s; }
+  .mp-zona:hover .mp-halo, .mp-zona:focus-within .mp-halo { opacity: 1; }
+  /* Los satélites, solo al acercarse a su planeta: así el mapa queda limpio. */
+  .mp-sat { opacity: 0; pointer-events: none; transition: opacity .25s var(--ease-out); }
+  .mp-zona:hover .mp-sat, .mp-zona:focus-within .mp-sat { opacity: 1; pointer-events: auto; }
   .mp-cielo text { font-family: var(--hud); }
-  .mp-nom { fill: #fff; font-size: 16px; font-weight: 700; letter-spacing: .14em; }
-  .mp-det { fill: #9DB0E6; font-size: 13.5px; }
-  .mp-tit { fill: #8FB4FF; font-size: 12px; letter-spacing: .2em; font-family: var(--display); font-weight: 700; }
-  .mp-lab { fill: #E8EEFF; font-size: 13.5px; text-decoration: underline; text-decoration-color: rgba(200, 215, 255, .45); text-underline-offset: 4px; }
+  .mp-nom { fill: #fff; font-size: 19px; font-weight: 700; letter-spacing: .16em; }
+  .mp-det { fill: #A9BAE8; font-size: 15px; }
+  .mp-lab { fill: #E8EEFF; font-size: 15px; text-decoration: underline; text-decoration-color: rgba(200, 215, 255, .45); text-underline-offset: 4px; }
   .mp-lab.a { fill: #FFC983; } .mp-lab.g { fill: #8FEBC2; }
   .mp-pl:hover .mp-lab { fill: #fff; text-decoration-color: #fff; }
-  .mp-sol { fill: #04122A; font-size: 34px; font-weight: 700; font-family: var(--display); }
+  .mp-sol { fill: #04122A; font-size: 38px; font-weight: 700; font-family: var(--display); }
   .mp-gira { transform-box: fill-box; transform-origin: center; animation: gira 90s linear infinite; }
   .mp-gira2 { transform-box: fill-box; transform-origin: center; animation: gira 55s linear infinite reverse; }
   .mp-flujo { stroke-dasharray: 2 14; stroke-linecap: round; fill: none; animation: mp-flujo 3s linear infinite; }
@@ -138,29 +147,48 @@
   .mp-flota { animation: mp-flota 7s ease-in-out infinite; }
   @keyframes mp-flota { 50% { transform: translateY(-6px); } }
   .mp-onda { stroke-dasharray: 6 4; animation: mp-flujo 5s linear infinite; }
-  .mp-lado { display: grid; gap: 14px; }
-  .mp-panel { display: block; box-sizing: border-box; border: 1px solid rgba(150, 180, 255, .2); background: linear-gradient(160deg, rgba(34, 40, 100, .5), rgba(12, 14, 40, .8));
-    border-radius: 14px; padding: 14px 16px; color: inherit; text-decoration: none; }
-  .mp-panel h3 { margin: 0 0 8px; font-family: var(--hud); font-size: 14px; font-weight: 600; color: #8FB4FF; letter-spacing: .04em; }
-  .mp-panel svg { width: 100%; height: auto; }
-  .mp-cifra { font-family: var(--display); font-weight: 700; font-size: 28px; margin-top: 4px; }
+  /* Lo poco que flota encima del cielo: la marca, actualizar/salir, el aviso y «Apuntar venta». */
+  .mp-marca { position: absolute; left: 24px; top: calc(20px + env(safe-area-inset-top, 0px)); display: flex; align-items: baseline; gap: 12px; pointer-events: none; }
+  .mp-marca b { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: .32em; color: #E4EEFF; }
+  .mp-marca span { font-size: 13px; color: #8FA6E6; }
+  .mp-arriba { position: absolute; right: 20px; top: calc(16px + env(safe-area-inset-top, 0px)); display: flex; gap: 8px; }
+  .mp-arriba button { background: rgba(20, 24, 56, .55); border: 1px solid rgba(150, 180, 255, .25); color: #CFE0FF; border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+  .mp-arriba button:hover { border-color: rgba(150, 180, 255, .6); }
+  .mp-barra { position: absolute; left: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(560px, calc(100% - 360px)); }
+  .mp-pildora { display: flex; align-items: center; gap: 10px; max-width: 100%; text-align: left; border: 1px solid rgba(150, 180, 255, .25); background: rgba(14, 18, 46, .72);
+    backdrop-filter: blur(8px); color: #DCE6FF; border-radius: 999px; padding: 10px 18px; font-size: 14.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-pildora.hay { border-color: rgba(255, 122, 110, .55); }
+  .mp-pildora b { flex: none; display: grid; place-items: center; min-width: 24px; height: 24px; border-radius: 12px; background: #FF7A6E; color: #2A0B08; font-size: 13px; }
+  .mp-arriba .mp-apuntar { background: var(--cian); border-color: var(--cian); color: #03202b; font-weight: 700; letter-spacing: .06em; padding: 7px 16px; }
+  .mp-arriba .mp-apuntar:hover { background: #6fdcf6; }
+  .mp-semana h3 { margin-top: 14px; }
+  .mp-avisos { position: absolute; left: 24px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); width: min(400px, calc(100% - 48px)); max-height: calc(100% - 160px); overflow: auto;
+    box-sizing: border-box; border: 1px solid rgba(150, 180, 255, .22); background: linear-gradient(160deg, rgba(34, 40, 100, .82), rgba(10, 12, 34, .94)); backdrop-filter: blur(12px);
+    border-radius: 16px; padding: 14px 16px; display: none; }
+  .mp-avisos.abierto { display: block; }
+  .mp-avisos h3 { margin: 12px 0 6px; font-family: var(--hud); font-size: 13.5px; font-weight: 600; color: #8FB4FF; letter-spacing: .05em; }
+  .mp-avisos h3:first-child { margin-top: 0; }
+  .mp-semana { display: block; color: inherit; text-decoration: none; }
+  .mp-semana svg { width: 100%; height: auto; }
+  .mp-cifra { font-family: var(--display); font-weight: 700; font-size: 24px; margin-top: 4px; }
   .mp-cifra small { font-family: var(--hud); font-size: 13px; color: #9DB0E6; font-weight: 400; }
-  .mp-aviso { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid rgba(150, 180, 255, .14); padding: 9px 2px; color: var(--tinta);
+  .mp-aviso { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid rgba(150, 180, 255, .14); padding: 8px 2px; color: var(--tinta);
     font-size: 14px; line-height: 1.4; cursor: pointer; }
-  .mp-aviso:first-of-type { border-top: 0; }
-  .mp-aviso.mal::before, .mp-aviso.aviso-n::before, .mp-aviso.info::before { content: "›  "; font-weight: 700; }
-  .mp-aviso.mal::before { color: var(--mal); } .mp-aviso.aviso-n::before { color: var(--aviso); } .mp-aviso.info::before { color: var(--cian); }
+  .mp-aviso::before { content: "›  "; font-weight: 700; color: var(--cian); }
+  .mp-aviso.n-mal::before { color: var(--mal); } .mp-aviso.n-aviso::before { color: var(--aviso); }
   .mp-nada { color: var(--bien); font-size: 14px; }
-  .mp-frase { border-top: 1px solid rgba(150, 180, 255, .14); padding: 8px 2px; font-size: 14px; line-height: 1.4; color: var(--tinta); }
-  .mp-frase:first-of-type { border-top: 0; }
-  .mp-pregunta { width: 100%; text-align: left; border: 0; border-radius: 12px; padding: 12px 14px; background: linear-gradient(90deg, #EAF0FF, #B7C8F2); color: #33406A; font-size: 14.5px; cursor: pointer; }
-  .mp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .mp-frase { border-top: 1px solid rgba(150, 180, 255, .14); padding: 7px 2px; font-size: 14px; line-height: 1.4; color: var(--tinta); }
+  .mp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   .mp-chips button { border: 1px solid rgba(150, 180, 255, .3); background: none; color: #A9B8DE; border-radius: 14px; padding: 5px 11px; font-size: 13px; cursor: pointer; }
-  .mp-apuntar { padding: 14px; font-size: 15px; letter-spacing: .08em; }
-  @media (max-width: 1100px) { .mp-todo { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 760px) {
+    .mp-todo { height: auto; min-height: 100vh; overflow: visible; padding: calc(64px + env(safe-area-inset-top, 0px)) 16px 120px; display: grid; gap: 12px; }
     .mp-cielo { display: none; }
-    .mp-lista { order: -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mp-barra, .mp-avisos { position: static; max-width: none; width: auto; }
+    .mp-barra { order: 2; } .mp-avisos { order: 4; }
+    .mp-arriba { left: 16px; right: 16px; justify-content: flex-end; }
+    .mp-marca { display: none; }
+    .mp-pildora { white-space: normal; border-radius: 14px; width: 100%; }
+    .mp-lista { order: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .mp-anillo { grid-column: 1 / -1; text-align: center; padding: 18px 10px; border: 1px solid rgba(150, 180, 255, .2); border-radius: 14px; background: radial-gradient(closest-side, rgba(54, 214, 255, .18), transparent); }
     .mp-anillo b { display: block; font-family: var(--display); font-size: 46px; text-shadow: 0 0 20px rgba(54, 214, 255, .6); }
     .mp-anillo span { color: var(--suave); font-size: 14px; }
@@ -722,6 +750,7 @@
 
   <div class="rejilla" id="rejilla" hidden>
     <div class="vistas" id="vistas">
+      <button type="button" class="btn volver-mapa" id="volver-mapa" data-ir="mapa" hidden>‹ Mapa</button>
       <section id="v-mapa" hidden></section>
       <section id="v-resumen" hidden></section>
       <section id="v-stock" hidden>
@@ -1171,11 +1200,12 @@
         `<tr><td>${esc(nombrePrenda(cod))}</td><td class="n">${a.ficha}</td><td class="n">${a.anade}</td><td class="n">${a.agotada}</td></tr>`).join('')}</tbody></table></div>`;
   }
 
-  // ---- Mapa: la constelación del negocio ----
-  // El sol es lo recuperado del pedido; cada zona es un planeta que se toca y lleva a su pantalla
-  // (con sus satélites, que llevan a un detalle: las tallas agotadas, un amigo, el embudo…). Todo
-  // sale de los datos de verdad. En el móvil, en vez del dibujo, una cuadrícula de zonas.
-  const SOL = { x: 500, y: 420 };
+  // ---- Mapa: la constelación del negocio, a pantalla completa ----
+  // Es la portada y la única forma de moverse: el sol es lo recuperado del pedido (y lleva a Mando) y
+  // cada zona es un planeta que lleva a su pantalla. Los satélites (un dato que lleva a un detalle:
+  // las tallas agotadas, un amigo, el embudo…) salen al pasar por encima del planeta. Todo sale de
+  // los datos de verdad. En el móvil, en vez del dibujo, una carta por zona.
+  const SOL = { x: 800, y: 450 };
   function pintarMapa() {
     if (!S.calc) return;
     const r = S.resumen, hoy = new Date();
@@ -1198,52 +1228,51 @@
 
     // Cada zona: dónde está, su color, su cifra, adónde lleva y sus satélites ([dx, dy, radio, texto, lado, destino, color]).
     const AV = { ir: 'resumen', ancla: 'la-tienda' };
-    const OFF_ORIGEN = [[-100, -80], [100, -110], [150, 70], [-95, 95]];
+    const OFF_ORIGEN = [[-110, -90], [110, -110], [170, 70], [-120, 100]];
     const zonas = [
-      { id: 'tienda', x: 160, y: 170, r: 34, c: '#6FA9FF', nombre: 'TIENDA', dato: `${t7.pedido} ${t7.pedido === 1 ? 'pedido' : 'pedidos'} · abre la web ↗`, href: '../',
+      { id: 'tienda', x: 270, y: 190, r: 38, c: '#6FA9FF', nombre: 'TIENDA', dato: `${t7.pedido} ${t7.pedido === 1 ? 'pedido' : 'pedidos'} · abre la web ↗`, href: '../',
         sats: origenes.map(([o, a], i) => [OFF_ORIGEN[i][0], OFF_ORIGEN[i][1], 10 + Math.min(10, a.visita / 4), `${Panel.nombreOrigen(o).split(' (')[0]} ${a.visita}`, 'r', AV])
-          .concat([[10, 150, 9, 'Webs y hoja', 'r', { ir: 'webs' }]]) },
-      { id: 'visitas', x: 100, y: 470, r: 30, c: '#3FD8FF', nombre: 'VISITAS', dato: `${t7.visita} esta semana`, ir: 'resumen', ancla: 'la-tienda',
-        sats: [[80, -90, 9, t7.visita ? `Piden ${Math.round(t7.pedido / t7.visita * 100)} de cada 100` : 'Aún sin visitas', 'r', AV],
-          [90, 80, 10, totAp ? `Móvil ${Math.round(movil / totAp * 100)} %` : 'Móvil —', 'r', AV],
-          [10, 110, 8, conCk ? `Vuelven ${Math.round(vuelven / conCk * 100)} %` : 'Vuelven —', 'r', AV]] },
-      { id: 'almacen', x: 260, y: 720, r: 34, c: '#46E6A4', nombre: 'ALMACÉN', dato: `${r.disponibles} prendas`, ir: 'stock',
-        sats: [[-120, 60, 10, `${agotadas} ${agotadas === 1 ? 'talla agotada' : 'tallas agotadas'}`, 'l', { ir: 'stock', filtro: 'agotado' }, agotadas ? '#FFB44D' : ''],
-          [130, -20, 9, 'Contar la caja', 'r', { ir: 'recuento' }], [-110, -40, 8, `${r.reservadas} reservadas`, 'l', { ir: 'stock', filtro: 'reservado' }]] },
-      { id: 'pedido', x: 560, y: 90, r: 28, c: '#FFB44D', nombre: 'PRÓXIMO PEDIDO', dato: reponer.length ? `repón ${recorta(reponer[0].producto + ' ' + reponer[0].modelo, 26)}` : 'nada urgente', ir: 'pedido',
-        sats: reponer.slice(0, 2).map((x, i) => [[110, -40], [-110, 70]][i].concat([8, `${recorta(x.producto + ' ' + x.modelo, 17)}: ${x.sugerido}`, i ? 'l' : 'r', { ir: 'pedido' }])) },
-      { id: 'excel', x: 840, y: 110, r: 30, c: '#8BE58A', nombre: 'EXCEL', dato: 'tu hoja ↗', href: hoja, ir: 'webs',
-        sats: [[95, -60, 9, 'Movimientos', 'l', { ir: 'movimientos' }], [-20, 100, 8, 'Productos', 'r', { ir: 'stock' }]] },
-      { id: 'amigos', x: 860, y: 340, r: 34, c: '#B7A0FF', nombre: 'AMIGOS', dato: `${enCasa} prendas en su casa`, ir: 'reparto',
-        sats: [[80, -80, 9, `${paradas} ${paradas === 1 ? 'parada' : 'paradas'}`, 'l', { ir: 'reparto' }, paradas ? '#FFB44D' : ''], [60, 110, 8, `${amigos.length} amigos`, 'l', { ir: 'reparto' }]] },
-      { id: 'deudas', x: 800, y: 590, r: 40, c: '#FF7A6E', nombre: 'DEUDAS', dato: Panel.eur(r.teDeben), ir: 'cuentas', aviso: deben.length > 0,
-        sats: deben.slice(0, 4).map((x, i) => [[110, -80], [170, 70], [30, 150], [-120, 90]][i].concat([10 + 22 * x.d / maxDeuda, `${nombreDe(x.f.id)} ${Panel.eur(x.d)}`, 'l', { ir: 'cuentas' }]))
-          .concat(alDia.slice(0, 1).map((f) => [-150, -10, 8, `${nombreDe(f.id)} al día`, 'l', { ir: 'cuentas' }, '#46E6A4'])) },
-      { id: 'dinero', x: 560, y: 790, r: 32, c: '#D3C6FF', nombre: 'DINERO', dato: `${Panel.eur(r.cobrado)} cobrados`, ir: 'resumen',
-        sats: [[-110, 20, 9, `Invertido ${Panel.eur(r.desembolso)}`, 'l', { ir: 'resumen' }], [110, 20, 9, 'Pagos recibidos', 'r', { ir: 'movimientos', tipo: 'PAGO' }]] },
+          .concat([[20, 170, 9, 'Webs y hoja', 'r', { ir: 'webs' }]]) },
+      { id: 'visitas', x: 150, y: 520, r: 34, c: '#3FD8FF', nombre: 'VISITAS', dato: `${t7.visita} esta semana`, ir: 'resumen', ancla: 'la-tienda',
+        sats: [[100, -100, 9, t7.visita ? `Piden ${Math.round(t7.pedido / t7.visita * 100)} de cada 100` : 'Aún sin visitas', 'r', AV],
+          [120, 90, 10, totAp ? `Móvil ${Math.round(movil / totAp * 100)} %` : 'Móvil —', 'r', AV],
+          [20, 130, 8, conCk ? `Vuelven ${Math.round(vuelven / conCk * 100)} %` : 'Vuelven —', 'r', AV]]
+          .concat(miradas.slice(0, 2).map(([cod, a], i) => [[150, 10], [60, -150]][i].concat([8, `${recorta(nombrePrenda(cod), 24)} · ${a.ficha}`, 'r', AV]))) },
+      { id: 'almacen', x: 360, y: 680, r: 38, c: '#46E6A4', nombre: 'ALMACÉN', dato: `${r.disponibles} prendas`, ir: 'stock',
+        sats: [[-140, 40, 10, `${agotadas} ${agotadas === 1 ? 'talla agotada' : 'tallas agotadas'}`, 'l', { ir: 'stock', filtro: 'agotado' }, agotadas ? '#FFB44D' : ''],
+          [150, -30, 9, 'Contar la caja', 'r', { ir: 'recuento' }], [-130, -70, 8, `${r.reservadas} reservadas`, 'l', { ir: 'stock', filtro: 'reservado' }]] },
+      { id: 'pedido', x: 800, y: 120, r: 32, c: '#FFB44D', nombre: 'PRÓXIMO PEDIDO', dato: reponer.length ? `repón ${recorta(reponer[0].producto + ' ' + reponer[0].modelo, 26)}` : 'nada urgente', ir: 'pedido',
+        sats: reponer.slice(0, 2).map((x, i) => [[130, -40], [-130, 50]][i].concat([8, `${recorta(x.producto + ' ' + x.modelo, 24)}: ${x.sugerido}`, i ? 'l' : 'r', { ir: 'pedido' }])) },
+      { id: 'excel', x: 1330, y: 160, r: 34, c: '#8BE58A', nombre: 'EXCEL', dato: 'tu hoja ↗', href: hoja, ir: 'webs',
+        sats: [[-130, -40, 9, 'Movimientos', 'l', { ir: 'movimientos' }], [60, 120, 8, 'Productos', 'r', { ir: 'stock' }]] },
+      { id: 'amigos', x: 1430, y: 430, r: 38, c: '#B7A0FF', nombre: 'AMIGOS', dato: `${enCasa} prendas en su casa`, ir: 'reparto',
+        sats: [[-120, -90, 9, `${paradas} ${paradas === 1 ? 'parada' : 'paradas'}`, 'l', { ir: 'reparto' }, paradas ? '#FFB44D' : ''], [-110, 100, 8, `${amigos.length} amigos`, 'l', { ir: 'reparto' }]] },
+      { id: 'deudas', x: 1250, y: 700, r: 44, c: '#FF7A6E', nombre: 'DEUDAS', dato: Panel.eur(r.teDeben), ir: 'cuentas', aviso: deben.length > 0,
+        sats: deben.slice(0, 4).map((x, i) => [[130, -100], [170, 50], [-170, 110], [60, -170]][i].concat([10 + 22 * x.d / maxDeuda, `${nombreDe(x.f.id)} ${Panel.eur(x.d)}`, i === 2 ? 'l' : 'r', { ir: 'cuentas' }]))
+          .concat(alDia.slice(0, 1).map((f) => [-170, -20, 8, `${nombreDe(f.id)} al día`, 'l', { ir: 'cuentas' }, '#46E6A4'])) },
+      { id: 'dinero', x: 800, y: 780, r: 36, c: '#D3C6FF', nombre: 'DINERO', dato: `${Panel.eur(r.cobrado)} cobrados`, ir: 'resumen',
+        sats: [[-140, 20, 9, `Invertido ${Panel.eur(r.desembolso)}`, 'l', { ir: 'resumen' }], [140, 20, 9, 'Pagos recibidos', 'r', { ir: 'movimientos', tipo: 'PAGO' }]] },
     ];
     const attrs = (d) => ` data-ir="${d.ir}"${d.ancla ? ` data-ancla="${d.ancla}"` : ''}${d.filtro ? ` data-filtro="${d.filtro}"` : ''}${d.tipo ? ` data-tipo="${d.tipo}"` : ''}`;
     const esf = (x, y, rr, color) => `<use href="#mp-esf" x="${x - rr}" y="${y - rr}" width="${2 * rr}" height="${2 * rr}" style="color:${color}"/>`;
     const camino = (z) => `M${SOL.x} ${SOL.y}L${z.x} ${z.y}`;
 
-    const lineas = zonas.map((z, i) => `<path id="mp-r${i}" d="${camino(z)}" stroke="${z.c}" stroke-opacity="${z.aviso ? 0.85 : 0.55}" stroke-width="${z.aviso ? 2 : 1.5}"/><path class="mp-flujo" d="${camino(z)}" stroke="${z.c}" stroke-width="${z.aviso ? 4 : 3}"/>`).join('');
+    const lineas = zonas.map((z, i) => `<path id="mp-r${i}" d="${camino(z)}" stroke="${z.c}" stroke-opacity="${z.aviso ? 0.85 : 0.5}" stroke-width="${z.aviso ? 2 : 1.5}"/><path class="mp-flujo" d="${camino(z)}" stroke="${z.c}" stroke-width="${z.aviso ? 4 : 3}"/>`).join('');
     const puntos = zonas.map((z, i) => `<circle r="${z.aviso ? 5 : 4}" fill="${z.c}"><animateMotion dur="${(4 + i * 0.7).toFixed(1)}s" repeatCount="indefinite"><mpath href="#mp-r${i}"/></animateMotion></circle>`).join('');
-    const lineasSat = zonas.map((z) => z.sats.map((s) => `<path d="M${z.x} ${z.y}L${z.x + s[0]} ${z.y + s[1]}" stroke="${s[6] || z.c}" stroke-opacity=".6"/>`).join('')).join('');
-    const planetas = zonas.map((z) => {
-      const cuerpo = `<g transform="translate(${z.x} ${z.y})"><circle r="${z.r + 18}" fill="none" stroke="${z.c}" class="mp-halo"/>${z.aviso ? `<circle class="mp-pulso" r="${z.r}" fill="none" stroke="${z.c}" stroke-width="2"/><circle r="${z.r + 28}" fill="none" stroke="${z.c}" stroke-width="2" stroke-dasharray="5 7" class="mp-gira"/>` : ''}${esf(0, 0, z.r + 6, z.c)}<text y="${z.r + 34}" text-anchor="middle" class="mp-nom">${esc(z.nombre)}</text><text y="${z.r + 52}" text-anchor="middle" class="mp-det">${esc(z.dato)}</text></g>`;
+    // Cada zona es un grupo: al pasar por encima (o al enfocar con el teclado) salen sus satélites.
+    const grupos = zonas.map((z) => {
+      const cuerpo = `<g transform="translate(${z.x} ${z.y})"><circle r="${z.r + 20}" fill="none" stroke="${z.c}" class="mp-halo"/>${z.aviso ? `<circle class="mp-pulso" r="${z.r}" fill="none" stroke="${z.c}" stroke-width="2"/><circle r="${z.r + 30}" fill="none" stroke="${z.c}" stroke-width="2" stroke-dasharray="5 7" class="mp-gira"/>` : ''}${esf(0, 0, z.r + 8, z.c)}<text y="${z.r + 40}" text-anchor="middle" class="mp-nom">${esc(z.nombre)}</text><text y="${z.r + 60}" text-anchor="middle" class="mp-det">${esc(z.dato)}</text></g>`;
       const tit = `${z.nombre}: ${z.dato}`;
-      return z.href ? `<a href="${esc(z.href)}" target="_blank" rel="noopener" class="mp-pl" aria-label="${esc(tit)} (se abre en otra pestaña)">${cuerpo}</a>`
+      const planeta = z.href ? `<a href="${esc(z.href)}" target="_blank" rel="noopener" class="mp-pl" aria-label="${esc(tit)} (se abre en otra pestaña)">${cuerpo}</a>`
         : `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(tit)}"${attrs(z)}>${cuerpo}</g>`;
+      const lineasSat = z.sats.map((s) => `<path d="M${z.x} ${z.y}L${z.x + s[0]} ${z.y + s[1]}" stroke="${s[6] || z.c}" stroke-opacity=".6"/>`).join('');
+      const sats = z.sats.map((s) => {
+        const [dx, dy, rr, txt, lado, dest, col] = s, x = z.x + dx, y = z.y + dy;
+        const tx = lado === 'r' ? x + rr + 8 : x - rr - 8;
+        return `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(txt)}"${attrs(dest)}>${esf(x, y, rr, col || z.c)}<text x="${tx}" y="${y + 5}" text-anchor="${lado === 'r' ? 'start' : 'end'}" class="mp-lab${col === '#FFB44D' ? ' a' : col === '#46E6A4' ? ' g' : ''}">${esc(txt)}</text></g>`;
+      }).join('');
+      return `<g class="mp-zona"><circle cx="${z.x}" cy="${z.y}" r="170" fill="transparent" pointer-events="all"/><g class="mp-sat"><g fill="none" stroke-width="1.2">${lineasSat}</g>${sats}</g>${planeta}</g>`;
     }).join('');
-    const satelites = zonas.map((z) => z.sats.map((s) => {
-      const [dx, dy, rr, txt, lado, dest, col] = s, x = z.x + dx, y = z.y + dy;
-      const color = col || z.c, tx = lado === 'r' ? x + rr + 8 : x - rr - 8;
-      return `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(txt)}"${attrs(dest)}>${esf(x, y, rr, color)}<text x="${tx}" y="${y + 5}" text-anchor="${lado === 'r' ? 'start' : 'end'}" class="mp-lab${col === '#FFB44D' ? ' a' : col === '#46E6A4' ? ' g' : ''}">${esc(txt)}</text></g>`;
-    }).join('')).join('');
-    const lunas = miradas.length ? `<text x="600" y="200" class="mp-tit">LO MÁS MIRADO</text>` + miradas.map(([cod, a], i) => {
-      const y = 232 + i * 40, fondo = ['#8A93A8', '#5C8BE0', '#D49A5A'][i];
-      return `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(nombrePrenda(cod))}: ${a.ficha} veces" data-ir="resumen" data-ancla="la-tienda"><circle cx="612" cy="${y}" r="12" fill="${fondo}"/><circle cx="612" cy="${y}" r="12" fill="url(#mp-brillo)"/><text x="632" y="${y + 5}" class="mp-lab" style="text-decoration:none">${esc(recorta(nombrePrenda(cod), 26))} · ${a.ficha}</text></g>`;
-    }).join('') : '';
 
     const olas = (() => {
       const dias = Panel.ventasPorDia(S.calc.ventas, 30, hoy), max = Math.max(1, ...dias.map((d) => d.importe));
@@ -1253,17 +1282,19 @@
       return { suave, total, hoyImp };
     })();
     const frasesSemana = Array.isArray(DATOS.analisis) ? DATOS.analisis.filter((x) => typeof x === 'string') : [];
-    const avisosHoy = Panel.avisos(S.calc, S.deudas, S.fichas, S.nombre, hoy, DATOS.filasMovimientos).slice(0, 4);
+    const avisosHoy = Panel.avisos(S.calc, S.deudas, S.fichas, S.nombre, hoy, DATOS.filasMovimientos);
     const cartas = zonas.map((z) => {
       const cuerpo = `<span class="mp-ic" style="background:${z.c}"></span><b>${esc(z.nombre)}</b><span>${esc(z.dato)}</span>`;
       return z.href ? `<a class="mp-carta" href="${esc(z.href)}" target="_blank" rel="noopener" style="--c:${z.c}">${cuerpo}</a>`
         : `<button type="button" class="mp-carta${z.aviso ? ' aviso' : ''}" style="--c:${z.c}"${attrs(z)}>${cuerpo}</button>`;
     }).join('');
+    const unAviso = (a) => `<button type="button" class="mp-aviso n-${a.nivel}" data-ir="${a.vista}"${a.filtro ? ` data-filtro="${a.filtro}"` : ''}${a.tipo ? ` data-tipo="${a.tipo}"` : ''}>${esc(a.texto)}</button>`;
+    const abierto = !!(el('v-mapa').querySelector && el('v-mapa').querySelector('.mp-avisos.abierto'));
 
     el('v-mapa').innerHTML = `<h2 class="sr-only">Mapa del negocio</h2>
     <div class="mp-todo">
-      <div class="mp-cielo caja">
-        <svg viewBox="0 0 1000 860" role="group" aria-label="Constelación del negocio: cada planeta es una zona">
+      <div class="mp-cielo">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Constelación del negocio: cada planeta es una zona">
           <defs>
             <filter id="mp-nA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0034 .005" numOctaves="5" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .26  0 0 0 0 .95  2.1 0 0 0 -.78"/></filter>
             <filter id="mp-nB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .0036" numOctaves="5" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 .1  0 0 0 0 .45  0 0 0 0 .95  2.2 0 0 0 -.85"/></filter>
@@ -1273,57 +1304,58 @@
             <filter id="mp-plasma" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="4" seed="2"/><feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .85  0 0 0 0 1  1.8 0 0 0 -.2"/></filter>
             <filter id="mp-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             <radialGradient id="mp-m1" cx="14%" cy="20%" r="55%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-            <radialGradient id="mp-m2" cx="52%" cy="52%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-            <radialGradient id="mp-m3" cx="82%" cy="14%" r="40%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-            <mask id="mp-k1"><rect width="1000" height="860" fill="url(#mp-m1)"/></mask><mask id="mp-k2"><rect width="1000" height="860" fill="url(#mp-m2)"/></mask><mask id="mp-k3"><rect width="1000" height="860" fill="url(#mp-m3)"/></mask>
+            <radialGradient id="mp-m2" cx="50%" cy="52%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+            <radialGradient id="mp-m3" cx="84%" cy="18%" r="40%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+            <mask id="mp-k1"><rect width="1600" height="900" fill="url(#mp-m1)"/></mask><mask id="mp-k2"><rect width="1600" height="900" fill="url(#mp-m2)"/></mask><mask id="mp-k3"><rect width="1600" height="900" fill="url(#mp-m3)"/></mask>
             <radialGradient id="mp-flare"><stop offset="0" stop-color="#fff"/><stop offset=".15" stop-color="#CFE0FF" stop-opacity=".8"/><stop offset="1" stop-color="#7FA8FF" stop-opacity="0"/></radialGradient>
             <radialGradient id="mp-brillo" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
             <radialGradient id="mp-corona" r="1"><stop offset="0" stop-color="#BFEAFF" stop-opacity=".95"/><stop offset=".3" stop-color="#4FA8FF" stop-opacity=".5"/><stop offset="1" stop-color="#2A5BE0" stop-opacity="0"/></radialGradient>
             <radialGradient id="mp-nuc" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9FE2FF"/><stop offset="1" stop-color="#2A74E8"/></radialGradient>
-            <clipPath id="mp-csol"><circle r="62"/></clipPath>
+            <clipPath id="mp-csol"><circle r="70"/></clipPath>
             <symbol id="mp-esf" viewBox="-50 -50 100 100" overflow="visible"><circle r="46" fill="currentColor" fill-opacity=".28"/><circle r="46" fill="url(#mp-brillo)"/><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-opacity=".95"><circle r="46"/><ellipse rx="46" ry="14"/><ellipse rx="46" ry="30"/><ellipse rx="14" ry="46"/><ellipse rx="30" ry="46"/><path d="M-46 0H46M0 -46V46" stroke-opacity=".5"/></g></symbol>
           </defs>
-          <rect width="1000" height="860" fill="#04050D"/>
-          <rect width="1000" height="860" filter="url(#mp-nA)" mask="url(#mp-k1)" opacity=".95"/>
-          <rect width="1000" height="860" filter="url(#mp-nB)" mask="url(#mp-k2)" opacity=".8"/>
-          <rect width="1000" height="860" filter="url(#mp-nC)" mask="url(#mp-k3)" opacity=".7"/>
-          <rect width="1000" height="860" filter="url(#mp-eB)" opacity=".75"/><rect width="1000" height="860" filter="url(#mp-eA)" opacity=".95"/>
-          <g class="mp-tw"><circle cx="330" cy="260" r="46" fill="url(#mp-flare)" opacity=".6"/><path d="M308 260H352M330 238V282" stroke="#fff" stroke-opacity=".6"/></g>
-          <g class="mp-tw2"><circle cx="700" cy="480" r="34" fill="url(#mp-flare)" opacity=".5"/></g>
-          <g class="mp-tw"><circle cx="930" cy="760" r="40" fill="url(#mp-flare)" opacity=".55"/><path d="M908 760H952M930 738V782" stroke="#fff" stroke-opacity=".5"/></g>
-          <g class="mp-tw2"><circle cx="60" cy="640" r="30" fill="url(#mp-flare)" opacity=".5"/></g>
-          <g fill="none" stroke="#9DB6FF" stroke-opacity=".14"><circle cx="500" cy="420" r="170"/><circle cx="500" cy="420" r="300"/><circle cx="500" cy="420" r="430" stroke-dasharray="3 9"/></g>
+          <rect width="1600" height="900" fill="#04050D"/>
+          <rect width="1600" height="900" filter="url(#mp-nA)" mask="url(#mp-k1)" opacity=".95"/>
+          <rect width="1600" height="900" filter="url(#mp-nB)" mask="url(#mp-k2)" opacity=".8"/>
+          <rect width="1600" height="900" filter="url(#mp-nC)" mask="url(#mp-k3)" opacity=".7"/>
+          <rect width="1600" height="900" filter="url(#mp-eB)" opacity=".75"/><rect width="1600" height="900" filter="url(#mp-eA)" opacity=".95"/>
+          <g class="mp-tw"><circle cx="520" cy="300" r="50" fill="url(#mp-flare)" opacity=".6"/><path d="M496 300H544M520 276V324" stroke="#fff" stroke-opacity=".6"/></g>
+          <g class="mp-tw2"><circle cx="1090" cy="560" r="36" fill="url(#mp-flare)" opacity=".5"/></g>
+          <g class="mp-tw"><circle cx="1500" cy="820" r="44" fill="url(#mp-flare)" opacity=".55"/><path d="M1476 820H1524M1500 796V844" stroke="#fff" stroke-opacity=".5"/></g>
+          <g class="mp-tw2"><circle cx="60" cy="700" r="32" fill="url(#mp-flare)" opacity=".5"/></g>
+          <g fill="none" stroke="#9DB6FF" stroke-opacity=".12"><circle cx="800" cy="450" r="200"/><circle cx="800" cy="450" r="360"/><circle cx="800" cy="450" r="520" stroke-dasharray="3 9"/></g>
           <g fill="none" stroke-linecap="round">${lineas}</g>
           <g filter="url(#mp-glow)">${puntos}</g>
-          <g fill="none" stroke-width="1.2">${lineasSat}</g>
-          <g transform="translate(${SOL.x} ${SOL.y})">
-            <circle r="140" fill="url(#mp-corona)" class="mp-flota"/>
-            <g fill="none" stroke="#B5D8FF"><g transform="rotate(-28)"><path id="mp-o1" d="M-112 0a112 38 0 1 0 224 0a112 38 0 1 0 -224 0" stroke-opacity=".75" stroke-width="1.4"/></g><g transform="rotate(34)"><path id="mp-o2" d="M-98 0a98 32 0 1 0 196 0a98 32 0 1 0 -196 0" stroke-opacity=".6" stroke-width="1.2"/></g><g transform="rotate(90)"><path id="mp-o3" d="M-86 0a86 28 0 1 0 172 0a86 28 0 1 0 -172 0" stroke-opacity=".55" stroke-width="1.2"/></g></g>
-            <g class="mp-gira" fill="none" stroke="#9FD0FF" stroke-opacity=".5"><circle r="124" stroke-dasharray="2 9"/></g>
-            <g class="mp-gira2" fill="none" stroke="#7FA8FF" stroke-opacity=".8" stroke-width="2"><circle r="98" stroke-dasharray="70 24"/></g>
-            <circle r="62" fill="url(#mp-nuc)"/>
-            <g clip-path="url(#mp-csol)"><rect x="-66" y="-66" width="132" height="132" filter="url(#mp-plasma)" opacity=".85"/></g>
-            <circle r="62" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5" style="filter:drop-shadow(0 0 16px #6FD0FF)"/>
-            <circle r="92" fill="none" stroke="#5EC8FF" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(578 * pct / 100).toFixed(1)} 578" transform="rotate(-90)" style="filter:drop-shadow(0 0 8px #5EC8FF)"/>
+          <g class="mp-pl" role="link" tabindex="0" aria-label="Resumen general (Mando): ${pct} % recuperado" data-ir="resumen" transform="translate(${SOL.x} ${SOL.y})">
+            <circle r="160" fill="url(#mp-corona)" class="mp-flota"/>
+            <g fill="none" stroke="#B5D8FF"><g transform="rotate(-28)"><path id="mp-o1" d="M-126 0a126 42 0 1 0 252 0a126 42 0 1 0 -252 0" stroke-opacity=".75" stroke-width="1.4"/></g><g transform="rotate(34)"><path id="mp-o2" d="M-110 0a110 36 0 1 0 220 0a110 36 0 1 0 -220 0" stroke-opacity=".6" stroke-width="1.2"/></g><g transform="rotate(90)"><path id="mp-o3" d="M-96 0a96 32 0 1 0 192 0a96 32 0 1 0 -192 0" stroke-opacity=".55" stroke-width="1.2"/></g></g>
+            <g class="mp-gira" fill="none" stroke="#9FD0FF" stroke-opacity=".5"><circle r="140" stroke-dasharray="2 9"/></g>
+            <g class="mp-gira2" fill="none" stroke="#7FA8FF" stroke-opacity=".8" stroke-width="2"><circle r="112" stroke-dasharray="70 24"/></g>
+            <circle r="70" fill="url(#mp-nuc)"/>
+            <g clip-path="url(#mp-csol)"><rect x="-74" y="-74" width="148" height="148" filter="url(#mp-plasma)" opacity=".85"/></g>
+            <circle r="70" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5" style="filter:drop-shadow(0 0 16px #6FD0FF)"/>
+            <circle r="104" fill="none" stroke="#5EC8FF" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(653 * pct / 100).toFixed(1)} 653" transform="rotate(-90)" style="filter:drop-shadow(0 0 8px #5EC8FF)"/>
             <g filter="url(#mp-glow)"><circle r="4.5" fill="#fff"><animateMotion dur="7s" repeatCount="indefinite"><mpath href="#mp-o1"/></animateMotion></circle><circle r="4" fill="#FFD9A8"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#mp-o2"/></animateMotion></circle><circle r="3.5" fill="#CFE0FF"><animateMotion dur="5.5s" repeatCount="indefinite"><mpath href="#mp-o3"/></animateMotion></circle></g>
-            <text y="11" text-anchor="middle" class="mp-sol">${pct}%</text>
-            <text y="132" text-anchor="middle" class="mp-nom" style="font-size:18px;letter-spacing:.3em">ZUBI</text>
-            <text y="152" text-anchor="middle" class="mp-det">recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</text>
+            <text y="12" text-anchor="middle" class="mp-sol">${pct}%</text>
+            <text y="150" text-anchor="middle" class="mp-nom" style="font-size:19px;letter-spacing:.3em">ZUBI</text>
+            <text y="172" text-anchor="middle" class="mp-det">recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</text>
           </g>
-          ${lunas}${planetas}${satelites}
+          ${grupos}
         </svg>
       </div>
-      <div class="mp-lado">
-        <a class="mp-panel" href="#resumen" data-ir="resumen"><h3>Ventas · 30 días</h3>
+      <div class="mp-marca"><b>ZUBI</b><span>centro de mando</span></div>
+      <div class="mp-arriba"><button type="button" class="btn primario mp-apuntar" data-ir="apuntar">+ Apuntar venta</button><button type="button" data-accion="refrescar">Actualizar</button><button type="button" data-accion="salir">Salir</button></div>
+      <div class="mp-barra">
+        <button type="button" class="mp-pildora${avisosHoy.length ? ' hay' : ''}" data-avisos="1" aria-expanded="${abierto}">${avisosHoy.length ? `<b>${avisosHoy.length}</b> ${esc(recorta(avisosHoy[0].texto, 70))}` : '✓ Nada pendiente'}</button>
+      </div>
+      <div class="mp-avisos${abierto ? ' abierto' : ''}" role="region" aria-label="Avisos y resumen de la semana">
+        <h3>Para hoy</h3>${avisosHoy.length ? avisosHoy.slice(0, 6).map(unAviso).join('') : '<div class="mp-nada">✓ Nada pendiente.</div>'}
+        ${frasesSemana.length ? `<a class="mp-semana" href="#resumen" data-ir="resumen" data-ancla="la-tienda"><h3>Lo importante esta semana</h3>${frasesSemana.slice(0, 5).map((x) => `<div class="mp-frase">${esc(x)}</div>`).join('')}</a>` : ''}
+        ${miradas.length ? `<h3>Lo más mirado</h3>${miradas.map(([cod, a]) => `<button type="button" class="mp-aviso n-info" data-ir="resumen" data-ancla="la-tienda">${esc(nombrePrenda(cod))} · ${a.ficha} ${a.ficha === 1 ? 'vez' : 'veces'}</button>`).join('')}` : ''}
+        <a class="mp-semana" href="#resumen" data-ir="resumen"><h3>Ventas · 30 días</h3>
           <svg viewBox="0 0 308 104" role="img" aria-label="Ventas de los últimos 30 días"><path class="mp-onda" d="${olas.suave}" fill="none" stroke="#7F9BFF" stroke-width="2.4"/></svg>
           <div class="mp-cifra">${esc(Panel.eur(olas.total))} <small>hoy ${esc(Panel.eur(olas.hoyImp))}</small></div></a>
-        <div class="mp-panel"><h3>Para hoy</h3>${avisosHoy.length ? avisosHoy.map((a) => `<button type="button" class="mp-aviso ${a.nivel}" data-ir="${a.vista}"${a.filtro ? ` data-filtro="${a.filtro}"` : ''}${a.tipo ? ` data-tipo="${a.tipo}"` : ''}>${esc(a.texto)}</button>`).join('')
-          : '<div class="mp-nada">✓ Nada pendiente.</div>'}</div>
-        ${frasesSemana.length ? `<a class="mp-panel" href="#resumen" data-ir="resumen" data-ancla="la-tienda"><h3>Lo importante esta semana</h3>${frasesSemana.slice(0, 4).map((x) => `<div class="mp-frase">${esc(x)}</div>`).join('')}</a>` : ''}
-        <div class="mp-panel"><h3>JARVIS</h3>
-          <button type="button" class="mp-pregunta" data-consola="1">Pregúntale a JARVIS…</button>
-          <div class="mp-chips"><button type="button" data-jarvis="¿Quién me debe más?">¿quién me debe más?</button><button type="button" data-jarvis="¿Qué debería reponer?">¿qué repongo?</button></div></div>
-        <button type="button" class="btn primario mp-apuntar" data-ir="apuntar">+ Apuntar venta</button>
+        <div class="mp-chips"><button type="button" data-consola="1">Pregúntale a JARVIS…</button><button type="button" data-jarvis="¿Quién me debe más?">¿quién me debe más?</button><button type="button" data-jarvis="¿Qué debería reponer?">¿qué repongo?</button></div>
       </div>
       <div class="mp-lista"><div class="mp-anillo"><b>${pct}%</b><span>recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</span></div>${cartas}</div>
     </div>`;
@@ -1981,6 +2013,9 @@ te lo preparo y tú lo confirmas.</div>` : '';
     if (VISTAS.indexOf(v) < 0) v = 'mapa';
     document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
+    // El mapa ocupa la página entera (sin cabecera); en las demás pantallas, «‹ Mapa» para volver.
+    clase(document.body, 'en-mapa', v === 'mapa');
+    el('volver-mapa').hidden = v === 'mapa';
     if (v === 'webs' && !el('web-marco').src) verWeb('../');
     // Las gráficas se miden por el hueco real: si Mando estaba oculto la primera vez que se
     // pintaron (se recuerda otra pestaña de una visita anterior), medían mal y el texto salía
@@ -2229,6 +2264,14 @@ te lo preparo y tú lo confirmas.</div>` : '';
       return;
     }
     if (e.target.closest && e.target.closest('[data-consola]')) { abrirConsola(true); return; }
+    const av = e.target.closest && e.target.closest('[data-avisos]');
+    if (av) {
+      const caja = el('v-mapa').querySelector('.mp-avisos'), si = !(caja && caja.classList && caja.classList.contains('abierto'));
+      clase(caja, 'abierto', si); av.setAttribute('aria-expanded', String(si));
+      return;
+    }
+    const acc = e.target.closest && e.target.closest('[data-accion]');
+    if (acc) { const b = el(acc.dataset.accion); if (b && b.click) b.click(); return; }
     const b = e.target.closest && e.target.closest('[data-jarvis]');
     if (!b) return;
     abrirConsola(true);
