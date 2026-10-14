@@ -6,7 +6,7 @@ var Panel = (function () {
 
   var num = function (v) { return Calculo.num(v); };
   var eur = function (n) {
-    return (Math.round(n * 100) / 100).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+    return (Math.round(n * 100) / 100).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' }) + ' €';   // «4.369,20 €» (sin «always», es-ES no pone el punto con 4 cifras)
   };
 
   // El resumen del negocio. `calc` y `cuentas` salen de Calculo; `config` es la pestaña
@@ -103,7 +103,7 @@ var Panel = (function () {
       texto: sinPrecio + (sinPrecio === 1 ? ' venta sin precio: cuenta 0 €' : ' ventas sin precio: cuentan 0 €') + ' hasta que lo pongas' });
     var agotadas = calc.prods.filter(function (p) { return p.inicial > 0 && p.disponible === 0; });
     if (agotadas.length) out.push({ nivel: 'info', peso: agotadas.length, vista: 'pedido',
-      texto: agotadas.length + (agotadas.length === 1 ? ' talla agotada' : ' tallas agotadas') + ': mira en Segundo pedido si vale la pena volver a pedirlas' });
+      texto: agotadas.length + (agotadas.length === 1 ? ' talla agotada' : ' tallas agotadas') + ': mira en Próximo pedido si vale la pena volver a pedirlas' });
     var reservadas = calc.prods.reduce(function (a, p) { return a + p.reservado; }, 0);
     if (reservadas) out.push({ nivel: 'info', peso: reservadas, vista: 'stock', filtro: 'reservado',
       texto: reservadas + (reservadas === 1 ? ' prenda reservada' : ' prendas reservadas') + ' sin vender todavía' });

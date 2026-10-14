@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cjkwZtJ02hi2EqteoOVgQGVzt4ovJbOuCvKzndVWHHk='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XhN/v621tTBYKN8JkjnyaPvSFM3pGxoY1t81bp9mdhY='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>JARVIS — China al por mayor</title>
@@ -21,7 +21,7 @@
   /* Un solo tema, oscuro a propósito: es un centro de mando. */
   :root {
     color-scheme: dark;
-    --fondo: #050b10; --panel: #0b1620; --panel-2: #0f1e2b;
+    --fondo: #0A0D2C; --panel: #10153A; --panel-2: #151B48;
     --linea: rgba(90, 200, 255, .14); --linea-2: rgba(90, 200, 255, .32);
     --tinta: #e4f2fa; --suave: #8aa7bc; --tenue: #6a879d;   /* --tenue: 4,5:1 sobre --panel */
     --cian: #35c9ee; --cian-hondo: #0f6f8f;
@@ -110,97 +110,165 @@
   nav.con-luz button[aria-selected="true"] { border-bottom-color: transparent; }
 
 
-  /* ---- Mapa: la constelación, a pantalla completa (es la portada y la forma de moverse) ---- */
-  /* Sin pestañas: a cada sitio se llega tocando un planeta, y de vuelta con «‹ Mapa». En el mapa
-     tampoco hay cabecera: la página entera es el cielo. */
+  /* ---- La galaxia: el fondo de todo el panel (también dentro de cada sección) ---- */
+  html { background: #080B24; }
+  .galaxia { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(120% 90% at 50% 40%, #121A46 0%, #0A0D2C 55%, #070920 100%); }
+  .galaxia svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .tw-a { animation: mp-tw 4s ease-in-out infinite; } .tw-b { animation: mp-tw 6.5s ease-in-out infinite; }
+  /* Las tarjetas son de cristal: se ve la galaxia detrás. */
+  body .caja { background: linear-gradient(180deg, rgba(26, 32, 78, .62), rgba(12, 16, 44, .72)); border-color: rgba(150, 180, 255, .18);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  body .caja::before { background: var(--acento, var(--cian)); box-shadow: 0 0 10px var(--acento, var(--cian)); }
+  h2.sec { color: #B9C8F0; }
+
+  /* ---- Sin pestañas ni cabecera: se navega tocando los planetas ---- */
   nav#pestanas { display: none !important; }
-  body.en-mapa header.hud { display: none; }
+  body.dentro header.hud { display: none; }
   body.en-mapa main.wrap { max-width: none; padding: 0; }
-  body.en-mapa .fondo { display: none; }
-  html:has(body.en-mapa) { background: #04050D; }
-  .volver-mapa { position: sticky; top: calc(76px + env(safe-area-inset-top, 0px)); z-index: 20; margin: 0 0 14px; }
-  .mp-todo { position: relative; height: 100vh; height: 100dvh; min-height: 560px; overflow: hidden; background: #04050D; }
+  body.en-mapa #j-abrir, body.en-mapa #j-hola { display: none !important; }   /* en el mapa, JARVIS es el sol */
+
+  /* ---- La cabecera de cada sección: su planeta, su nombre y sus cifras ---- */
+  .cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin: 4px 0 20px; padding: 16px 18px; border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--acento, #36D6FF) 40%, transparent);
+    background: radial-gradient(140% 160% at 0% 0%, color-mix(in srgb, var(--acento, #36D6FF) 22%, transparent), rgba(12, 16, 44, .7) 60%);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 0 40px -18px var(--acento, #36D6FF); }
+  .cab-planeta { width: 74px; height: 74px; flex: none; filter: drop-shadow(0 0 14px currentColor); animation: mp-flota 7s ease-in-out infinite; }
+  .cab-texto { flex: 1 1 260px; min-width: 0; }
+  .cab-tit { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(22px, 3.2vw, 32px); letter-spacing: .14em; text-transform: uppercase; text-shadow: 0 0 22px currentColor; }
+  .cab-texto p { margin: 4px 0 0; color: #B9C8F0; font-size: 14.5px; }
+  .cab-cifras { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cab-cifras > div { min-width: 110px; padding: 8px 12px; border-radius: 12px; background: rgba(8, 10, 34, .5); border: 1px solid rgba(150, 180, 255, .16); }
+  .cab-cifras span { display: block; font-size: 12px; color: #9DB0E6; letter-spacing: .04em; }
+  .cab-cifras b { display: block; font-family: var(--display); font-size: 19px; margin-top: 2px; color: #fff; }
+  .cab-volver { order: -1; }
+  .cab-apuntar { margin-left: auto; }
+  @media (max-width: 700px) { .cab-planeta { width: 54px; height: 54px; } .cab-apuntar { margin-left: 0; } .cab-cifras > div { min-width: 0; flex: 1 1 90px; } }
+
+  /* ---- Mapa: la constelación a pantalla completa ---- */
+  .mp-todo { position: relative; height: 100vh; height: 100dvh; min-height: 560px; overflow: hidden; }
   .mp-cielo, .mp-cielo svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .mp-lista { display: none; }
   .mp-pl { cursor: pointer; outline: none; }
   .mp-pl:focus-visible { outline: 2px solid var(--cian); outline-offset: 4px; border-radius: 6px; }
+  .mp-zona-area { fill: transparent; pointer-events: all; }
   .mp-halo { opacity: .45; transition: opacity .2s; }
-  .mp-zona:hover .mp-halo, .mp-zona:focus-within .mp-halo { opacity: 1; }
-  /* Los satélites, solo al acercarse a su planeta: así el mapa queda limpio. */
-  .mp-sat { opacity: 0; pointer-events: none; transition: opacity .25s var(--ease-out); }
-  .mp-zona:hover .mp-sat, .mp-zona:focus-within .mp-sat { opacity: 1; pointer-events: auto; }
+  .mp-zona.activa .mp-halo { opacity: 1; }
+  .mp-zona { transition: opacity .3s ease; }
+  .mp-zonas.foco .mp-zona:not(.activa) { opacity: .2; }
+  .mp-linea { pointer-events: none; }
+  /* Los satélites salen al acercarse a su planeta y se quedan un momento al salir (para poder tocarlos). */
+  .mp-sat { opacity: 0; visibility: hidden; transition: opacity .2s ease .15s, visibility 0s linear .35s; }
+  .mp-zona.activa .mp-sat { opacity: 1; visibility: visible; transition-delay: 0s; }
+  .mp-hilo { fill: none; stroke-width: 1.3; stroke-opacity: .7; stroke-dasharray: 3 5; }
+  .mp-pastilla { fill: rgba(9, 11, 36, .88); stroke-width: 1.2; stroke-opacity: .7; }
+  .mp-pl:hover .mp-pastilla, .mp-pl:focus-visible .mp-pastilla { fill: rgba(30, 36, 90, .95); stroke-opacity: 1; }
   .mp-cielo text { font-family: var(--hud); }
-  .mp-nom { fill: #fff; font-size: 19px; font-weight: 700; letter-spacing: .16em; }
-  .mp-det { fill: #A9BAE8; font-size: 15px; }
-  .mp-lab { fill: #E8EEFF; font-size: 15px; text-decoration: underline; text-decoration-color: rgba(200, 215, 255, .45); text-underline-offset: 4px; }
-  .mp-lab.a { fill: #FFC983; } .mp-lab.g { fill: #8FEBC2; }
-  .mp-pl:hover .mp-lab { fill: #fff; text-decoration-color: #fff; }
-  .mp-sol { fill: #04122A; font-size: 38px; font-weight: 700; font-family: var(--display); }
+  .mp-nom { fill: #fff; font-size: 19px; font-weight: 700; letter-spacing: .16em; paint-order: stroke; stroke: rgba(6, 8, 30, .7); stroke-width: 4px; }
+  .mp-det { fill: #C3D0F5; font-size: 15px; paint-order: stroke; stroke: rgba(6, 8, 30, .7); stroke-width: 4px; }
+  .mp-lab { fill: #F0F4FF; font-size: 14.5px; font-weight: 600; }
+  .mp-sol { fill: #04122A; font-size: 25px; font-weight: 800; letter-spacing: .12em; font-family: var(--display); }
+  .mp-sol-sub { fill: #0B2A55; font-size: 13px; font-weight: 600; letter-spacing: .08em; }
+  .mp-halo-sol { opacity: .3; transition: opacity .2s; }
+  .mp-jarvis:hover .mp-halo-sol, .mp-jarvis:focus-visible .mp-halo-sol { opacity: 1; }
   .mp-gira { transform-box: fill-box; transform-origin: center; animation: gira 90s linear infinite; }
   .mp-gira2 { transform-box: fill-box; transform-origin: center; animation: gira 55s linear infinite reverse; }
   .mp-flujo { stroke-dasharray: 2 14; stroke-linecap: round; fill: none; animation: mp-flujo 3s linear infinite; }
   @keyframes mp-flujo { to { stroke-dashoffset: -64; } }
-  .mp-tw { animation: mp-tw 4s ease-in-out infinite; } .mp-tw2 { animation: mp-tw 6.5s ease-in-out infinite; }
   @keyframes mp-tw { 50% { opacity: .3; } }
   .mp-pulso { transform-box: fill-box; transform-origin: center; animation: mp-pulso 2.6s ease-out infinite; }
   @keyframes mp-pulso { 0% { transform: scale(.7); opacity: .9; } 100% { transform: scale(2.3); opacity: 0; } }
   .mp-flota { animation: mp-flota 7s ease-in-out infinite; }
   @keyframes mp-flota { 50% { transform: translateY(-6px); } }
-  .mp-onda { stroke-dasharray: 6 4; animation: mp-flujo 5s linear infinite; }
-  /* Lo poco que flota encima del cielo: la marca, actualizar/salir, el aviso y «Apuntar venta». */
+  /* Lo poco que flota encima del cielo. */
   .mp-marca { position: absolute; left: 24px; top: calc(20px + env(safe-area-inset-top, 0px)); display: flex; align-items: baseline; gap: 12px; pointer-events: none; }
   .mp-marca b { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: .32em; color: #E4EEFF; }
-  .mp-marca span { font-size: 13px; color: #8FA6E6; }
+  .mp-marca span { font-size: 13px; color: #9DB0E6; }
   .mp-arriba { position: absolute; right: 20px; top: calc(16px + env(safe-area-inset-top, 0px)); display: flex; gap: 8px; }
-  .mp-arriba button { background: rgba(20, 24, 56, .55); border: 1px solid rgba(150, 180, 255, .25); color: #CFE0FF; border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+  .mp-arriba button { background: rgba(20, 24, 66, .6); border: 1px solid rgba(150, 180, 255, .28); color: #CFE0FF; border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
   .mp-arriba button:hover { border-color: rgba(150, 180, 255, .6); }
-  .mp-barra { position: absolute; left: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(560px, calc(100% - 360px)); }
-  .mp-pildora { display: flex; align-items: center; gap: 10px; max-width: 100%; text-align: left; border: 1px solid rgba(150, 180, 255, .25); background: rgba(14, 18, 46, .72);
-    backdrop-filter: blur(8px); color: #DCE6FF; border-radius: 999px; padding: 10px 18px; font-size: 14.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .mp-pildora.hay { border-color: rgba(255, 122, 110, .55); }
-  .mp-pildora b { flex: none; display: grid; place-items: center; min-width: 24px; height: 24px; border-radius: 12px; background: #FF7A6E; color: #2A0B08; font-size: 13px; }
   .mp-arriba .mp-apuntar { background: var(--cian); border-color: var(--cian); color: #03202b; font-weight: 700; letter-spacing: .06em; padding: 7px 16px; }
   .mp-arriba .mp-apuntar:hover { background: #6fdcf6; }
-  .mp-semana h3 { margin-top: 14px; }
-  .mp-avisos { position: absolute; left: 24px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); width: min(400px, calc(100% - 48px)); max-height: calc(100% - 160px); overflow: auto;
-    box-sizing: border-box; border: 1px solid rgba(150, 180, 255, .22); background: linear-gradient(160deg, rgba(34, 40, 100, .82), rgba(10, 12, 34, .94)); backdrop-filter: blur(12px);
+  .mp-barra { position: absolute; left: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(560px, calc(100% - 48px)); }
+  .mp-pildora { display: flex; align-items: center; gap: 10px; max-width: 100%; text-align: left; border: 1px solid rgba(150, 180, 255, .28); background: rgba(16, 20, 56, .72);
+    backdrop-filter: blur(8px); color: #DCE6FF; border-radius: 999px; padding: 10px 18px; font-size: 14.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-pildora.hay { border-color: rgba(255, 107, 107, .6); }
+  .mp-pildora b { flex: none; display: grid; place-items: center; min-width: 24px; height: 24px; border-radius: 12px; background: #FF6B6B; color: #2A0B08; font-size: 13px; }
+  .mp-avisos { position: absolute; left: 24px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); width: min(420px, calc(100% - 48px)); max-height: calc(100% - 160px); overflow: auto;
+    box-sizing: border-box; border: 1px solid rgba(150, 180, 255, .24); background: linear-gradient(160deg, rgba(34, 40, 100, .86), rgba(12, 14, 40, .94)); backdrop-filter: blur(12px);
     border-radius: 16px; padding: 14px 16px; display: none; }
   .mp-avisos.abierto { display: block; }
-  .mp-avisos h3 { margin: 12px 0 6px; font-family: var(--hud); font-size: 13.5px; font-weight: 600; color: #8FB4FF; letter-spacing: .05em; }
-  .mp-avisos h3:first-child { margin-top: 0; }
+  .mp-avisos h3 { margin: 0 0 6px; font-family: var(--hud); font-size: 13.5px; font-weight: 600; color: #9DB8FF; letter-spacing: .05em; }
   .mp-semana { display: block; color: inherit; text-decoration: none; }
-  .mp-semana svg { width: 100%; height: auto; }
-  .mp-cifra { font-family: var(--display); font-weight: 700; font-size: 24px; margin-top: 4px; }
-  .mp-cifra small { font-family: var(--hud); font-size: 13px; color: #9DB0E6; font-weight: 400; }
+  .mp-semana h3 { margin-top: 14px; }
   .mp-aviso { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid rgba(150, 180, 255, .14); padding: 8px 2px; color: var(--tinta);
     font-size: 14px; line-height: 1.4; cursor: pointer; }
   .mp-aviso::before { content: "›  "; font-weight: 700; color: var(--cian); }
   .mp-aviso.n-mal::before { color: var(--mal); } .mp-aviso.n-aviso::before { color: var(--aviso); }
   .mp-nada { color: var(--bien); font-size: 14px; }
   .mp-frase { border-top: 1px solid rgba(150, 180, 255, .14); padding: 7px 2px; font-size: 14px; line-height: 1.4; color: var(--tinta); }
-  .mp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .mp-chips button { border: 1px solid rgba(150, 180, 255, .3); background: none; color: #A9B8DE; border-radius: 14px; padding: 5px 11px; font-size: 13px; cursor: pointer; }
-  @media (max-width: 760px) {
+  @media (max-width: 1023px), (max-height: 560px) {
     .mp-todo { height: auto; min-height: 100vh; overflow: visible; padding: calc(64px + env(safe-area-inset-top, 0px)) 16px 120px; display: grid; gap: 12px; }
     .mp-cielo { display: none; }
+    .mp-marca { position: static; order: 0; } .mp-marca span { display: none; }
     .mp-barra, .mp-avisos { position: static; max-width: none; width: auto; }
-    .mp-barra { order: 2; } .mp-avisos { order: 4; }
+    .mp-barra { order: 2; } .mp-avisos { order: 3; }
     .mp-arriba { left: 16px; right: 16px; justify-content: flex-end; }
-    .mp-marca { display: none; }
     .mp-pildora { white-space: normal; border-radius: 14px; width: 100%; }
     .mp-lista { order: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .mp-anillo { grid-column: 1 / -1; text-align: center; padding: 18px 10px; border: 1px solid rgba(150, 180, 255, .2); border-radius: 14px; background: radial-gradient(closest-side, rgba(54, 214, 255, .18), transparent); }
-    .mp-anillo b { display: block; font-family: var(--display); font-size: 46px; text-shadow: 0 0 20px rgba(54, 214, 255, .6); }
-    .mp-anillo span { color: var(--suave); font-size: 14px; }
-    .mp-carta { display: grid; gap: 4px; text-align: left; text-decoration: none; color: var(--tinta); cursor: pointer; border: 1px solid color-mix(in srgb, var(--c) 60%, #0A1622);
-      background: linear-gradient(160deg, color-mix(in srgb, var(--c) 16%, #0A1622), #07111B 70%); border-radius: 12px; padding: 12px; min-height: 92px; }
+    .mp-anillo { grid-column: 1 / -1; display: grid; gap: 4px; text-align: center; padding: 22px 10px; cursor: pointer; color: var(--tinta); border: 1px solid rgba(127, 214, 255, .4); border-radius: 16px;
+      background: radial-gradient(closest-side, rgba(127, 214, 255, .35), rgba(42, 91, 224, .12) 70%, transparent); }
+    .mp-anillo b { font-family: var(--display); font-size: 34px; letter-spacing: .14em; text-shadow: 0 0 20px rgba(127, 214, 255, .8); }
+    .mp-anillo span { color: #C3D0F5; font-size: 14px; }
+    .mp-carta { display: grid; gap: 4px; text-align: left; color: var(--tinta); cursor: pointer; border: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+      background: linear-gradient(160deg, color-mix(in srgb, var(--c) 22%, rgba(16, 20, 56, .6)), rgba(10, 12, 40, .7) 70%); backdrop-filter: blur(8px); border-radius: 14px; padding: 12px; min-height: 92px; }
     .mp-carta b { font-family: var(--display); font-size: 12px; letter-spacing: .12em; color: var(--c); }
-    .mp-carta span:last-child { font-size: 14px; color: #CBD8F5; }
-    .mp-ic { width: 12px; height: 12px; border-radius: 50%; }
-    .mp-carta.aviso { box-shadow: 0 0 0 1px var(--c), 0 0 18px -4px var(--c); }
+    .mp-carta span:last-child { font-size: 14px; color: #DCE6FF; }
+    .mp-ic { width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 12px var(--c); }
+    .mp-carta.con-aviso { box-shadow: 0 0 0 1px var(--c), 0 0 18px -4px var(--c); }
   }
-  @media (prefers-reduced-motion: reduce) { .mp-gira, .mp-gira2, .mp-flujo, .mp-tw, .mp-tw2, .mp-pulso, .mp-flota, .mp-onda { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .mp-gira, .mp-gira2, .mp-flujo, .tw-a, .tw-b, .mp-pulso, .mp-flota, .cab-planeta { animation: none; } }
 
+  .acciones-top { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  /* Cabeceras fijas de las tablas: opacas (se quedan arriba al hacer scroll) pero del color de la galaxia, no negras. */
+  body .tabla thead th, body table.fija thead th:first-child { background: #1A2154; }
+  body table.fija td:first-child { background: #141B45; }
+  /* Dinero: las tres cifras, una debajo de otra junto al aro (sin huecos). */
+  .mando-top .tiles { grid-template-columns: minmax(0, 1fr); }
+  /* Los textos sueltos de la Tienda, sobre cristal para que se lean encima de la galaxia. */
+  /* Campos y casillas de cristal (sin cambiar la flecha de los desplegables). */
+  body .campo input, body .campo select, body .campo textarea, body .filtros input, body .filtros select, body .contar, body .ped-cab select, body .j-form input {
+    background-color: rgba(12, 16, 52, .72); border-color: rgba(150, 180, 255, .26); }
+  body tr.grupo td { background: #1C2458; }
+  #v-tienda table { table-layout: fixed; } #v-tienda th:first-child { width: 38%; }
+  .vendedores, .graficas { align-items: start; }
+  #v-apuntar .form, #apuntar-msg { margin-inline: auto; }
+  .marco { height: calc(100vh - 260px); min-height: 420px; }
+  .galaxia { will-change: transform; }
+  /* «‹ Mapa» siempre a mano abajo a la izquierda (fuera del mapa). */
+  .volver-flota { position: fixed; z-index: 45; left: 16px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); padding: 10px 16px; font-size: 14px;
+    background: rgba(20, 26, 70, .82); border-color: rgba(150, 180, 255, .4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 6px 20px -8px rgba(0, 0, 0, .7); }
+  body.en-mapa .volver-flota { display: none; }
+  /* Estado de la conexión, Actualizar y Salir en cada sección. */
+  .cab-estado { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: #9DB0E6; }
+  .cab-estado button { background: rgba(20, 24, 66, .6); border: 1px solid rgba(150, 180, 255, .28); color: #CFE0FF; border-radius: 8px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; }
+  .cab-con::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--bien); margin-right: 6px; vertical-align: 1px; }
+  .cab-con.cargando::before { background: var(--aviso); } .cab-con.mal::before { background: var(--mal); } .cab-con.mal { color: var(--mal); }
+  .cab-acciones { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  /* JARVIS contestó con la consola cerrada: el sol lo avisa. */
+  body.jarvis-nuevo .mp-halo-sol { opacity: 1; stroke: #FF6B6B; stroke-width: 4; }
+  @media (max-width: 700px) {
+    .cab-cifras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+    .cab-cifras b { font-size: 15px; white-space: nowrap; } .cab-cifras span { font-size: 11px; }
+    .cab-acciones { margin-left: 0; width: 100%; flex-direction: row; justify-content: space-between; align-items: center; }
+  }
+  @media (max-width: 640px) {
+    .tabla { max-height: none; }
+    .orbe { width: 52px; height: 52px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+    main { padding-bottom: 96px; }
+  }
+  /* En el móvil, sin desenfoque (va más suelto al desplazarse). */
+  @media (max-width: 760px) { body .caja, .cabeza, .mp-carta { backdrop-filter: none; -webkit-backdrop-filter: none; } body .caja { background: rgba(16, 20, 56, .9); } }
+  #v-tienda p.suave { color: #C9D5F5; background: rgba(14, 18, 50, .6); padding: 8px 12px; border-radius: 10px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
   main { padding-block: 20px 60px; }
   .aviso { border: 1px solid rgba(240, 180, 90, .6); background: rgba(240, 180, 90, .08); color: var(--aviso);
     border-radius: var(--r); padding: 11px 14px; margin-bottom: 16px; font-size: 14px; }
@@ -701,7 +769,37 @@
 </style>
 </head>
 <body>
-<div class="fondo" aria-hidden="true"></div>
+<!-- La galaxia del fondo, fija detrás de todo el panel: nebulosas hechas con ruido y estrellas. -->
+<div class="galaxia" aria-hidden="true">
+  <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <filter id="gx-nA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0034 .005" numOctaves="5" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .3  0 0 0 0 .98  2.1 0 0 0 -.72"/></filter>
+      <filter id="gx-nB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .0036" numOctaves="5" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 .12  0 0 0 0 .5  0 0 0 0 .98  2.2 0 0 0 -.8"/></filter>
+      <filter id="gx-nC" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".006 .005" numOctaves="4" seed="23"/><feColorMatrix type="matrix" values="0 0 0 0 .98  0 0 0 0 .3  0 0 0 0 .68  2.2 0 0 0 -.86"/></filter>
+      <filter id="gx-nD" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".005 .004" numOctaves="5" seed="41"/><feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .75  0 0 0 0 .9  2 0 0 0 -.85"/></filter>
+      <filter id="gx-eA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".42" numOctaves="1" seed="3"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  16 0 0 0 -11.9"/></filter>
+      <filter id="gx-eB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .8  0 0 0 0 .88  0 0 0 0 1  18 0 0 0 -13.6"/></filter>
+      <radialGradient id="gx-m1" cx="14%" cy="22%" r="58%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+      <radialGradient id="gx-m2" cx="50%" cy="52%" r="55%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+      <radialGradient id="gx-m3" cx="86%" cy="16%" r="44%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+      <radialGradient id="gx-m4" cx="78%" cy="88%" r="46%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+      <mask id="gx-k1"><rect width="1600" height="900" fill="url(#gx-m1)"/></mask><mask id="gx-k2"><rect width="1600" height="900" fill="url(#gx-m2)"/></mask>
+      <mask id="gx-k3"><rect width="1600" height="900" fill="url(#gx-m3)"/></mask><mask id="gx-k4"><rect width="1600" height="900" fill="url(#gx-m4)"/></mask>
+      <radialGradient id="gx-flare"><stop offset="0" stop-color="#fff"/><stop offset=".15" stop-color="#CFE0FF" stop-opacity=".8"/><stop offset="1" stop-color="#7FA8FF" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="1600" height="900" filter="url(#gx-nA)" mask="url(#gx-k1)"/>
+    <rect width="1600" height="900" filter="url(#gx-nB)" mask="url(#gx-k2)" opacity=".85"/>
+    <rect width="1600" height="900" filter="url(#gx-nC)" mask="url(#gx-k3)" opacity=".8"/>
+    <rect width="1600" height="900" filter="url(#gx-nD)" mask="url(#gx-k4)" opacity=".75"/>
+    <rect width="1600" height="900" filter="url(#gx-eB)" opacity=".75"/>
+    <rect width="1600" height="900" filter="url(#gx-eA)" opacity=".95"/>
+    <g class="tw-a"><circle cx="520" cy="300" r="50" fill="url(#gx-flare)" opacity=".6"/><path d="M496 300H544M520 276V324" stroke="#fff" stroke-opacity=".6"/></g>
+    <g class="tw-b"><circle cx="1090" cy="560" r="36" fill="url(#gx-flare)" opacity=".5"/></g>
+    <g class="tw-a"><circle cx="1500" cy="820" r="44" fill="url(#gx-flare)" opacity=".55"/><path d="M1476 820H1524M1500 796V844" stroke="#fff" stroke-opacity=".5"/></g>
+    <g class="tw-b"><circle cx="60" cy="700" r="32" fill="url(#gx-flare)" opacity=".5"/></g>
+    <g class="tw-b"><circle cx="1320" cy="90" r="38" fill="url(#gx-flare)" opacity=".55"/><path d="M1300 90H1340M1320 70V110" stroke="#fff" stroke-opacity=".5"/></g>
+  </svg>
+</div>
 
 <header class="hud">
   <div class="wrap">
@@ -718,9 +816,10 @@
     </div>
     <nav role="tablist" id="pestanas" hidden>
       <button role="tab" data-vista="mapa" aria-selected="true" style="--i:0">Mapa</button>
-      <button role="tab" data-vista="resumen" aria-selected="false" style="--i:1">Mando</button>
+      <button role="tab" data-vista="resumen" aria-selected="false" style="--i:1">Dinero</button>
+      <button role="tab" data-vista="tienda" aria-selected="false" style="--i:1">Tienda</button>
       <button role="tab" data-vista="stock" aria-selected="false" style="--i:2">Stock</button>
-      <button role="tab" data-vista="reparto" aria-selected="false" style="--i:3">Amigos<span class="insignia aviso" id="ins-reparto" hidden></span></button>
+      <button role="tab" data-vista="reparto" aria-selected="false" style="--i:3">Vendedores<span class="insignia aviso" id="ins-reparto" hidden></span></button>
       <button role="tab" data-vista="cuentas" aria-selected="false" style="--i:4">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
       <button role="tab" data-vista="movimientos" aria-selected="false" style="--i:5">Movimientos</button>
       <button role="tab" data-vista="apuntar" aria-selected="false" style="--i:6">Apuntar</button>
@@ -750,10 +849,13 @@
 
   <div class="rejilla" id="rejilla" hidden>
     <div class="vistas" id="vistas">
-      <button type="button" class="btn volver-mapa" id="volver-mapa" data-ir="mapa" hidden>‹ Mapa</button>
+      <div class="cabeza" id="cabeza" hidden></div>
+      <button type="button" class="btn volver-flota" data-ir="mapa">‹ Mapa</button>
       <section id="v-mapa" hidden></section>
       <section id="v-resumen" hidden></section>
+      <section id="v-tienda" hidden></section>
       <section id="v-stock" hidden>
+        <div id="stock-graf"></div>
         <div class="filtros">
           <input type="search" id="stock-q" placeholder="Buscar: polo, arcteryx, M…" autocomplete="off">
           <select id="stock-f">
@@ -783,11 +885,11 @@
             <div class="campo"><label for="a-tipo">Qué ha pasado</label>
               <select id="a-tipo">
                 <option value="VENTA">VENTA — cobrada</option>
-                <option value="CONSIGNA">CONSIGNA — se la lleva un amigo</option>
+                <option value="CONSIGNA">CONSIGNA — se la lleva un vendedor</option>
                 <option value="DEVOLUCION">DEVOLUCION — te la devuelve</option>
                 <option value="RESERVA">RESERVA — la quieren, sin pagar</option>
                 <option value="QUITA_RESERVA">QUITA_RESERVA — se cae la reserva</option>
-                <option value="PAGO">PAGO — un amigo te da dinero</option>
+                <option value="PAGO">PAGO — un vendedor te da dinero</option>
               </select></div>
             <div class="campo"><label for="a-vend">Quién</label><select id="a-vend"></select></div>
           </div>
@@ -848,7 +950,7 @@
       <div class="j-sug" id="j-sug">
         <button type="button">¿Cómo vamos hoy?</button>
         <button type="button">¿Quién me debe dinero?</button>
-        <button type="button">¿Qué tiene cada amigo?</button>
+        <button type="button">¿Qué tiene cada vendedor?</button>
         <button type="button">¿Qué no se está vendiendo?</button>
         <button type="button">Apunta una venta</button>
       </div>
@@ -883,7 +985,7 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-  const VISTAS = ['mapa', 'resumen', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'recuento', 'pedido', 'webs'];
+  const VISTAS = ['mapa', 'resumen', 'tienda', 'stock', 'reparto', 'cuentas', 'movimientos', 'apuntar', 'recuento', 'pedido', 'webs'];
   const guardar = (k, v) => { try { window.sessionStorage.setItem(k, v); } catch (e) { /* sin almacenamiento */ } };
   const recordar = (k) => { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } };
   const olvidar = (k) => { try { window.sessionStorage.removeItem(k); } catch (e) { /* nada */ } };
@@ -981,9 +1083,13 @@
     a.className = 'aviso' + (tipo === 'mal' ? ' mal' : '');
     a.hidden = !texto;
   }
+  const estadoConexion = { tipo: '', texto: '' };
   function conexion(tipo, texto) {
     el('conexion').className = 'conexion' + (tipo ? ' ' + tipo : '');
     el('actualizado').textContent = texto;
+    estadoConexion.tipo = tipo || ''; estadoConexion.texto = texto || '';
+    const cc = el('cabeza') && el('cabeza').querySelector && el('cabeza').querySelector('.cab-con');
+    if (cc) { cc.textContent = texto; cc.className = 'cab-con ' + (tipo || ''); }
   }
 
   // Convierte lo que manda Google (modo=privado) en las cuentas y pinta el panel. Aparte de
@@ -1098,7 +1204,7 @@
   }
 
   function graficaStock(cats, W) {
-    const SERIES = [['vendidas', 'Vendidas', 'var(--s1)'], ['enLaCalle', 'En casa de amigos', 'var(--s2)'], ['enCasa', 'En tu casa', 'var(--s3)']];
+    const SERIES = [['vendidas', 'Vendidas', 'var(--s1)'], ['enLaCalle', 'En casa de vendedores', 'var(--s2)'], ['enCasa', 'En tu casa', 'var(--s3)']];
     // Con prendas apuntadas de más, la barra es más larga que lo comprado: se dice al lado.
     const largo = (c) => c.vendidas + c.enLaCalle + c.enCasa;
     const max = Math.max(...cats.map(largo)) || 1;
@@ -1124,8 +1230,8 @@
         title="Ver solo: ${n.toLowerCase()}"><i style="background:${col}"></i>${n}</button>`).join('')}</div>
       <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Prendas por categoría: vendidas, en casa de amigos y en tu casa">${cuerpo}</svg>` +
       (deMas ? `<p class="nota" style="color:var(--mal)">⚠ Hay ${deMas} ${deMas === 1 ? 'prenda apuntada' : 'prendas apuntadas'} de más que las compradas:
-        en Stock, filtra por «Agotadas o en negativo» para ver cuál.</p>` : '') +
-      tabla(['Categoría', 'Vendidas', 'En casa de amigos', 'En tu casa', 'Compradas'],
+        abajo, filtra por «Agotadas o en negativo» para ver cuál.</p>` : '') +
+      tabla(['Categoría', 'Vendidas', 'En casa de vendedores', 'En tu casa', 'Compradas'],
         cats.map((c) => [c.categoria, c.vendidas, c.enLaCalle, c.enCasa, c.total]));
   }
 
@@ -1148,14 +1254,14 @@
     return `<h2 class="sec" id="la-tienda">La tienda · últimos 30 días</h2>
       <div class="embudo">${pasos.map(([k, t, antes], n) => `<div class="tile caja" style="--i:${6.5 + n * 0.5}"><div class="etq">${t}</div><div class="v" data-n="${t30[k]}">${t30[k]}</div>
         <div class="d">${antes ? pct(t30[k], t30[antes]) + ' del paso anterior' : t7.visita + ' en los últimos 7 días'}</div></div>`).join('')}</div>
-      ${amigos.length ? `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>Por el enlace de un amigo</th>
+      ${amigos.length ? `<div class="tabla caja" style="margin-top:12px"><table><thead><tr><th>Por el enlace de un vendedor</th>
         <th class="n">Visitas</th><th class="n">Añadieron</th><th class="n">Pedidos</th></tr></thead><tbody>${amigos.map(([id, a]) =>
           `<tr><td>${esc(nombreDe(id))}</td><td class="n">${a.visita}</td><td class="n">${a.carrito}</td><td class="n">${a.pedido}</td></tr>`).join('')}</tbody></table></div>` : ''}
       <p class="suave" style="white-space:normal;margin-top:8px">De cada 100 visitas, ${t30.conversion == null ? '—' : Math.round(t30.conversion * 100)}
         envían un pedido. Se cuenta una vez por visita, sin cookies ni datos de nadie.</p>
       ${t30.mitad || t30.final || t30.filtros ? `<p class="suave" style="white-space:normal;margin-top:4px">Hasta dónde bajan: ${pct(t30.mitad, t30.visita)} llegan a la mitad
         del catálogo y ${pct(t30.final, t30.visita)} hasta la última prenda; ${pct(t30.filtros, t30.visita)} abren «Filtros» en el móvil.</p>` : ''}
-      ${tablaPasos('De dónde llegan', t30.porOrigen, Panel.nombreOrigen)}
+      ${tablaPasos('De dónde llegan', t30.porOrigen, (k) => Panel.nombreOrigen(k).split(' (')[0])}
       ${tablaPasos('Aparato', t30.porAparato, (k) => (k === 'movil' ? 'Móvil' : 'Ordenador'))}
       ${tablaPasos('Con cookies aceptadas', t30.porVuelta, (k) => (k === 'nueva' ? 'Primera visita' : 'Vuelven'))}
       ${pintarQuienPide(t30)}
@@ -1201,164 +1307,245 @@
   }
 
   // ---- Mapa: la constelación del negocio, a pantalla completa ----
-  // Es la portada y la única forma de moverse: el sol es lo recuperado del pedido (y lleva a Mando) y
-  // cada zona es un planeta que lleva a su pantalla. Los satélites (un dato que lleva a un detalle:
-  // las tallas agotadas, un amigo, el embudo…) salen al pasar por encima del planeta. Todo sale de
-  // los datos de verdad. En el móvil, en vez del dibujo, una carta por zona.
+  // Es la portada y la única forma de moverse. El sol es JARVIS (tocarlo abre la consola) y cada
+  // planeta es una zona con su propia sección. Al pasar por encima de un planeta salen sus satélites
+  // (un dato que lleva a un detalle) en sitios pensados para no pisar nada; los demás planetas se
+  // apagan y el activo se pone delante. Al salir, los satélites se quedan un momento para poder
+  // tocarlos. En el móvil, en vez del dibujo, una carta por zona. Todo sale de los datos de verdad.
   const SOL = { x: 800, y: 450 };
+  // Cada sección con su planeta: nombre, color y una frase. El mapa y la cabecera de cada sección salen de aquí.
+  const ZONAS = {
+    resumen: { nombre: 'Dinero', c: '#F5C451', frase: 'Lo invertido, lo recuperado y cómo van las ventas' },
+    cuentas: { nombre: 'Cobros', c: '#FF6B6B', frase: 'Quién te debe, prenda a prenda, y apuntar lo que te pagan' },
+    reparto: { nombre: 'Vendedores', c: '#A98BFF', frase: 'Cada vendedor: lo que ha vendido, lo que tiene en casa y su comisión' },
+    webs: { nombre: 'Webs y hoja', c: '#9BE36D', frase: 'La tienda, el catálogo de vendedores y tu hoja de cálculo' },
+    pedido: { nombre: 'Próximo pedido', c: '#FF9A3D', frase: 'Qué se vende más rápido y cuánto volver a pedir' },
+    stock: { nombre: 'Almacén', c: '#3EE0A0', frase: 'Cada talla: vendida, reservada, en casa de un vendedor o en la tuya' },
+    recuento: { nombre: 'Contar la caja', c: '#3EE0A0', frase: 'Cuenta lo que ha llegado y pon la hoja al día' },
+    tienda: { nombre: 'Tienda', c: '#5B9BFF', frase: 'Quién entra en la tienda, de dónde viene y qué mira' },
+    movimientos: { nombre: 'Movimientos', c: '#38D6F0', frase: 'Todo lo apuntado: ventas, entregas, devoluciones y pagos' },
+    apuntar: { nombre: 'Apuntar', c: '#38D6F0', frase: 'Una venta, una entrega a un vendedor, una devolución o un pago' },
+  };
+  // Los ocho planetas, en el orden del reloj desde arriba, y los huecos de sus satélites ([dx, dy, lado del texto]):
+  // cada sitio tiene los suyos para que ningún texto se salga de la pantalla ni caiga encima de otro planeta.
+  const ORBITA = [
+    { v: 'resumen', x: 800, y: 150, huecos: [[-150, -55, 'l'], [150, -55, 'r'], [-185, 35, 'l'], [185, 35, 'r']] },
+    { v: 'cuentas', x: 1196, y: 238, huecos: [[130, -90, 'r'], [170, -5, 'r'], [150, 80, 'r'], [-10, -135, 'r'], [-150, -105, 'l']] },
+    { v: 'reparto', x: 1360, y: 450, huecos: [[-150, -70, 'l'], [-150, 100, 'l'], [40, -125, 'r'], [40, 145, 'r']] },
+    { v: 'webs', x: 1196, y: 662, huecos: [[140, -45, 'r'], [150, 45, 'r'], [105, 130, 'r'], [-140, 110, 'l']] },
+    { v: 'pedido', x: 800, y: 750, huecos: [[-150, -45, 'l'], [150, -45, 'r'], [175, 45, 'r']] },
+    { v: 'stock', x: 404, y: 662, huecos: [[-140, -45, 'l'], [-150, 45, 'l'], [140, 60, 'r'], [-95, 125, 'l']] },
+    { v: 'tienda', x: 240, y: 450, huecos: [[-40, -85, 'r'], [135, -40, 'r'], [135, 50, 'r'], [65, 120, 'r'], [-55, 150, 'r']] },
+    { v: 'movimientos', x: 404, y: 238, huecos: [[-150, -55, 'l'], [-160, 35, 'l'], [125, -90, 'r'], [-60, -130, 'l']] },
+  ];
+  let zonaActiva = null, apagarZona = 0;
+  function activarZona(z) {
+    clearTimeout(apagarZona);
+    if (zonaActiva === z) return;
+    if (zonaActiva) clase(zonaActiva, 'activa', false);
+    zonaActiva = z || null;
+    const grupo = el('v-mapa').querySelector && el('v-mapa').querySelector('.mp-zonas');
+    clase(grupo, 'foco', !!z);
+    if (!z) return;
+    // Delante de todo (en un SVG manda el orden): así sus satélites nunca quedan debajo de otro planeta.
+    if (z.parentNode && z.parentNode.lastElementChild !== z) z.parentNode.appendChild(z);
+    clase(z, 'activa', true);
+  }
   function pintarMapa() {
     if (!S.calc) return;
+    zonaActiva = null;
     const r = S.resumen, hoy = new Date();
     const t7 = Panel.tienda(S.tienda, 7, hoy);
+    const rt = Panel.ritmo(S.calc.ventas, hoy);
     const pct = Math.round(r.recuperado * 100);
     const agotadas = S.calc.prods.filter((p) => p.inicial > 0 && p.disponible <= 0).length;
-    const amigos = S.fichas.filter((f) => !f.propio);
-    const enCasa = amigos.reduce((a, f) => a + f.udsEnCasa, 0), paradas = amigos.reduce((a, f) => a + f.paradas, 0);
-    const deben = amigos.map((f) => ({ f, d: deudaDe(f.id).debe })).filter((x) => x.d > 0.004).sort((a, b) => b.d - a.d);
-    const alDia = amigos.filter((f) => deudaDe(f.id).debe <= 0.004 && f.uds > 0);
+    const enLaCalle = S.calc.prods.filter((p) => p.enVendedores > 0).length;
+    const vendedores = S.fichas.filter((f) => !f.propio);
+    const enCasa = vendedores.reduce((a, f) => a + f.udsEnCasa, 0), paradas = vendedores.reduce((a, f) => a + f.paradas, 0);
+    const deben = vendedores.map((f) => ({ f, d: deudaDe(f.id).debe })).filter((x) => x.d > 0.004).sort((a, b) => b.d - a.d);
     const maxDeuda = deben.length ? deben[0].d : 1;
+    const mejor = vendedores.slice().sort((a, b) => b.bruto - a.bruto)[0];
     const R = Panel.rotacion(S.calc, DATOS.movimientos || [], DATOS.config || {}, hoy, SEMANAS);
     const reponer = R.productos.filter((x) => x.sugerido > 0).sort((a, b) => b.sugerido - a.sugerido);
-    const origenes = Object.entries(t7.porOrigen).sort((a, b) => b[1].visita - a[1].visita).slice(0, 4);
+    const origenes = Object.entries(t7.porOrigen).sort((a, b) => b[1].visita - a[1].visita).slice(0, 2);
     const movil = (t7.porAparato.movil && t7.porAparato.movil.visita) || 0, totAp = movil + ((t7.porAparato.ordenador && t7.porAparato.ordenador.visita) || 0);
-    const vuelven = (t7.porVuelta.vuelve && t7.porVuelta.vuelve.visita) || 0, conCk = vuelven + ((t7.porVuelta.nueva && t7.porVuelta.nueva.visita) || 0);
-    const miradas = Object.entries(t7.porPrenda).filter(([, a]) => a.ficha).sort((a, b) => b[1].ficha - a[1].ficha).slice(0, 3);
+    const movs = (DATOS.movimientos || []).filter((m) => String(m.tipo || '').trim());
+    const cuantos = (t) => movs.filter((m) => String(m.tipo).toUpperCase() === t).length;
     const hoja = DATOS.hoja || '';
-    const recorta = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
+    const recorta = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
+    const recortaPalabra = (s, n) => { if (s.length <= n) return s; const c = s.slice(0, n); const i = c.lastIndexOf(' '); return (i > 6 ? c.slice(0, i) : c).trimEnd() + '…'; };
+    const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
-    // Cada zona: dónde está, su color, su cifra, adónde lleva y sus satélites ([dx, dy, radio, texto, lado, destino, color]).
-    const AV = { ir: 'resumen', ancla: 'la-tienda' };
-    const OFF_ORIGEN = [[-110, -90], [110, -110], [170, 70], [-120, 100]];
-    const zonas = [
-      { id: 'tienda', x: 270, y: 190, r: 38, c: '#6FA9FF', nombre: 'TIENDA', dato: `${t7.pedido} ${t7.pedido === 1 ? 'pedido' : 'pedidos'} · abre la web ↗`, href: '../',
-        sats: origenes.map(([o, a], i) => [OFF_ORIGEN[i][0], OFF_ORIGEN[i][1], 10 + Math.min(10, a.visita / 4), `${Panel.nombreOrigen(o).split(' (')[0]} ${a.visita}`, 'r', AV])
-          .concat([[20, 170, 9, 'Webs y hoja', 'r', { ir: 'webs' }]]) },
-      { id: 'visitas', x: 150, y: 520, r: 34, c: '#3FD8FF', nombre: 'VISITAS', dato: `${t7.visita} esta semana`, ir: 'resumen', ancla: 'la-tienda',
-        sats: [[100, -100, 9, t7.visita ? `Piden ${Math.round(t7.pedido / t7.visita * 100)} de cada 100` : 'Aún sin visitas', 'r', AV],
-          [120, 90, 10, totAp ? `Móvil ${Math.round(movil / totAp * 100)} %` : 'Móvil —', 'r', AV],
-          [20, 130, 8, conCk ? `Vuelven ${Math.round(vuelven / conCk * 100)} %` : 'Vuelven —', 'r', AV]]
-          .concat(miradas.slice(0, 2).map(([cod, a], i) => [[150, 10], [60, -150]][i].concat([8, `${recorta(nombrePrenda(cod), 24)} · ${a.ficha}`, 'r', AV]))) },
-      { id: 'almacen', x: 360, y: 680, r: 38, c: '#46E6A4', nombre: 'ALMACÉN', dato: `${r.disponibles} prendas`, ir: 'stock',
-        sats: [[-140, 40, 10, `${agotadas} ${agotadas === 1 ? 'talla agotada' : 'tallas agotadas'}`, 'l', { ir: 'stock', filtro: 'agotado' }, agotadas ? '#FFB44D' : ''],
-          [150, -30, 9, 'Contar la caja', 'r', { ir: 'recuento' }], [-130, -70, 8, `${r.reservadas} reservadas`, 'l', { ir: 'stock', filtro: 'reservado' }]] },
-      { id: 'pedido', x: 800, y: 120, r: 32, c: '#FFB44D', nombre: 'PRÓXIMO PEDIDO', dato: reponer.length ? `repón ${recorta(reponer[0].producto + ' ' + reponer[0].modelo, 26)}` : 'nada urgente', ir: 'pedido',
-        sats: reponer.slice(0, 2).map((x, i) => [[130, -40], [-130, 50]][i].concat([8, `${recorta(x.producto + ' ' + x.modelo, 24)}: ${x.sugerido}`, i ? 'l' : 'r', { ir: 'pedido' }])) },
-      { id: 'excel', x: 1330, y: 160, r: 34, c: '#8BE58A', nombre: 'EXCEL', dato: 'tu hoja ↗', href: hoja, ir: 'webs',
-        sats: [[-130, -40, 9, 'Movimientos', 'l', { ir: 'movimientos' }], [60, 120, 8, 'Productos', 'r', { ir: 'stock' }]] },
-      { id: 'amigos', x: 1430, y: 430, r: 38, c: '#B7A0FF', nombre: 'AMIGOS', dato: `${enCasa} prendas en su casa`, ir: 'reparto',
-        sats: [[-120, -90, 9, `${paradas} ${paradas === 1 ? 'parada' : 'paradas'}`, 'l', { ir: 'reparto' }, paradas ? '#FFB44D' : ''], [-110, 100, 8, `${amigos.length} amigos`, 'l', { ir: 'reparto' }]] },
-      { id: 'deudas', x: 1250, y: 700, r: 44, c: '#FF7A6E', nombre: 'DEUDAS', dato: Panel.eur(r.teDeben), ir: 'cuentas', aviso: deben.length > 0,
-        sats: deben.slice(0, 4).map((x, i) => [[130, -100], [170, 50], [-170, 110], [60, -170]][i].concat([10 + 22 * x.d / maxDeuda, `${nombreDe(x.f.id)} ${Panel.eur(x.d)}`, i === 2 ? 'l' : 'r', { ir: 'cuentas' }]))
-          .concat(alDia.slice(0, 1).map((f) => [-170, -20, 8, `${nombreDe(f.id)} al día`, 'l', { ir: 'cuentas' }, '#46E6A4'])) },
-      { id: 'dinero', x: 800, y: 780, r: 36, c: '#D3C6FF', nombre: 'DINERO', dato: `${Panel.eur(r.cobrado)} cobrados`, ir: 'resumen',
-        sats: [[-140, 20, 9, `Invertido ${Panel.eur(r.desembolso)}`, 'l', { ir: 'resumen' }], [140, 20, 9, 'Pagos recibidos', 'r', { ir: 'movimientos', tipo: 'PAGO' }]] },
-    ];
-    const attrs = (d) => ` data-ir="${d.ir}"${d.ancla ? ` data-ancla="${d.ancla}"` : ''}${d.filtro ? ` data-filtro="${d.filtro}"` : ''}${d.tipo ? ` data-tipo="${d.tipo}"` : ''}`;
-    const esf = (x, y, rr, color) => `<use href="#mp-esf" x="${x - rr}" y="${y - rr}" width="${2 * rr}" height="${2 * rr}" style="color:${color}"/>`;
-    const camino = (z) => `M${SOL.x} ${SOL.y}L${z.x} ${z.y}`;
+    // Lo que dice cada planeta y sus satélites: [texto, adónde lleva ({ir, filtro, tipo} o {href}), tamaño, color].
+    const datos = {
+      resumen: { dato: `${pct} % recuperado`, sats: [
+        [`Neto ${eur(r.neto)}`, { ir: 'resumen' }],
+        [`Esta semana ${eur(rt.semana.importe)}`, { ir: 'resumen' }], [`Si se vende todo ${eur(r.beneficioSiTodo)}`, { ir: 'resumen' }]] },
+      cuentas: { dato: deben.length ? `te deben ${eur(r.teDeben)}` : 'nadie te debe', aviso: deben.length > 0, sats:
+        deben.slice(0, 4).map((x) => [`${nombreDe(x.f.id)} ${eur(x.d)}`, { ir: 'cuentas' }, 9 + 9 * x.d / maxDeuda])
+          .concat([['Pagos recibidos', { ir: 'movimientos', tipo: 'PAGO' }]]) },
+      reparto: { dato: plural(vendedores.length, 'vendedor', 'vendedores'), aviso: paradas > 0, sats: [
+        ['Catálogo de vendedores ↗', { href: '../vendedores/' }], [plural(enCasa, 'prenda en su casa', 'prendas en su casa'), { ir: 'reparto' }],
+        [plural(paradas, 'prenda parada', 'prendas paradas'), { ir: 'reparto' }, 9, paradas ? '#FF9A3D' : ''],
+        [mejor && mejor.bruto ? recorta(`Vende más: ${mejor.nombre}`, 18) : 'Aún sin ventas', { ir: 'reparto' }]] },
+      webs: { dato: 'tienda, catálogo y hoja', sats: [
+        ['Abrir la hoja ↗', hoja ? { href: hoja } : { ir: 'webs' }], ['Abrir la tienda ↗', { href: '../' }],
+        ['Abrir el catálogo ↗', { href: '../vendedores/' }], ['Ver las webs aquí', { ir: 'webs' }]] },
+      pedido: { dato: reponer.length ? plural(reponer.length, 'prenda que reponer', 'prendas que reponer') : 'nada urgente',
+        sats: (reponer.length ? reponer.slice(0, 3).map((x) => [`Pedir ${x.sugerido} · ${recortaPalabra(x.producto, 17)}`, { ir: 'pedido' }])
+          : [['Nada que reponer aún', { ir: 'pedido' }]]) },
+      stock: { dato: `${r.disponibles} prendas`, sats: [
+        [plural(agotadas, 'talla agotada', 'tallas agotadas'), { ir: 'stock', filtro: 'agotado' }, 9, agotadas ? '#FF9A3D' : ''],
+        [plural(r.reservadas, 'reservada', 'reservadas'), { ir: 'stock', filtro: 'reservado' }],
+        ['Contar la caja', { ir: 'recuento' }], [plural(enLaCalle, 'talla en la calle', 'tallas en la calle'), { ir: 'stock', filtro: 'calle' }]] },
+      tienda: { dato: `${plural(t7.visita, 'visita', 'visitas')} esta semana`, sats: [['Abrir la tienda ↗', { href: '../' }]]
+        .concat(origenes.map(([o, a]) => [`${plural(a.visita, 'visita', 'visitas')} de ${Panel.nombreOrigen(o).split(' (')[0]}`, { ir: 'tienda' }, 8 + Math.min(10, a.visita / 4)]))
+        .concat([[t7.visita ? `${Math.round(t7.pedido / t7.visita * 100)} % de las visitas piden` : 'Aún sin visitas', { ir: 'tienda' }],
+          [totAp ? `Móvil ${Math.round(movil / totAp * 100)} %` : 'Enlaces para compartir', { ir: 'tienda' }]]) },
+      movimientos: { dato: plural(movs.length, 'apunte', 'apuntes'), sats: [
+        ['Apuntar algo nuevo', { ir: 'apuntar' }], [plural(cuantos('VENTA'), 'venta', 'ventas'), { ir: 'movimientos', tipo: 'VENTA' }],
+        [plural(cuantos('CONSIGNA'), 'entrega', 'entregas'), { ir: 'movimientos', tipo: 'CONSIGNA' }],
+        [plural(cuantos('PAGO'), 'pago', 'pagos'), { ir: 'movimientos', tipo: 'PAGO' }]] },
+    };
+    const attrs = (d) => (d.href ? '' : ` data-ir="${d.ir}"${d.filtro ? ` data-filtro="${d.filtro}"` : ''}${d.tipo ? ` data-tipo="${d.tipo}"` : ''}`);
+    const enlace = (d, etiqueta, cuerpo, extra) => (d.href
+      ? `<a href="${esc(d.href)}" target="_blank" rel="noopener" class="mp-pl"${extra || ''} aria-label="${esc(etiqueta)} (se abre en otra pestaña)">${cuerpo}</a>`
+      : `<g class="mp-pl" role="link" tabindex="0"${extra || ''} aria-label="${esc(etiqueta)}"${attrs(d)}>${cuerpo}</g>`);
+    const esf = (x, y, rr, color) => `<use href="#mp-esf" x="${(x - rr).toFixed(1)}" y="${(y - rr).toFixed(1)}" width="${(2 * rr).toFixed(1)}" height="${(2 * rr).toFixed(1)}" style="color:${color}"/>`;
+    const ancho = (t) => Math.round(t.length * 8.4 + 22);   // lo que ocupa la etiqueta (14,5 px de Chakra Petch)
 
-    const lineas = zonas.map((z, i) => `<path id="mp-r${i}" d="${camino(z)}" stroke="${z.c}" stroke-opacity="${z.aviso ? 0.85 : 0.5}" stroke-width="${z.aviso ? 2 : 1.5}"/><path class="mp-flujo" d="${camino(z)}" stroke="${z.c}" stroke-width="${z.aviso ? 4 : 3}"/>`).join('');
-    const puntos = zonas.map((z, i) => `<circle r="${z.aviso ? 5 : 4}" fill="${z.c}"><animateMotion dur="${(4 + i * 0.7).toFixed(1)}s" repeatCount="indefinite"><mpath href="#mp-r${i}"/></animateMotion></circle>`).join('');
-    // Cada zona es un grupo: al pasar por encima (o al enfocar con el teclado) salen sus satélites.
-    const grupos = zonas.map((z) => {
-      const cuerpo = `<g transform="translate(${z.x} ${z.y})"><circle r="${z.r + 20}" fill="none" stroke="${z.c}" class="mp-halo"/>${z.aviso ? `<circle class="mp-pulso" r="${z.r}" fill="none" stroke="${z.c}" stroke-width="2"/><circle r="${z.r + 30}" fill="none" stroke="${z.c}" stroke-width="2" stroke-dasharray="5 7" class="mp-gira"/>` : ''}${esf(0, 0, z.r + 8, z.c)}<text y="${z.r + 40}" text-anchor="middle" class="mp-nom">${esc(z.nombre)}</text><text y="${z.r + 60}" text-anchor="middle" class="mp-det">${esc(z.dato)}</text></g>`;
-      const tit = `${z.nombre}: ${z.dato}`;
-      const planeta = z.href ? `<a href="${esc(z.href)}" target="_blank" rel="noopener" class="mp-pl" aria-label="${esc(tit)} (se abre en otra pestaña)">${cuerpo}</a>`
-        : `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(tit)}"${attrs(z)}>${cuerpo}</g>`;
-      const lineasSat = z.sats.map((s) => `<path d="M${z.x} ${z.y}L${z.x + s[0]} ${z.y + s[1]}" stroke="${s[6] || z.c}" stroke-opacity=".6"/>`).join('');
-      const sats = z.sats.map((s) => {
-        const [dx, dy, rr, txt, lado, dest, col] = s, x = z.x + dx, y = z.y + dy;
-        const tx = lado === 'r' ? x + rr + 8 : x - rr - 8;
-        return `<g class="mp-pl" role="link" tabindex="0" aria-label="${esc(txt)}"${attrs(dest)}>${esf(x, y, rr, col || z.c)}<text x="${tx}" y="${y + 5}" text-anchor="${lado === 'r' ? 'start' : 'end'}" class="mp-lab${col === '#FFB44D' ? ' a' : col === '#46E6A4' ? ' g' : ''}">${esc(txt)}</text></g>`;
+    const zonas = ORBITA.map((o, i) => {
+      const z = ZONAS[o.v], d = datos[o.v], R0 = o.v === 'cuentas' && d.aviso ? 42 : 38;
+      const sats = d.sats.slice(0, o.huecos.length).map((s, k) => {
+        const [txt, dest, rr = 9, col] = s, [dx, dy, lado] = o.huecos[k], x = o.x + dx, y = o.y + dy, color = col || z.c;
+        const w = ancho(txt), px = lado === 'r' ? x + rr + 6 : x - rr - 6 - w;
+        const cuerpo = `${esf(x, y, rr, color)}<rect class="mp-pastilla" x="${px.toFixed(1)}" y="${y - 14}" width="${w}" height="28" rx="14" style="stroke:${color}"/>` +
+          `<text x="${(px + w / 2).toFixed(1)}" y="${y + 5}" text-anchor="middle" class="mp-lab">${esc(txt)}</text>`;
+        return `<path d="M${o.x} ${o.y}L${x} ${y}" class="mp-hilo" style="stroke:${color}"/>` + enlace(dest, txt, cuerpo);
       }).join('');
-      return `<g class="mp-zona"><circle cx="${z.x}" cy="${z.y}" r="170" fill="transparent" pointer-events="all"/><g class="mp-sat"><g fill="none" stroke-width="1.2">${lineasSat}</g>${sats}</g>${planeta}</g>`;
+      const anillo = o.v === 'resumen'
+        ? `<circle r="${R0 + 15}" fill="none" stroke="${z.c}" stroke-opacity=".18" stroke-width="5"/><circle r="${R0 + 15}" fill="none" stroke="${z.c}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(2 * Math.PI * (R0 + 15) * pct / 100).toFixed(1)} 999" transform="rotate(-90)"/>`
+        : '';
+      const planeta = `<g transform="translate(${o.x} ${o.y})"><circle r="${R0 + 22}" fill="none" stroke="${z.c}" class="mp-halo"/>${anillo}` +
+        `${d.aviso ? `<circle class="mp-pulso" r="${R0}" fill="none" stroke="${z.c}" stroke-width="2"/><circle r="${R0 + 30}" fill="none" stroke="${z.c}" stroke-width="2" stroke-dasharray="5 7" class="mp-gira"/>` : ''}` +
+        `${esf(0, 0, R0 + 6, z.c)}<text y="${R0 + 42}" text-anchor="middle" class="mp-nom">${esc(z.nombre.toUpperCase())}</text>` +
+        `<text y="${R0 + 62}" text-anchor="middle" class="mp-det">${esc(d.dato)}</text></g>`;
+      const dx = o.x - SOL.x, dy = o.y - SOL.y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+      const ini = [SOL.x + ux * 104, SOL.y + uy * 104];
+      const fin = o.v === 'resumen' ? [o.x, o.y + R0 + 74] : [o.x - ux * (R0 + 24), o.y - uy * (R0 + 24)];   // Dinero, justo encima del sol: la línea para bajo su nombre
+      const camino = `M${ini[0].toFixed(1)} ${ini[1].toFixed(1)}L${fin[0].toFixed(1)} ${fin[1].toFixed(1)}`;
+      const linea = `<g class="mp-linea"><path id="mp-r${i}" d="${camino}" fill="none" stroke="${z.c}" stroke-opacity="${d.aviso ? 0.8 : 0.42}" stroke-width="${d.aviso ? 2 : 1.4}"/>` +
+        `<path class="mp-flujo" d="${camino}" stroke="${z.c}" stroke-width="${d.aviso ? 3.6 : 2.8}"/><circle r="${d.aviso ? 5 : 3.6}" fill="${z.c}" filter="url(#mp-glow)"><animateMotion dur="${(4.2 + i * 0.6).toFixed(1)}s" repeatCount="indefinite"><mpath href="#mp-r${i}"/></animateMotion></circle></g>`;
+      return `<g class="mp-zona" data-zona="${o.v}"><circle cx="${o.x}" cy="${o.y}" r="150" class="mp-zona-area"/>${linea}` +
+        `<g class="mp-sat">${sats}</g>${enlace({ ir: o.v }, `${z.nombre}: ${d.dato}`, planeta)}</g>`;
     }).join('');
-
-    const olas = (() => {
-      const dias = Panel.ventasPorDia(S.calc.ventas, 30, hoy), max = Math.max(1, ...dias.map((d) => d.importe));
-      const pts = dias.map((d, i) => [Math.round(i * 308 / Math.max(1, dias.length - 1)), Math.round(96 - d.importe / max * 84)]);
-      const suave = pts.map((p, i) => (i ? `L${p[0]} ${p[1]}` : `M${p[0]} ${p[1]}`)).join('');
-      const total = dias.reduce((a, d) => a + d.importe, 0), hoyImp = dias.length ? dias[dias.length - 1].importe : 0;
-      return { suave, total, hoyImp };
-    })();
     const frasesSemana = Array.isArray(DATOS.analisis) ? DATOS.analisis.filter((x) => typeof x === 'string') : [];
     const avisosHoy = Panel.avisos(S.calc, S.deudas, S.fichas, S.nombre, hoy, DATOS.filasMovimientos);
-    const cartas = zonas.map((z) => {
-      const cuerpo = `<span class="mp-ic" style="background:${z.c}"></span><b>${esc(z.nombre)}</b><span>${esc(z.dato)}</span>`;
-      return z.href ? `<a class="mp-carta" href="${esc(z.href)}" target="_blank" rel="noopener" style="--c:${z.c}">${cuerpo}</a>`
-        : `<button type="button" class="mp-carta${z.aviso ? ' aviso' : ''}" style="--c:${z.c}"${attrs(z)}>${cuerpo}</button>`;
-    }).join('');
     const unAviso = (a) => `<button type="button" class="mp-aviso n-${a.nivel}" data-ir="${a.vista}"${a.filtro ? ` data-filtro="${a.filtro}"` : ''}${a.tipo ? ` data-tipo="${a.tipo}"` : ''}>${esc(a.texto)}</button>`;
     const abierto = !!(el('v-mapa').querySelector && el('v-mapa').querySelector('.mp-avisos.abierto'));
+    const cartas = ORBITA.map((o) => {
+      const z = ZONAS[o.v];
+      return `<button type="button" class="mp-carta${datos[o.v].aviso ? ' con-aviso' : ''}" style="--c:${z.c}" data-ir="${o.v}"><span class="mp-ic"></span><b>${esc(z.nombre.toUpperCase())}</b><span>${esc(datos[o.v].dato)}</span></button>`;
+    }).join('');
 
     el('v-mapa').innerHTML = `<h2 class="sr-only">Mapa del negocio</h2>
     <div class="mp-todo">
       <div class="mp-cielo">
-        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Constelación del negocio: cada planeta es una zona">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Constelación del negocio: el sol es JARVIS y cada planeta una sección">
           <defs>
-            <filter id="mp-nA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0034 .005" numOctaves="5" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .26  0 0 0 0 .95  2.1 0 0 0 -.78"/></filter>
-            <filter id="mp-nB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .0036" numOctaves="5" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 .1  0 0 0 0 .45  0 0 0 0 .95  2.2 0 0 0 -.85"/></filter>
-            <filter id="mp-nC" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".006 .005" numOctaves="4" seed="23"/><feColorMatrix type="matrix" values="0 0 0 0 .95  0 0 0 0 .25  0 0 0 0 .62  2.2 0 0 0 -.9"/></filter>
-            <filter id="mp-eA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".42" numOctaves="1" seed="3"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  16 0 0 0 -11.9"/></filter>
-            <filter id="mp-eB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .8  0 0 0 0 .88  0 0 0 0 1  18 0 0 0 -13.6"/></filter>
             <filter id="mp-plasma" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="4" seed="2"/><feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .85  0 0 0 0 1  1.8 0 0 0 -.2"/></filter>
             <filter id="mp-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <radialGradient id="mp-m1" cx="14%" cy="20%" r="55%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-            <radialGradient id="mp-m2" cx="50%" cy="52%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-            <radialGradient id="mp-m3" cx="84%" cy="18%" r="40%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-            <mask id="mp-k1"><rect width="1600" height="900" fill="url(#mp-m1)"/></mask><mask id="mp-k2"><rect width="1600" height="900" fill="url(#mp-m2)"/></mask><mask id="mp-k3"><rect width="1600" height="900" fill="url(#mp-m3)"/></mask>
-            <radialGradient id="mp-flare"><stop offset="0" stop-color="#fff"/><stop offset=".15" stop-color="#CFE0FF" stop-opacity=".8"/><stop offset="1" stop-color="#7FA8FF" stop-opacity="0"/></radialGradient>
             <radialGradient id="mp-brillo" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
             <radialGradient id="mp-corona" r="1"><stop offset="0" stop-color="#BFEAFF" stop-opacity=".95"/><stop offset=".3" stop-color="#4FA8FF" stop-opacity=".5"/><stop offset="1" stop-color="#2A5BE0" stop-opacity="0"/></radialGradient>
             <radialGradient id="mp-nuc" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9FE2FF"/><stop offset="1" stop-color="#2A74E8"/></radialGradient>
-            <clipPath id="mp-csol"><circle r="70"/></clipPath>
+            <clipPath id="mp-csol"><circle r="72"/></clipPath>
             <symbol id="mp-esf" viewBox="-50 -50 100 100" overflow="visible"><circle r="46" fill="currentColor" fill-opacity=".28"/><circle r="46" fill="url(#mp-brillo)"/><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-opacity=".95"><circle r="46"/><ellipse rx="46" ry="14"/><ellipse rx="46" ry="30"/><ellipse rx="14" ry="46"/><ellipse rx="30" ry="46"/><path d="M-46 0H46M0 -46V46" stroke-opacity=".5"/></g></symbol>
           </defs>
-          <rect width="1600" height="900" fill="#04050D"/>
-          <rect width="1600" height="900" filter="url(#mp-nA)" mask="url(#mp-k1)" opacity=".95"/>
-          <rect width="1600" height="900" filter="url(#mp-nB)" mask="url(#mp-k2)" opacity=".8"/>
-          <rect width="1600" height="900" filter="url(#mp-nC)" mask="url(#mp-k3)" opacity=".7"/>
-          <rect width="1600" height="900" filter="url(#mp-eB)" opacity=".75"/><rect width="1600" height="900" filter="url(#mp-eA)" opacity=".95"/>
-          <g class="mp-tw"><circle cx="520" cy="300" r="50" fill="url(#mp-flare)" opacity=".6"/><path d="M496 300H544M520 276V324" stroke="#fff" stroke-opacity=".6"/></g>
-          <g class="mp-tw2"><circle cx="1090" cy="560" r="36" fill="url(#mp-flare)" opacity=".5"/></g>
-          <g class="mp-tw"><circle cx="1500" cy="820" r="44" fill="url(#mp-flare)" opacity=".55"/><path d="M1476 820H1524M1500 796V844" stroke="#fff" stroke-opacity=".5"/></g>
-          <g class="mp-tw2"><circle cx="60" cy="700" r="32" fill="url(#mp-flare)" opacity=".5"/></g>
-          <g fill="none" stroke="#9DB6FF" stroke-opacity=".12"><circle cx="800" cy="450" r="200"/><circle cx="800" cy="450" r="360"/><circle cx="800" cy="450" r="520" stroke-dasharray="3 9"/></g>
-          <g fill="none" stroke-linecap="round">${lineas}</g>
-          <g filter="url(#mp-glow)">${puntos}</g>
-          <g class="mp-pl" role="link" tabindex="0" aria-label="Resumen general (Mando): ${pct} % recuperado" data-ir="resumen" transform="translate(${SOL.x} ${SOL.y})">
-            <circle r="160" fill="url(#mp-corona)" class="mp-flota"/>
-            <g fill="none" stroke="#B5D8FF"><g transform="rotate(-28)"><path id="mp-o1" d="M-126 0a126 42 0 1 0 252 0a126 42 0 1 0 -252 0" stroke-opacity=".75" stroke-width="1.4"/></g><g transform="rotate(34)"><path id="mp-o2" d="M-110 0a110 36 0 1 0 220 0a110 36 0 1 0 -220 0" stroke-opacity=".6" stroke-width="1.2"/></g><g transform="rotate(90)"><path id="mp-o3" d="M-96 0a96 32 0 1 0 192 0a96 32 0 1 0 -192 0" stroke-opacity=".55" stroke-width="1.2"/></g></g>
-            <g class="mp-gira" fill="none" stroke="#9FD0FF" stroke-opacity=".5"><circle r="140" stroke-dasharray="2 9"/></g>
-            <g class="mp-gira2" fill="none" stroke="#7FA8FF" stroke-opacity=".8" stroke-width="2"><circle r="112" stroke-dasharray="70 24"/></g>
-            <circle r="70" fill="url(#mp-nuc)"/>
-            <g clip-path="url(#mp-csol)"><rect x="-74" y="-74" width="148" height="148" filter="url(#mp-plasma)" opacity=".85"/></g>
-            <circle r="70" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5" style="filter:drop-shadow(0 0 16px #6FD0FF)"/>
-            <circle r="104" fill="none" stroke="#5EC8FF" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(653 * pct / 100).toFixed(1)} 653" transform="rotate(-90)" style="filter:drop-shadow(0 0 8px #5EC8FF)"/>
+          <g fill="none" stroke="#B4C6FF" stroke-opacity=".13"><ellipse cx="800" cy="450" rx="560" ry="300"/><circle cx="800" cy="450" r="200"/><ellipse cx="800" cy="450" rx="700" ry="400" stroke-dasharray="3 9"/></g>
+          <g class="mp-pl mp-jarvis" role="button" tabindex="0" data-consola="1" aria-label="JARVIS, tu asistente: tócalo para preguntarle" transform="translate(${SOL.x} ${SOL.y})">
+            <circle r="168" fill="url(#mp-corona)" class="mp-flota"/>
+            <g fill="none" stroke="#B5D8FF"><g transform="rotate(-28)"><path id="mp-o1" d="M-132 0a132 44 0 1 0 264 0a132 44 0 1 0 -264 0" stroke-opacity=".75" stroke-width="1.4"/></g><g transform="rotate(34)"><path id="mp-o2" d="M-116 0a116 38 0 1 0 232 0a116 38 0 1 0 -232 0" stroke-opacity=".6" stroke-width="1.2"/></g><g transform="rotate(90)"><path id="mp-o3" d="M-100 0a100 34 0 1 0 200 0a100 34 0 1 0 -200 0" stroke-opacity=".55" stroke-width="1.2"/></g></g>
+            <g class="mp-gira" fill="none" stroke="#9FD0FF" stroke-opacity=".55"><circle r="146" stroke-dasharray="2 9"/></g>
+            <g class="mp-gira2" fill="none" stroke="#7FA8FF" stroke-opacity=".85" stroke-width="2"><circle r="116" stroke-dasharray="70 24"/></g>
+            <circle class="mp-halo-sol" r="96" fill="none" stroke="#7FD6FF" stroke-width="2"/>
+            <circle r="72" fill="url(#mp-nuc)"/>
+            <g clip-path="url(#mp-csol)"><rect x="-76" y="-76" width="152" height="152" filter="url(#mp-plasma)" opacity=".85"/></g>
+            <circle r="72" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="1.5" style="filter:drop-shadow(0 0 18px #6FD0FF)"/>
             <g filter="url(#mp-glow)"><circle r="4.5" fill="#fff"><animateMotion dur="7s" repeatCount="indefinite"><mpath href="#mp-o1"/></animateMotion></circle><circle r="4" fill="#FFD9A8"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#mp-o2"/></animateMotion></circle><circle r="3.5" fill="#CFE0FF"><animateMotion dur="5.5s" repeatCount="indefinite"><mpath href="#mp-o3"/></animateMotion></circle></g>
-            <text y="12" text-anchor="middle" class="mp-sol">${pct}%</text>
-            <text y="150" text-anchor="middle" class="mp-nom" style="font-size:19px;letter-spacing:.3em">ZUBI</text>
-            <text y="172" text-anchor="middle" class="mp-det">recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</text>
+            <text y="6" text-anchor="middle" class="mp-sol">JARVIS</text>
+            <text y="28" text-anchor="middle" class="mp-sol-sub">pregúntame</text>
           </g>
-          ${grupos}
+          <g class="mp-zonas">${zonas}</g>
         </svg>
       </div>
       <div class="mp-marca"><b>ZUBI</b><span>centro de mando</span></div>
       <div class="mp-arriba"><button type="button" class="btn primario mp-apuntar" data-ir="apuntar">+ Apuntar venta</button><button type="button" data-accion="refrescar">Actualizar</button><button type="button" data-accion="salir">Salir</button></div>
       <div class="mp-barra">
-        <button type="button" class="mp-pildora${avisosHoy.length ? ' hay' : ''}" data-avisos="1" aria-expanded="${abierto}">${avisosHoy.length ? `<b>${avisosHoy.length}</b> ${esc(recorta(avisosHoy[0].texto, 70))}` : '✓ Nada pendiente'}</button>
+        <button type="button" class="mp-pildora${avisosHoy.length ? ' hay' : ''}" data-avisos="1" aria-expanded="${abierto}">${avisosHoy.length ? `<b>${avisosHoy.length}</b> ${avisosHoy.length === 1 ? 'aviso' : 'avisos'} · ${esc(recorta(avisosHoy[0].texto, 58))} ›` : '✓ Nada pendiente'}</button>
       </div>
       <div class="mp-avisos${abierto ? ' abierto' : ''}" role="region" aria-label="Avisos y resumen de la semana">
-        <h3>Para hoy</h3>${avisosHoy.length ? avisosHoy.slice(0, 6).map(unAviso).join('') : '<div class="mp-nada">✓ Nada pendiente.</div>'}
-        ${frasesSemana.length ? `<a class="mp-semana" href="#resumen" data-ir="resumen" data-ancla="la-tienda"><h3>Lo importante esta semana</h3>${frasesSemana.slice(0, 5).map((x) => `<div class="mp-frase">${esc(x)}</div>`).join('')}</a>` : ''}
-        ${miradas.length ? `<h3>Lo más mirado</h3>${miradas.map(([cod, a]) => `<button type="button" class="mp-aviso n-info" data-ir="resumen" data-ancla="la-tienda">${esc(nombrePrenda(cod))} · ${a.ficha} ${a.ficha === 1 ? 'vez' : 'veces'}</button>`).join('')}` : ''}
-        <a class="mp-semana" href="#resumen" data-ir="resumen"><h3>Ventas · 30 días</h3>
-          <svg viewBox="0 0 308 104" role="img" aria-label="Ventas de los últimos 30 días"><path class="mp-onda" d="${olas.suave}" fill="none" stroke="#7F9BFF" stroke-width="2.4"/></svg>
-          <div class="mp-cifra">${esc(Panel.eur(olas.total))} <small>hoy ${esc(Panel.eur(olas.hoyImp))}</small></div></a>
-        <div class="mp-chips"><button type="button" data-consola="1">Pregúntale a JARVIS…</button><button type="button" data-jarvis="¿Quién me debe más?">¿quién me debe más?</button><button type="button" data-jarvis="¿Qué debería reponer?">¿qué repongo?</button></div>
+        <h3>Para hoy</h3>${avisosHoy.length ? avisosHoy.map(unAviso).join('') : '<div class="mp-nada">✓ Nada pendiente.</div>'}
+        ${frasesSemana.length ? `<a class="mp-semana" href="#tienda" data-ir="tienda"><h3>Lo importante esta semana</h3>${frasesSemana.slice(0, 5).map((x) => `<div class="mp-frase">${esc(x)}</div>`).join('')}</a>` : ''}
       </div>
-      <div class="mp-lista"><div class="mp-anillo"><b>${pct}%</b><span>recuperado · faltan ${esc(Panel.eur(r.faltaRecuperar))}</span></div>${cartas}</div>
+      <div class="mp-lista">
+        <button type="button" class="mp-anillo" data-consola="1"><b>JARVIS</b><span>Tócalo para preguntarle</span></button>${cartas}
+      </div>
     </div>`;
+  }
+
+  // La cabecera de cada sección: su planeta, su nombre, una frase, sus cifras y «‹ Mapa» para volver.
+  function cifrasZona(v) {
+    if (!S.calc) return [];
+    const r = S.resumen, hoy = new Date();
+    const vendedores = S.fichas.filter((f) => !f.propio);
+    switch (v) {
+      case 'resumen': return [];   // el aro de debajo ya es la cifra
+      case 'cuentas': return [['Te deben', eur(r.teDeben)], ['Te han pagado', eur(r.cobrado)],
+        ['Con deuda', String(vendedores.filter((f) => deudaDe(f.id).debe > 0.004).length)]];
+      case 'reparto': return [['Vendedores', String(vendedores.length)], ['En su casa', String(vendedores.reduce((a, f) => a + f.udsEnCasa, 0))],
+        ['Paradas', String(vendedores.reduce((a, f) => a + f.paradas, 0))]];
+      case 'stock': case 'recuento': return [['Disponibles', String(r.disponibles)], ['Vendidas', String(r.vendidas)],
+        ['Agotadas', String(S.calc.prods.filter((p) => p.inicial > 0 && p.disponible <= 0).length)]];
+      case 'pedido': {
+        const R = Panel.rotacion(S.calc, DATOS.movimientos || [], DATOS.config || {}, hoy, SEMANAS);
+        return [['Que reponer', String(R.productos.filter((x) => x.sugerido > 0).length)], ['Prendas a pedir', String(R.productos.reduce((a, x) => a + x.sugerido, 0))]];
+      }
+      case 'tienda': {
+        const t7 = Panel.tienda(S.tienda, 7, hoy);
+        return [['Visitas 7 días', String(t7.visita)], ['Pedidos', String(t7.pedido)], ['Piden', t7.visita ? Math.round(t7.pedido / t7.visita * 100) + ' %' : '—']];
+      }
+      case 'movimientos': return [['Apuntes', String((DATOS.movimientos || []).filter((m) => String(m.tipo || '').trim()).length)],
+        ['Ventas', String(S.calc.ventas.length)]];
+      default: return [];
+    }
+  }
+  // El botón principal de cada sección: lo propio de su planeta (abrir la tienda, el catálogo, la hoja, contar la caja…).
+  function accionZona(v) {
+    const a = (href, txt) => `<a class="btn primario cab-apuntar" href="${esc(href)}" target="_blank" rel="noopener">${txt}</a>`;
+    const b = (ir, txt) => `<button type="button" class="btn primario cab-apuntar" data-ir="${ir}">${txt}</button>`;
+    if (v === 'tienda') return a('../', 'Abrir la tienda ↗');
+    if (v === 'reparto') return a('../vendedores/', 'Abrir su catálogo ↗');
+    if (v === 'webs') return DATOS && DATOS.hoja ? a(DATOS.hoja, 'Abrir tu hoja ↗') : '';
+    if (v === 'stock') return b('recuento', 'Contar la caja');
+    if (v === 'recuento') return b('stock', '‹ Volver al almacén');
+    if (v === 'apuntar') return '';
+    return b('apuntar', '+ Apuntar');
+  }
+  function pintarCabeza(v) {
+    const z = ZONAS[v], c = el('cabeza');
+    if (!c) return;
+    if (!z) { c.innerHTML = ''; return; }
+    const cifras = cifrasZona(v);
+    c.innerHTML = `<button type="button" class="btn cab-volver" data-ir="mapa">‹ Mapa</button>
+      <svg class="cab-planeta" viewBox="-60 -60 120 120" aria-hidden="true" style="color:${z.c}"><circle r="56" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+        <circle r="44" fill="currentColor" fill-opacity=".3"/><g fill="none" stroke="currentColor" stroke-width="1.6"><circle r="44"/><ellipse rx="44" ry="13"/><ellipse rx="44" ry="29"/><ellipse rx="13" ry="44"/><ellipse rx="29" ry="44"/></g></svg>
+      <div class="cab-texto"><h2 class="cab-tit" style="color:${z.c}">${esc(z.nombre)}</h2><p>${esc(z.frase)}</p></div>
+      ${cifras.length ? `<div class="cab-cifras">${cifras.map(([k, n]) => `<div><span>${esc(k)}</span><b>${esc(n)}</b></div>`).join('')}</div>` : ''}
+      <div class="cab-acciones">${accionZona(v)}<div class="cab-estado"><span class="cab-con ${esc(estadoConexion.tipo)}">${esc(estadoConexion.texto)}</span>
+        <button type="button" data-accion="refrescar">Actualizar</button><button type="button" data-accion="salir">Salir</button></div></div>`;
+    if (c.style && c.style.setProperty) c.style.setProperty('--acento', z.c);
+    const vs = el('vistas');
+    if (vs && vs.style && vs.style.setProperty) vs.style.setProperty('--acento', z.c);
   }
 
   // ---- Mando ----
@@ -1368,32 +1555,22 @@
     const pct = Math.round(r.recuperado * 100);
     const radio = 80, vuelta = 2 * Math.PI * radio;
     const dias = Panel.ventasPorDia(S.calc.ventas, 30, new Date());
-    const A = anchoVistas(), ancha = A - 34, media = A >= 672 ? Math.floor((A - 12) / 2) - 34 : ancha;
+    const A = anchoVistas(), ancha = A - 34;
     anchoPintado = A;
     const rt = Panel.ritmo(S.calc.ventas, new Date());
     const cambio = rt.semanaAntes.importe > 0 ? Math.round((rt.semana.importe / rt.semanaAntes.importe - 1) * 100) : null;
     const uds = (n) => `${n} ${n === 1 ? 'prenda' : 'prendas'}`;
-    const lista = Panel.avisos(S.calc, S.deudas, S.fichas, S.nombre, new Date(), DATOS.filasMovimientos);
-    const IR = { cuentas: 'Cuentas', reparto: 'Amigos', stock: 'Stock', pedido: 'Segundo pedido', movimientos: 'Movimientos', resumen: '' };
-    const avisosHtml = lista.length ? lista.slice(0, 8).map((a) => `<button type="button" class="${a.nivel === 'aviso' ? 'aviso-n' : a.nivel}"
-        data-ir="${a.vista}"${a.filtro ? ` data-filtro="${a.filtro}"` : ''}${a.tipo ? ` data-tipo="${a.tipo}"` : ''}>
-        <span class="ico" aria-hidden="true">${a.vista === 'cuentas' ? '€' : a.nivel === 'info' ? 'i' : '!'}</span>
-        <span>${esc(a.texto)}</span>${IR[a.vista] ? `<span class="ir">${IR[a.vista]} →</span>` : ''}</button>`).join('') +
-        (lista.length > 8 ? `<div class="mas" style="padding:4px 10px">…y ${lista.length - 8} ${lista.length - 8 === 1 ? 'aviso más' : 'avisos más'}</div>` : '')
-      : '<div class="nada">✓ Nada pendiente: nadie te debe, no hay prendas paradas ni errores.</div>';
     el('v-resumen').innerHTML = `
       <div class="mando-top">
         <div class="reactor caja" style="--i:0" data-revela="reactor">
           <div class="etq">Recuperado del pedido</div>
           <svg viewBox="0 0 200 200" role="img" aria-label="${pct} % recuperado">
             <defs><filter id="brillo"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-            <circle class="marcas" cx="100" cy="100" r="96" fill="none" stroke="rgba(53,201,238,.35)" stroke-width="3" stroke-dasharray="1.2 8.85"/>
-            <circle cx="100" cy="100" r="91" fill="none" stroke="var(--linea)" stroke-width="1"/>
-            <circle cx="100" cy="100" r="${radio}" fill="none" stroke="rgba(53,201,238,.12)" stroke-width="12"/>
-            <circle class="anillo-luz" cx="100" cy="100" r="${radio}" fill="none" stroke="var(--cian)" stroke-width="12" stroke-linecap="round"
+            <circle class="marcas" cx="100" cy="100" r="96" fill="none" stroke="rgba(245,196,81,.35)" stroke-width="3" stroke-dasharray="1.2 8.85"/>
+            <circle cx="100" cy="100" r="${radio}" fill="none" stroke="rgba(245,196,81,.14)" stroke-width="12"/>
+            <circle class="anillo-luz" cx="100" cy="100" r="${radio}" fill="none" stroke="#F5C451" stroke-width="12" stroke-linecap="round"
               stroke-dasharray="${(vuelta * r.recuperado).toFixed(1)} ${vuelta.toFixed(1)}" transform="rotate(-90 100 100)" filter="url(#brillo)"/>
-            <circle class="marcas-2" cx="100" cy="100" r="64" fill="none" stroke="rgba(53,201,238,.3)" stroke-width="1" stroke-dasharray="26 14 4 14"/>
-            <circle cx="100" cy="100" r="56" fill="rgba(53,201,238,.05)" stroke="var(--linea-2)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="56" fill="rgba(245,196,81,.06)" stroke="rgba(245,196,81,.3)" stroke-width="1"/>
             <text x="100" y="110" text-anchor="middle" class="pct" font-size="30" data-n="${pct}" data-f="pct">${pct} %</text>
           </svg>
           <div class="d">${eur(r.neto)} de ${eur(r.desembolso)}<br>${r.faltaRecuperar > 0 ? 'faltan ' + eur(r.faltaRecuperar) : 'pedido recuperado'}</div>
@@ -1401,39 +1578,30 @@
         <div class="tiles">
           <div class="tile caja bien" style="--i:1"><div class="etq">Neto para ti</div><div class="v" data-n="${r.neto}" data-f="eur">${eur(r.neto)}</div>
             <div class="d">vendido ${eur(r.ingresado)} − comisiones ${eur(r.comisiones)}</div></div>
-          <div class="tile caja ${r.teDeben > 0.005 ? 'debe' : ''}" style="--i:2"><div class="etq">Te deben tus amigos</div><div class="v" data-n="${r.teDeben}" data-f="eur">${eur(r.teDeben)}</div>
-            <div class="d">ya te han pagado ${eur(r.cobrado)}</div></div>
+          <div class="tile caja" style="--i:2"><div class="etq">Esta semana</div><div class="v" data-n="${rt.semana.importe}" data-f="eur">${eur(rt.semana.importe)}</div>
+            <div class="d">${cambio == null ? uds(rt.semana.uds) : `<span class="${cambio >= 0 ? 'sube' : 'baja'}">${cambio >= 0 ? '↑' : '↓'} ${Math.abs(cambio)} %</span> frente a los 7 días de antes`} · este mes ${eur(rt.mes.importe)}</div></div>
           <div class="tile caja" style="--i:3"><div class="etq">Si se vende lo que queda</div><div class="v" data-n="${r.beneficioSiTodo}" data-f="eur">${eur(r.beneficioSiTodo)}</div>
-            <div class="d">de beneficio, a precio de tus amigos</div></div>
-          <div class="tile caja" style="--i:2.5"><div class="etq">Disponibles</div><div class="v" data-n="${r.disponibles}">${r.disponibles}</div><div class="d">de ${r.compradas} compradas</div></div>
-          <div class="tile caja" style="--i:3.5"><div class="etq">Vendidas</div><div class="v" data-n="${r.vendidas}">${r.vendidas}</div><div class="d">${r.reservadas} reservadas</div></div>
-          <div class="tile caja" style="--i:4.5"><div class="etq">En casa de tus amigos</div><div class="v" data-n="${r.enLaCalle}">${r.enLaCalle}</div><div class="d">prendas en consigna</div></div>
+            <div class="d">de beneficio, a precio de tus vendedores</div></div>
         </div>
       </div>
-      <div class="dos-col">
-        <div>
-          <h2 class="sec">Para hoy</h2>
-          <div class="avisos caja" id="avisos" style="--i:5">${avisosHtml}</div>
-        </div>
-        <div>
-          <h2 class="sec">Ritmo de ventas</h2>
-          <div class="ritmo">
-            <div class="tile caja" style="--i:5.5"><div class="etq">Hoy</div><div class="v" data-n="${rt.hoy.importe}" data-f="eur">${eur(rt.hoy.importe)}</div><div class="d">${uds(rt.hoy.uds)}</div></div>
-            <div class="tile caja" style="--i:6"><div class="etq">Últimos 7 días</div><div class="v" data-n="${rt.semana.importe}" data-f="eur">${eur(rt.semana.importe)}</div>
-              <div class="d">${cambio == null ? uds(rt.semana.uds) : `<span class="${cambio >= 0 ? 'sube' : 'baja'}">${cambio >= 0 ? '↑' : '↓'} ${Math.abs(cambio)} %</span> frente a los 7 de antes`}</div></div>
-            <div class="tile caja" style="--i:6.5"><div class="etq">Este mes</div><div class="v" data-n="${rt.mes.importe}" data-f="eur">${eur(rt.mes.importe)}</div><div class="d">${uds(rt.mes.uds)}</div></div>
-          </div>
-        </div>
-      </div>
-      ${pintarTienda()}
-      <h2 class="sec">Estadísticas</h2>
+      <h2 class="sec">Ventas</h2>
       <div class="graficas">
-        <div class="grafica caja ancha" style="--i:7" data-revela="dias"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
-        <div class="grafica caja" style="--i:8" data-revela="canal"><h3>Por canal</h3><p class="nota">Dónde se vende más, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', media)}</div>
-        <div class="grafica caja" style="--i:8.5" data-revela="vendedor"><h3>Por vendedor</h3><p class="nota">Lo que ha vendido cada uno, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', media)}</div>
-        <div class="grafica caja ancha" style="--i:9" data-revela="stock"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus amigos y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), ancha)}</div>
+        <div class="grafica caja ancha" style="--i:6" data-revela="dias"><h3>Ventas de los últimos 30 días</h3><p class="nota">Importe cobrado cada día. Pasa por encima de una barra para ver el detalle.</p>${graficaDias(dias, ancha)}</div>
       </div>`;
     prepararRevelado();
+  }
+
+  // La sección Tienda: la analítica de la tienda de clientes y el botón para abrirla.
+  function pintarTiendaVista() {
+    el('v-tienda').innerHTML = pintarTienda();
+  }
+  // El almacén: dónde está cada prenda, por categoría, encima de la tabla de tallas.
+  let anchoStock = 0, anchoReparto = 0;
+  function pintarStockGraf() {
+    const A = anchoVistas();
+    anchoStock = A;
+    el('stock-graf').innerHTML = `<div class="graficas" style="margin-bottom:14px"><div class="grafica caja ancha"><h3>Dónde está cada prenda</h3><p class="nota">Por categoría: lo vendido, lo que tienen tus vendedores y lo que queda en tu casa.</p>${graficaStock(Panel.stockPorCategoria(S.calc.prods), A - 34)}</div>
+      <div class="grafica caja ancha"><h3>Qué se vende</h3><p class="nota">Por categoría, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.prod.categoria), 'Aún no hay ventas.', A - 34)}</div></div>`;
   }
 
   // ---- Stock ----
@@ -1466,7 +1634,11 @@
   const hace = (d) => (d == null ? '' : d === 0 ? 'hoy' : d === 1 ? 'ayer' : 'hace ' + d + ' días');
   function pintarReparto() {
     const fichas = S.fichas.filter((f) => !f.propio || f.uds || f.udsEnCasa);
-    el('v-reparto').innerHTML = '<h2 class="sr-only">Amigos</h2>' + (fichas.length ? `<div class="vendedores">${fichas.map((f, n) => {
+    anchoReparto = anchoVistas();
+    const mediaR = anchoReparto >= 672 ? Math.floor((anchoReparto - 12) / 2) - 34 : anchoReparto - 34;
+    el('v-reparto').innerHTML = '<h2 class="sr-only">Vendedores</h2>' + `<div class="graficas" style="margin-bottom:14px">
+      <div class="grafica caja"><h3>Lo que ha vendido cada uno</h3><p class="nota">Desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => nombreDe(v.vendedor)), 'Aún no hay ventas.', mediaR)}</div>
+      <div class="grafica caja"><h3>Dónde se vende</h3><p class="nota">Por canal, desde el principio.</p>${graficaBarras(Panel.ventasPor(S.calc.ventas, (v) => v.canal), 'Aún no hay ventas.', mediaR)}</div></div>` + (fichas.length ? `<div class="vendedores">${fichas.map((f, n) => {
       const debe = !f.propio && f.pendiente > 0.005;
       const chips = [
         f.propio ? '<span class="chip">tú</span>' : '',
@@ -1505,10 +1677,10 @@
           if (f.propio || !dd.pendientes.length) return '';
           return `<h4>Te debe por</h4><ul>${dd.pendientes.slice(0, 4).map((x) => `<li><span>${fechaCorta(x.venta.fecha)} · ${esc(x.venta.prod.producto)} (${esc(x.venta.prod.talla)})${x.venta.cantidad > 1 ? ' ×' + x.venta.cantidad : ''}</span><b style="color:var(--mal)">${eur(x.pendiente)}</b></li>`).join('')}</ul>
             ${dd.pendientes.length > 4 ? `<div class="mas">…y ${dd.pendientes.length - 4} más.</div>` : ''}
-            <button class="btn mini" type="button" data-ir="cuentas" style="margin-top:8px">Ver todo en Cuentas →</button>`;
+            <button class="btn mini" type="button" data-ir="cuentas" style="margin-top:8px">Ver todo en Cobros →</button>`;
         })()}
         ${f.enCasa.length ? `<h4>En su casa</h4><ul>${f.enCasa.map((x) => `<li><span>${esc(x.prod.producto)} — ${esc(x.prod.modelo)} (${esc(x.prod.talla)})${x.n > 1 ? ' ×' + x.n : ''}</span>
-          <span class="${x.dias != null && x.dias >= Panel.DIAS_PARADA ? 'parada' : 'suave'}" title="${x.desde ? 'Desde el ' + esc(x.desde) : ''}">${x.dias == null ? '' : x.dias === 0 ? 'hoy' : x.dias + ' d'}</span></li>`).join('')}</ul>` : ''}
+          <span class="${x.dias != null && x.dias >= Panel.DIAS_PARADA ? 'parada' : 'suave'}" title="${x.desde ? 'Desde el ' + esc(x.desde) : ''}">${x.dias == null ? '' : x.dias <= 0 ? 'hoy' : x.dias + ' d'}</span></li>`).join('')}</ul>` : ''}
         ${f.ventas.length ? `<h4>Últimas ventas</h4><ul>${f.ventas.slice(0, 4).map((v) => `<li><span>${fechaCorta(v.fecha)} · ${esc(v.prod.producto)} (${esc(v.prod.talla)})${v.cantidad > 1 ? ' ×' + v.cantidad : ''}</span><b>${v.sinPrecio ? 'sin precio' : eur(v.importe)}</b></li>`).join('')}</ul>` : ''}
         ${acciones ? `<div class="acciones">${acciones}</div>` : ''}
       </div>`;
@@ -1701,7 +1873,7 @@
         : dd.aFavor > 0.004 ? `<span class="chip">+${eur(dd.aFavor)} a su favor</span>` : '<span class="chip bien">al día</span>';
       const lineas = dd.pendientes.map((x) => {   // una por venta, la más antigua primero
         const d = diasAtras(x.venta.fecha);
-        return `<li><span class="cuando${d != null && d >= 14 ? ' vieja' : ''}">${fechaCorta(x.venta.fecha)}<small>${d == null ? '' : d === 0 ? 'hoy' : 'hace ' + d + ' d'}</small></span>
+        return `<li><span class="cuando${d != null && d >= 14 ? ' vieja' : ''}">${fechaCorta(x.venta.fecha)}<small>${d == null ? '' : d <= 0 ? 'hoy' : 'hace ' + d + ' d'}</small></span>
           <span class="que">${esc(prendaDe(x.venta.prod))}${x.venta.cantidad > 1 ? ' ×' + x.venta.cantidad : ''}
             <small>vendida a ${eur(x.venta.importe)}${x.pagado > 0.004 ? ` · ya te pagó ${eur(x.pagado)} de ${eur(x.tuParte)}` : ` · te tocan ${eur(x.tuParte)}`}</small></span>
           <b class="falta">${eur(x.pendiente)}</b>
@@ -1890,7 +2062,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
       const r = await google({ cuerpo: { accion: 'asistente', clave: CLAVE, idPeticion: Panel.idPeticion(), mensajes: historial() } });
       if (r.ok) {
         CHAT.push({ rol: 'asistente', texto: r.respuesta, propuestas: (r.propuestas || []).map((p) => ({ ...p, estado: 'pendiente' })) });
-        if (!consolaAbierta) el('j-nuevo').hidden = false;   // contestó con el chat cerrado: punto en la bolita
+        if (!consolaAbierta) { el('j-nuevo').hidden = false; clase(document.body, 'jarvis-nuevo', true); }   // contestó con el chat cerrado: punto en la bolita
         if (DATOS && DATOS.asistente) { DATOS.asistente.gastoHoy = r.gastoHoy; DATOS.asistente.preguntasHoy = (DATOS.asistente.preguntasHoy || 0) + 1; pintarGasto(DATOS.asistente); }
         hablar(r.respuesta);
       } else {
@@ -1953,7 +2125,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     el('consola').className = 'consola caja' + (si ? ' abierta' : '');
     el('j-abrir').setAttribute('aria-expanded', String(!!si));
     el('j-abrir').setAttribute('aria-label', si ? 'Cerrar JARVIS' : 'Abrir JARVIS');
-    if (si) { el('j-nuevo').hidden = true; el('j-hola').hidden = true; }
+    if (si) { el('j-nuevo').hidden = true; el('j-hola').hidden = true; clase(document.body, 'jarvis-nuevo', false); }
     pintarOrbe();
     if (si && el('j-input').focus) setTimeout(() => el('j-input').focus(), 240);
   }
@@ -1977,7 +2149,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
 
   // ---- Pintar, navegar, entrar y salir ----
   function pintarTodo() {
-    pintarMapa(); pintarResumen(); pintarStock(); pintarReparto(); pintarCuentas(); pintarRecuento(); pintarPedido();
+    pintarMapa(); pintarResumen(); pintarTiendaVista(); pintarStockGraf(); pintarStock(); pintarReparto(); pintarCuentas(); pintarRecuento(); pintarPedido();
     const tipos = [...new Set((DATOS.movimientos || []).map((m) => String(m.tipo).toUpperCase()).filter(Boolean))];
     const mt = el('mov-tipo').value, mv = el('mov-vend').value;
     el('mov-tipo').innerHTML = '<option value="">Todos los tipos</option>' + tipos.map((x) => `<option>${esc(x)}</option>`).join('');
@@ -1988,6 +2160,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     opcionesFormulario();
     if (DATOS.hoja) { el('hoja-abrir').href = DATOS.hoja; el('hoja-abrir').hidden = false; }
     pintarGasto(DATOS.asistente);
+    if (vistaActual && vistaActual !== 'mapa') pintarCabeza(vistaActual);
     // Números en las pestañas: a cuántos amigos hay que cobrar y cuántas prendas llevan paradas.
     const debiendo = S.cuentas.filter((c) => !c.propio && deudaDe(c.vendedor).debe > 0.004).length;
     const paradas = S.fichas.reduce((a, f) => a + f.paradas, 0);
@@ -2013,9 +2186,12 @@ te lo preparo y tú lo confirmas.</div>` : '';
     if (VISTAS.indexOf(v) < 0) v = 'mapa';
     document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
-    // El mapa ocupa la página entera (sin cabecera); en las demás pantallas, «‹ Mapa» para volver.
+    // El mapa ocupa la página entera; cada sección lleva arriba su planeta, sus cifras y «‹ Mapa».
     clase(document.body, 'en-mapa', v === 'mapa');
-    el('volver-mapa').hidden = v === 'mapa';
+    el('cabeza').hidden = v === 'mapa';
+    pintarCabeza(v);
+    if (S.calc && v === 'stock' && anchoVistas() !== anchoStock) pintarStockGraf();
+    if (S.calc && v === 'reparto' && anchoVistas() !== anchoReparto) pintarReparto();
     if (v === 'webs' && !el('web-marco').src) verWeb('../');
     // Las gráficas se miden por el hueco real: si Mando estaba oculto la primera vez que se
     // pintaron (se recuerda otra pestaña de una visita anterior), medían mal y el texto salía
@@ -2131,6 +2307,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
   }, { passive: true });
   function mostrarPanel(si) {
     el('entrar').hidden = si;
+    clase(document.body, 'dentro', si);   // dentro del panel no hay cabecera: se navega por el mapa
     el('pestanas').hidden = !si;
     el('conexion').hidden = !si;
     el('rejilla').hidden = !si;
@@ -2140,7 +2317,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
       verVista(hashVista() || pref('panel_vista') || 'mapa');
       pintarChat();
       // La primera vez en esta pestaña, la bolita se presenta un momento.
-      if (!recordar('jarvis_hola')) {
+      if (vistaActual !== 'mapa' && !recordar('jarvis_hola')) {   // en el mapa, JARVIS es el sol: el saludo de la bolita no se gasta ahí
         guardar('jarvis_hola', '1');
         el('j-hola').hidden = false;
         setTimeout(() => { el('j-hola').hidden = true; }, 7000);
@@ -2240,8 +2417,8 @@ te lo preparo y tú lo confirmas.</div>` : '';
     catch (err) { aviso('Su enlace de la tienda: ' + b.dataset.enlace); }
     setTimeout(() => { b.textContent = 'Copiar su enlace de la tienda'; }, 2000);
   });
-  // Los enlaces marcados de la tienda (Mando → La tienda): se copian y el botón vuelve a su texto.
-  el('v-resumen').addEventListener('click', async (e) => {
+  // Los enlaces marcados de la tienda (sección Tienda): se copian y el botón vuelve a su texto.
+  el('v-tienda').addEventListener('click', async (e) => {
     const b = e.target.closest && e.target.closest('[data-copiar-enlace]');
     if (!b) return;
     const texto = b.textContent;
@@ -2279,11 +2456,21 @@ te lo preparo y tú lo confirmas.</div>` : '';
   });
   // Los planetas y satélites del mapa se pueden usar con el teclado (Intro o espacio).
   el('v-mapa').addEventListener('keydown', (e) => {
-    const x = e.target && e.target.getAttribute && e.target.getAttribute('role') === 'link' && e.target;
+    const x = e.target && e.target.getAttribute && /^(link|button)$/.test(e.target.getAttribute('role') || '') && e.target;
     if (x && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); if (x.dispatchEvent) x.dispatchEvent(new window.MouseEvent('click', { bubbles: true })); }
   });
+  // Al pasar por encima de un planeta (o llegar con el teclado) salen sus satélites; al salir, se
+  // quedan un momento para poder tocarlos.
+  el('v-mapa').addEventListener('mouseover', (e) => { const z = e.target.closest && e.target.closest('.mp-zona'); if (z) activarZona(z); });
+  el('v-mapa').addEventListener('mouseout', (e) => {
+    const z = e.target.closest && e.target.closest('.mp-zona');
+    if (!z || (e.relatedTarget && z.contains && z.contains(e.relatedTarget))) return;
+    clearTimeout(apagarZona);
+    apagarZona = setTimeout(() => activarZona(null), 700);
+  });
+  el('v-mapa').addEventListener('focusin', (e) => { const z = e.target.closest && e.target.closest('.mp-zona'); activarZona(z || null); });
   // Detalle de las gráficas al pasar por encima.
-  el('v-resumen').addEventListener('mousemove', (e) => {
+  el('vistas').addEventListener('mousemove', (e) => {
     if (activa) return;   // en el móvil manda el toque (ver más abajo)
     const t = e.target.closest && e.target.closest('[data-tip]');
     const tip = el('tip');
@@ -2293,7 +2480,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     tip.style.left = Math.min(e.clientX + 14, (window.innerWidth || 800) - 240) + 'px';
     tip.style.top = (e.clientY + 14) + 'px';
   });
-  el('v-resumen').addEventListener('mouseleave', () => { if (!activa) el('tip').hidden = true; });
+  el('vistas').addEventListener('mouseleave', () => { if (!activa) el('tip').hidden = true; });
   // En el móvil no hay «pasar por encima»: tocar una barra la enciende y enseña su detalle;
   // tocarla otra vez, o fuera, lo quita. La leyenda de «Dónde está cada prenda» aísla una serie.
   let activa = null;
@@ -2307,7 +2494,7 @@ te lo preparo y tú lo confirmas.</div>` : '';
     activa = null;
     el('tip').hidden = true;
   }
-  el('v-resumen').addEventListener('click', (e) => {
+  el('vistas').addEventListener('click', (e) => {
     const ley = e.target.closest && e.target.closest('.ley');
     if (ley) {
       const g = ley.closest('.grafica'), s = ley.getAttribute('data-s');
@@ -2334,7 +2521,12 @@ te lo preparo y tú lo confirmas.</div>` : '';
   let redibujo = 0;
   if (window.addEventListener) window.addEventListener('resize', () => {
     clearTimeout(redibujo);
-    redibujo = setTimeout(() => { if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen(); marcarDesbordes(); moverLuz(); }, 200);
+    redibujo = setTimeout(() => {
+      if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen();
+      if (S.calc && !el('v-stock').hidden && anchoVistas() !== anchoStock) pintarStockGraf();
+      if (S.calc && !el('v-reparto').hidden && anchoVistas() !== anchoReparto) pintarReparto();
+      marcarDesbordes(); moverLuz();
+    }, 200);
   });
   // Cuando llegan las letras de verdad las pestañas cambian de ancho: la luz se recoloca.
   try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moverLuz()); } catch (e) { /* nada */ }
