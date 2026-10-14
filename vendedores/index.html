@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-HQnidxv61TWx4D++HgdNKWTWyY9yBMqrnf8UwqyBV1c='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-zx4AKUakDS2PsJujcSL1/nWiaorIoNmr+4t3TleY1Lg='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8E9E3">
@@ -426,8 +426,14 @@
   // ordenador la lista no está, y se prueba img/<codigo>.jpg como siempre.
   /* ===== FOTOS DEL CATÁLOGO · las pone `npm run web` ===== */
   const FOTOS_CATALOGO = ["CALC-RL.jpg","CARD-MIX.jpg","CHAQ-RL.jpg","GORE-ARC.jpg","JER-LAC.jpg","JER-RL.jpg","PERF-BDC.jpg","PERF-LOE.jpg","PERF-TF.jpg","POLO-LAC.jpg","POLO-RL.jpg","ROPI-CK.jpg"];
+  // Tus fotos (las de tu carpeta de Drive, con fondo blanco): las mismas que la tienda, por código de la hoja
+  // ({"POLO-RL": ["ZB-004-1", "ZB-004-2"]}). Están en la tienda (../fotos/), así que no se repiten. Mandan sobre
+  // las del proveedor.
+  const FOTOS_PROPIAS = {};
   /* ===== FIN DE LAS FOTOS DEL CATÁLOGO ===== */
   const hayFoto = (archivo) => !Array.isArray(FOTOS_CATALOGO) || FOTOS_CATALOGO.indexOf(archivo) >= 0;
+  const propias = (cod) => (cod && Object.prototype.hasOwnProperty.call(FOTOS_PROPIAS, cod) && Array.isArray(FOTOS_PROPIAS[cod])
+    ? FOTOS_PROPIAS[cod].filter((n) => /^ZB-\d{3}-\d{1,2}$/.test(n)) : []);
 
   // ---- La última visita: para enseñar algo al momento ----
   // Google tarda unos segundos. Mientras, se enseña el stock de la última vez que se abrió el
@@ -572,7 +578,10 @@
       // FOTOS_CATALOGO). Si ese archivo no existe, queda el hueco "sin foto" (ver fotoRota). Para
       // completar una ficha basta con guardar la foto en web/img/ con el nombre del codigo
       // (ej. BOTA-NIK.jpg): en tu ordenador sale al recargar; en la web, al publicar.
-      const src = g.imagen || (g.cod && hayFoto(`${g.cod}.jpg`) ? `img/${g.cod}.jpg` : '');
+      // Primero, tus fotos (las de la tienda: ../fotos/ZB-004-1-p.webp).
+      const mias = propias(g.cod);
+      const src = mias.length ? `../fotos/${mias[0]}-p.webp`
+        : g.imagen || (g.cod && hayFoto(`${g.cod}.jpg`) ? `img/${g.cod}.jpg` : '');
       const foto = src
         ? `<img src="${esc(src)}" data-cod="${esc(g.cod)}" alt="${esc(g.producto)} ${esc(g.modelo)}" loading="lazy" data-sinfoto>`
         : sinFoto(g.cod);
@@ -843,9 +852,9 @@
       });
     });
 
-    // Galería a pantalla completa. La portada es COD.jpg; las demás fotos del mismo
-    // producto son COD-2.jpg, COD-3.jpg… Se buscan al abrir (solo del producto que miras)
-    // y se pasan con flechas, teclado o deslizando. Suelta más fotos y aparecen solas.
+    // Galería a pantalla completa. Con tus fotos, todas las de la prenda (en grande). Si no, la portada es
+    // COD.jpg y las demás del mismo producto son COD-2.jpg, COD-3.jpg… Se buscan al abrir (solo del producto
+    // que miras) y se pasan con flechas, teclado o deslizando. Suelta más fotos y aparecen solas.
     let galeria = { fotos: [], idx: 0 };
     const renderGaleria = () => {
       const { fotos, idx } = galeria;
@@ -871,10 +880,11 @@
     };
     el('grid').addEventListener('click', (e) => {
       if (e.target.tagName !== 'IMG') return;
-      galeria = { fotos: [e.target.src], idx: 0 };
+      const mias = propias(e.target.dataset.cod);
+      galeria = { fotos: mias.length ? mias.map((n) => `../fotos/${n}.webp`) : [e.target.src], idx: 0 };
       renderGaleria();
       el('lightbox').hidden = false;
-      buscarMas(e.target.dataset.cod, 2);
+      if (!mias.length) buscarMas(e.target.dataset.cod, 2);
     });
     const cerrarLb = () => { el('lightbox').hidden = true; };
     el('lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') cerrarLb(); });

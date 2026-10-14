@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-MZTvZohmHWTGzu78k6v9zG36UjYhLz7+olb9k5BS7Hw=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ND/kX1w6Pk1oTmf9D4OWOA6vbdOqDLuGJYY4u8qRP90=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>ZUBI · Ropa de calle en Madrid · Buen precio, stock limitado</title>
 <meta name="description" content="Fútbol retro, punto, sudaderas, chaquetas y zapatillas en Madrid. Stock real por talla, pedido por WhatsApp en un minuto, envío a toda España en 24-48 h y recogida en mano gratis.">
@@ -208,6 +208,8 @@ a{color:var(--azul); text-underline-offset:3px; text-decoration-thickness:1px}
 @media (hover:hover) and (pointer:fine){.card:hover .shot svg,.card:hover .shot img{transform:scale(1.04)}}
 .shot .badge,.shot .ref{z-index:1}
 .shot:has(img) .ref{background:var(--paper); padding:1px 6px}
+/* Las fotos llevan fondo blanco (scripts/fondo-blanco.js): su recuadro, también blanco, también en el tema oscuro. */
+.shot:has(img),.fotos figure:has(img),.li .mini:has(img){background:#FFFFFF}
 .badge{position:absolute; top:12px; left:12px; font-size:10px; letter-spacing:.16em; text-transform:uppercase; background:var(--ink); color:var(--paper); padding:4px 9px; font-weight:500}
 .badge.low{background:var(--paper); color:var(--ink); border:1px solid var(--ink)}
 .badge.gone{background:var(--ink-3); color:var(--paper)}
@@ -709,7 +711,7 @@ const STOCK = {"fecha":"2026-10-14","fuente":"Google","disponible":{"MUN-ESP-S":
 /* ===== FIN DE LA FOTO DE STOCK ===== */
 /* ===== FOTOS PROPIAS · las pone `npm run web` con lo que haya en tienda/fotos/ (ZB-001.jpg, ZB-001-2.jpg…):
    {"ZB-001": ["ZB-001-1", "ZB-001-2"]} → fotos/ZB-001-1.webp (grande) y fotos/ZB-001-1-p.webp (pequeña) ===== */
-const FOTOS = {};
+const FOTOS = {"ZB-004":["ZB-004-1"],"ZB-005":["ZB-005-1"],"ZB-008":["ZB-008-1"],"ZB-017":["ZB-017-1"],"ZB-018":["ZB-018-1"],"ZB-030":["ZB-030-1"]};
 /* ===== FIN DE LAS FOTOS ===== */
 const IG_PLACEHOLDER = "zubi.madrid", MAIL_PLACEHOLDER = "hola@zubi.es";
 
