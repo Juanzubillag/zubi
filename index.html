@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-BBTbIV1Rm6xlUqwbr0tkm1GsRXlEw3rW1fAohwWAcdI=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6gMoi/AcrqL6HNAB7RRzLLgrvcwpH2AAJlW6CgP2p90=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>ZUBI · Ropa de calle en Madrid a precio de mercadillo</title>
 <meta name="description" content="Fútbol retro, punto, sudaderas, chaquetas y zapatillas en Madrid. Stock real por talla, pedido por WhatsApp en un minuto, envío a toda España en 24-48 h y recogida en mano gratis.">
@@ -299,15 +299,18 @@ a.shot{cursor:pointer}
 body.fopen{overflow:hidden}
 
 /* ---------- aviso de cookies ---------- */
-/* Abajo y fijo (no empuja nada al cargar); «Aceptar» y «No, gracias» igual de fáciles, como pide la ley. */
-.cookies{position:fixed; left:16px; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:120; max-width:560px; margin-inline:auto; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:6px; box-shadow:var(--shadow); padding:16px 16px 14px; font-size:13.5px; line-height:1.5}
+/* Una barra fina abajo, de lado a lado (14-10-2026; antes era una tarjeta que tapaba un tercio del móvil).
+   Fija: no empuja nada al cargar. «Aceptar» y «No, gracias» igual de fáciles, como pide la ley. */
+.cookies{position:fixed; left:0; right:0; bottom:0; z-index:120; display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; background:var(--surface); color:var(--ink); border-top:1px solid var(--line-2); box-shadow:0 -8px 24px -16px rgba(0,0,0,.35); padding:10px max(16px, calc((100% - 1148px) / 2)) calc(10px + env(safe-area-inset-bottom,0px)); font-size:13px; line-height:1.4}
 .cookies[hidden]{display:none}
 .cookies b{font-weight:700}
-.cookies details{margin-top:8px; color:var(--ink-2); font-size:12.5px}
+.ck-texto{flex:1 1 360px; min-width:0}
+.cookies details{order:3; flex-basis:100%; color:var(--ink-2); font-size:12.5px}
 .cookies summary{cursor:pointer; text-decoration:underline; text-decoration-color:var(--line-2); text-underline-offset:3px; width:max-content}
 .cookies details p{margin-top:6px}
-.ck-botones{display:flex; gap:8px; margin-top:12px}
-.ck-botones .btn{flex:1; height:40px; font-size:13.5px}
+.ck-botones{display:flex; gap:8px; flex:0 0 auto}
+.ck-botones .btn{height:34px; padding:0 16px; font-size:13px; white-space:nowrap}
+@media (max-width:620px){ .ck-texto{flex-basis:100%} .ck-botones{flex:1 1 100%} .ck-botones .btn{flex:1} }
 
 /* ---------- cart drawer ---------- */
 .scrim{position:fixed; inset:0; background:rgba(10,12,14,.42); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); z-index:90; opacity:0; pointer-events:none; transition:opacity .28s var(--ease)}
@@ -666,8 +669,9 @@ body::after{
 </div>
 
 <div class="cookies" id="cookies" role="region" aria-label="Aviso de cookies" hidden>
-  <p><b>¿Nos dejas usar cookies?</b> <span id="ckTexto">Sirven para saber cómo se usa la tienda y mejorarla: si vuelves y qué prendas miras.</span> No sabemos quién eres. Puedes cambiarlo cuando quieras en «Cookies», abajo del todo.</p>
+  <p class="ck-texto"><b>¿Cookies?</b> <span id="ckTexto">Para saber si vuelves y qué prendas miras.</span> No sabemos quién eres.</p>
   <details><summary>Más información</summary>
+    <p>Puedes cambiarlo cuando quieras en «Cookies», abajo del todo.</p>
     <p><b>De la tienda (ZUBI):</b> en tu navegador, durante un año, cuándo viniste la primera vez, cuántas visitas llevas y qué prendas has mirado. Solo nos llega un resumen («segunda visita»), nunca quién eres.</p>
     <p id="ckGa" hidden><b>Google Analytics (de Google):</b> sus cookies <code>_ga</code> y <code>_ga_…</code>, hasta 2 años, para contar visitas, de dónde llegan y qué se mira. Los datos los trata Google.</p>
     <p>Si dices que no, la tienda funciona igual y solo contamos, sin cookies, cuántas visitas hay cada día.</p>
@@ -1254,7 +1258,7 @@ function borrarCookies(){
 const avisoCookies = document.getElementById("cookies");
 function mostrarAvisoCookies(){
   document.getElementById("ckGa").hidden = !gaId();
-  if (gaId()) document.getElementById("ckTexto").textContent = "Sirven para saber cómo se usa la tienda y mejorarla: si vuelves, qué prendas miras y, con Google Analytics, de dónde llegas.";
+  if (gaId()) document.getElementById("ckTexto").textContent = "Para saber si vuelves, qué prendas miras y, con Google Analytics, de dónde llegas.";
   avisoCookies.hidden = false;
 }
 avisoCookies.addEventListener("click", e => {
@@ -1392,9 +1396,13 @@ async function send(how){
 // sirve para mandarla por WhatsApp, y el botón «atrás» del móvil la cierra.
 const ficha = document.getElementById("ficha");
 let fichaRef = null, fichaDesdeTienda = false, focoFicha = null;
+// También con el código de la hoja (…/zubi/#p=MUN-ESP): así lo comparte el catálogo de vendedores.
 const refDeLaDireccion = () => {
-  const m = /^#p=(ZB-\d{3})$/i.exec(location.hash), r = m && m[1].toUpperCase();
-  return r && byRef(r) ? r : null;
+  const m = /^#p=([A-Z0-9-]{2,20})$/i.exec(location.hash), r = m && m[1].toUpperCase();
+  if (!r) return null;
+  if (byRef(r)) return r;
+  const porCod = CATALOGO.find(p => p.cod === r);
+  return porCod ? porCod.r : null;
 };
 const flecha = (d) => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>';
 function pintarGaleria(p){

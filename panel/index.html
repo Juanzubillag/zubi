@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XhN/v621tTBYKN8JkjnyaPvSFM3pGxoY1t81bp9mdhY='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-heItC3MNbqpzNaLlOLnqVaqAi25vTe3eE57htWl5cxE='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>JARVIS — China al por mayor</title>
@@ -42,15 +42,9 @@
   ::selection { background: rgba(53, 201, 238, .34); color: #fff; }
   input, textarea { caret-color: var(--cian); }
   ::placeholder { color: #6f8ba1; opacity: 1; }
-  body { background: transparent; }   /* el fondo va en html: así la cuadrícula (z-index -1) se ve */
+  body { background: transparent; }   /* el fondo va en html: así la galaxia (z-index -1) se ve */
   body { margin: 0; color: var(--tinta); font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-text-size-adjust: 100%; min-height: 100vh; }
-  .fondo { position: fixed; inset: 0; pointer-events: none; z-index: -1;
-    background:
-      radial-gradient(1200px 600px at 75% -10%, rgba(53, 201, 238, .10), transparent 60%),
-      linear-gradient(var(--linea) 1px, transparent 1px) 0 0 / 44px 44px,
-      linear-gradient(90deg, var(--linea) 1px, transparent 1px) 0 0 / 44px 44px;
-    opacity: .55; mask-image: linear-gradient(#000, rgba(0,0,0,.25)); }
   .wrap { position: relative; max-width: 1440px; margin: 0 auto; padding-inline: 16px; }
   h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
@@ -94,26 +88,13 @@
     .btn.wa:hover { background: #16a34a; border-color: #16a34a; box-shadow: 0 0 20px -6px rgba(34, 197, 94, .7); }
   }
   .btn:disabled { opacity: .5; cursor: default; }
-  nav { position: relative; display: flex; gap: 2px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
-  nav::-webkit-scrollbar { display: none; }
-  nav button { display: inline-flex; align-items: center; flex: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; color: var(--suave);
-    cursor: pointer; white-space: nowrap; font-family: var(--hud); font-size: 14px; letter-spacing: .04em;
-    transition: color .18s ease, text-shadow .25s ease; -webkit-tap-highlight-color: transparent; }
-  @media (hover: hover) and (pointer: fine) { nav button:hover { color: var(--tinta); } }
-  nav button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--cian); text-shadow: 0 0 12px rgba(53,201,238,.5); }
-  /* La luz bajo la pestaña activa se desliza de una a otra (la pone moverLuz() en JS; sin JS,
-     queda el borde de abajo de siempre). */
-  .nav-luz { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; border-radius: 2px; pointer-events: none;
-    background: linear-gradient(90deg, transparent, var(--cian) 18%, #bff3ff 50%, var(--cian) 82%, transparent);
-    box-shadow: 0 0 12px var(--cian), 0 -4px 14px -2px rgba(53, 201, 238, .55); opacity: 0; }
-  nav.con-luz .nav-luz { opacity: 1; transition: transform .34s var(--ease-out), width .34s var(--ease-out); }
-  nav.con-luz button[aria-selected="true"] { border-bottom-color: transparent; }
 
 
   /* ---- La galaxia: el fondo de todo el panel (también dentro de cada sección) ---- */
   html { background: #080B24; }
-  .galaxia { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(120% 90% at 50% 40%, #121A46 0%, #0A0D2C 55%, #070920 100%); }
-  .galaxia svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* Una imagen ya dibujada (antes, filtros de ruido que el navegador recalculaba al moverse): mismo aspecto, mucho menos trabajo. */
+  .galaxia { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: url(galaxia.webp) center / cover no-repeat, radial-gradient(120% 90% at 50% 40%, #121A46 0%, #0A0D2C 55%, #070920 100%); }
   .tw-a { animation: mp-tw 4s ease-in-out infinite; } .tw-b { animation: mp-tw 6.5s ease-in-out infinite; }
   /* Las tarjetas son de cristal: se ve la galaxia detrás. */
   body .caja { background: linear-gradient(180deg, rgba(26, 32, 78, .62), rgba(12, 16, 44, .72)); border-color: rgba(150, 180, 255, .18);
@@ -122,7 +103,6 @@
   h2.sec { color: #B9C8F0; }
 
   /* ---- Sin pestañas ni cabecera: se navega tocando los planetas ---- */
-  nav#pestanas { display: none !important; }
   body.dentro header.hud { display: none; }
   body.en-mapa main.wrap { max-width: none; padding: 0; }
   body.en-mapa #j-abrir, body.en-mapa #j-hola { display: none !important; }   /* en el mapa, JARVIS es el sol */
@@ -495,32 +475,6 @@
   .ped-cab select { padding: 4px 8px; border: 1px solid var(--linea-2); border-radius: 8px; background: var(--panel); }
 
   /* ---- pestañas con número (a quién cobrar, prendas paradas) ---- */
-  .insignia { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 6px; border-radius: 999px; font-size: 11px;
-    line-height: 18px; text-align: center; background: rgba(255, 138, 128, .16); color: var(--mal); font-weight: 700;
-    font-variant-numeric: tabular-nums; animation: pop .4s var(--ease-out) both; }
-  @keyframes pop { from { opacity: 0; transform: scale(.6); } }
-  .insignia.aviso { background: rgba(240, 180, 90, .15); color: var(--aviso); }
-
-  /* ---- mando: para hoy y ritmo ---- */
-  .dos-col { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px; align-items: start; }
-  @media (max-width: 900px) { .dos-col { grid-template-columns: minmax(0, 1fr); } }
-  .avisos { padding: 8px 6px; }
-  .avisos button { display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left; background: none; border: 0;
-    border-radius: 8px; padding: 9px 10px; cursor: pointer; font-size: 14.5px; line-height: 1.35;
-    transition: background-color .15s ease, transform .16s var(--ease-out); -webkit-tap-highlight-color: transparent; }
-  .avisos button:active { transform: scale(.985); }
-  .avisos .ir { transition: color .15s ease, transform .2s var(--ease-out); }
-  @media (hover: hover) and (pointer: fine) {
-    .avisos button:hover { background: rgba(53, 201, 238, .07); }
-    .avisos button:hover .ir { color: var(--cian); transform: translateX(3px); }
-  }
-  .avisos .ico { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800;
-    font-family: var(--hud); margin-top: -1px; }
-  .avisos .mal .ico { background: rgba(255, 138, 128, .16); color: var(--mal); }
-  .avisos .aviso-n .ico { background: rgba(240, 180, 90, .16); color: var(--aviso); }
-  .avisos .info .ico { background: rgba(53, 201, 238, .13); color: var(--cian); }
-  .avisos .ir { margin-left: auto; color: var(--tenue); font-family: var(--hud); font-size: 12.5px; white-space: nowrap; padding-left: 8px; }
-  .avisos .nada { color: var(--bien); padding: 10px; font-size: 14.5px; }
   .ritmo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   @media (max-width: 480px) { .ritmo { grid-template-columns: minmax(0, 1fr); } }
   .embudo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
@@ -553,7 +507,7 @@
   .btn.mini { padding: 3px 9px; font-size: 12.5px; }
   .mas { color: var(--suave); font-size: 13px; padding-top: 6px; }
   .mas-cobros summary { cursor: pointer; color: var(--cian); font-family: var(--hud); font-size: 13px; padding: 8px 0 2px; }
-  @media (max-width: 480px) { .avisos .ir { display: none; } .sin-pagar li { grid-template-columns: 58px minmax(0, 1fr) auto; } .sin-pagar li .btn { grid-column: 2 / -1; justify-self: start; } }
+  @media (max-width: 480px) { .sin-pagar li { grid-template-columns: 58px minmax(0, 1fr) auto; } .sin-pagar li .btn { grid-column: 2 / -1; justify-self: start; } }
 
   /* ---- apuntar ---- */
   .form { padding: 18px; display: grid; gap: 14px; max-width: 660px; }
@@ -687,7 +641,7 @@
   @keyframes aviso-entra { from { opacity: 0; transform: translateY(-6px); } }
 
   /* ---- ARRANQUE: la primera vez tras la clave, el sistema se enciende ----
-     Solo mientras #pestanas y la vista tienen .arranque (lo quita arrancar() al acabar): el
+     Solo mientras la vista tiene .arranque (lo quita arrancar() al acabar): el
      panel se repinta cada minuto y nada de esto debe repetirse. */
   .barrido { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
   .barrido::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 140px;
@@ -698,7 +652,6 @@
     animation: destello 1s ease-out forwards; }
   @keyframes barre { from { transform: translateY(-150px); } to { transform: translateY(calc(100vh + 20px)); } }
   @keyframes destello { from { opacity: 1; } to { opacity: 0; } }
-  nav.arranque button { animation: entra-tab .5s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 40ms + 80ms); }
   @keyframes entra-tab { from { opacity: 0; transform: translateY(-6px); filter: blur(4px); } }
   .arranque .caja { animation: entra .75s var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 55ms + 160ms); }
   .arranque h2.sec { animation: aparece-o .6s ease both .5s; }
@@ -759,7 +712,7 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
       scroll-behavior: auto !important; }
-    .btn:active:not(:disabled), .orbe:active, .orbe:hover, .avisos button:active, .j-sug button:active { transform: none; }
+    .btn:active:not(:disabled), .orbe:active, .orbe:hover, .j-sug button:active { transform: none; }
     .consola, .consola.abierta { transform: none !important; filter: none !important; }
     .vistas > section:not([hidden]), .aviso, .ok-msg, .burbuja.nueva { animation: aparece-o .2s ease !important; }
     .girando, .entrar.conectando .rl-nucleo, .ondas i, .conexion.cargando .punto { animation: pulso 1.4s ease-in-out infinite !important; }
@@ -769,37 +722,8 @@
 </style>
 </head>
 <body>
-<!-- La galaxia del fondo, fija detrás de todo el panel: nebulosas hechas con ruido y estrellas. -->
-<div class="galaxia" aria-hidden="true">
-  <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <filter id="gx-nA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0034 .005" numOctaves="5" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .3  0 0 0 0 .98  2.1 0 0 0 -.72"/></filter>
-      <filter id="gx-nB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .0036" numOctaves="5" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 .12  0 0 0 0 .5  0 0 0 0 .98  2.2 0 0 0 -.8"/></filter>
-      <filter id="gx-nC" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".006 .005" numOctaves="4" seed="23"/><feColorMatrix type="matrix" values="0 0 0 0 .98  0 0 0 0 .3  0 0 0 0 .68  2.2 0 0 0 -.86"/></filter>
-      <filter id="gx-nD" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".005 .004" numOctaves="5" seed="41"/><feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .75  0 0 0 0 .9  2 0 0 0 -.85"/></filter>
-      <filter id="gx-eA" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".42" numOctaves="1" seed="3"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  16 0 0 0 -11.9"/></filter>
-      <filter id="gx-eB" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .8  0 0 0 0 .88  0 0 0 0 1  18 0 0 0 -13.6"/></filter>
-      <radialGradient id="gx-m1" cx="14%" cy="22%" r="58%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-      <radialGradient id="gx-m2" cx="50%" cy="52%" r="55%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-      <radialGradient id="gx-m3" cx="86%" cy="16%" r="44%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-      <radialGradient id="gx-m4" cx="78%" cy="88%" r="46%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-      <mask id="gx-k1"><rect width="1600" height="900" fill="url(#gx-m1)"/></mask><mask id="gx-k2"><rect width="1600" height="900" fill="url(#gx-m2)"/></mask>
-      <mask id="gx-k3"><rect width="1600" height="900" fill="url(#gx-m3)"/></mask><mask id="gx-k4"><rect width="1600" height="900" fill="url(#gx-m4)"/></mask>
-      <radialGradient id="gx-flare"><stop offset="0" stop-color="#fff"/><stop offset=".15" stop-color="#CFE0FF" stop-opacity=".8"/><stop offset="1" stop-color="#7FA8FF" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" filter="url(#gx-nA)" mask="url(#gx-k1)"/>
-    <rect width="1600" height="900" filter="url(#gx-nB)" mask="url(#gx-k2)" opacity=".85"/>
-    <rect width="1600" height="900" filter="url(#gx-nC)" mask="url(#gx-k3)" opacity=".8"/>
-    <rect width="1600" height="900" filter="url(#gx-nD)" mask="url(#gx-k4)" opacity=".75"/>
-    <rect width="1600" height="900" filter="url(#gx-eB)" opacity=".75"/>
-    <rect width="1600" height="900" filter="url(#gx-eA)" opacity=".95"/>
-    <g class="tw-a"><circle cx="520" cy="300" r="50" fill="url(#gx-flare)" opacity=".6"/><path d="M496 300H544M520 276V324" stroke="#fff" stroke-opacity=".6"/></g>
-    <g class="tw-b"><circle cx="1090" cy="560" r="36" fill="url(#gx-flare)" opacity=".5"/></g>
-    <g class="tw-a"><circle cx="1500" cy="820" r="44" fill="url(#gx-flare)" opacity=".55"/><path d="M1476 820H1524M1500 796V844" stroke="#fff" stroke-opacity=".5"/></g>
-    <g class="tw-b"><circle cx="60" cy="700" r="32" fill="url(#gx-flare)" opacity=".5"/></g>
-    <g class="tw-b"><circle cx="1320" cy="90" r="38" fill="url(#gx-flare)" opacity=".55"/><path d="M1300 90H1340M1320 70V110" stroke="#fff" stroke-opacity=".5"/></g>
-  </svg>
-</div>
+<!-- La galaxia del fondo: una imagen (panel/galaxia.webp, la dibuja scripts/galaxia-panel.js), fija detrás de todo. -->
+<div class="galaxia" aria-hidden="true"></div>
 
 <header class="hud">
   <div class="wrap">
@@ -814,20 +738,6 @@
         <button class="btn" type="button" id="salir">Salir</button>
       </div>
     </div>
-    <nav role="tablist" id="pestanas" hidden>
-      <button role="tab" data-vista="mapa" aria-selected="true" style="--i:0">Mapa</button>
-      <button role="tab" data-vista="resumen" aria-selected="false" style="--i:1">Dinero</button>
-      <button role="tab" data-vista="tienda" aria-selected="false" style="--i:1">Tienda</button>
-      <button role="tab" data-vista="stock" aria-selected="false" style="--i:2">Stock</button>
-      <button role="tab" data-vista="reparto" aria-selected="false" style="--i:3">Vendedores<span class="insignia aviso" id="ins-reparto" hidden></span></button>
-      <button role="tab" data-vista="cuentas" aria-selected="false" style="--i:4">Cuentas<span class="insignia" id="ins-cuentas" hidden></span></button>
-      <button role="tab" data-vista="movimientos" aria-selected="false" style="--i:5">Movimientos</button>
-      <button role="tab" data-vista="apuntar" aria-selected="false" style="--i:6">Apuntar</button>
-      <button role="tab" data-vista="recuento" aria-selected="false" style="--i:7">Contar la caja</button>
-      <button role="tab" data-vista="pedido" aria-selected="false" style="--i:8">Segundo pedido</button>
-      <button role="tab" data-vista="webs" aria-selected="false" style="--i:9">Webs y hoja</button>
-      <span class="nav-luz" id="nav-luz" aria-hidden="true"></span>
-    </nav>
   </div>
 </header>
 
@@ -1001,6 +911,8 @@
   };
   // El enlace marcado de la tienda para un sitio (…/zubi/?o=wa): así se sabe de dónde llega cada visita.
   const enlaceOrigen = (o) => enlaceTienda('').replace(/\?v=$/, '?o=' + o);
+  // Su catálogo de vendedores con su código: al compartir una prenda desde ahí, el enlace de la tienda lleva su código.
+  const enlaceCatalogo = (id) => enlaceTienda('').replace(/\?v=$/, 'vendedores/?v=' + encodeURIComponent(id));
   // Pone o quita una clase sin pisar las demás (con classList si lo hay; si no, a mano).
   const clase = (n, c, si) => {
     if (!n) return;
@@ -1336,7 +1248,7 @@
     { v: 'pedido', x: 800, y: 750, huecos: [[-150, -45, 'l'], [150, -45, 'r'], [175, 45, 'r']] },
     { v: 'stock', x: 404, y: 662, huecos: [[-140, -45, 'l'], [-150, 45, 'l'], [140, 60, 'r'], [-95, 125, 'l']] },
     { v: 'tienda', x: 240, y: 450, huecos: [[-40, -85, 'r'], [135, -40, 'r'], [135, 50, 'r'], [65, 120, 'r'], [-55, 150, 'r']] },
-    { v: 'movimientos', x: 404, y: 238, huecos: [[-150, -55, 'l'], [-160, 35, 'l'], [125, -90, 'r'], [-60, -130, 'l']] },
+    { v: 'movimientos', x: 404, y: 238, huecos: [[-150, -55, 'l'], [-160, 35, 'l'], [125, -90, 'r'], [-60, -130, 'l'], [135, -10, 'r']] },
   ];
   let zonaActiva = null, apagarZona = 0;
   function activarZona(z) {
@@ -1375,6 +1287,11 @@
     const recorta = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
     const recortaPalabra = (s, n) => { if (s.length <= n) return s; const c = s.slice(0, n); const i = c.lastIndexOf(' '); return (i > 6 ? c.slice(0, i) : c).trimEnd() + '…'; };
     const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+    // El último apunte (por fecha; con la misma fecha, el que va más abajo en la hoja).
+    const ultimo = movs.reduce((a, m) => (!a || String(m.fecha) >= String(a.fecha) ? m : a), null);
+    const TIPO = { VENTA: 'venta', CONSIGNA: 'entrega', DEVOLUCION: 'devolución', PAGO: 'pago', RESERVA: 'reserva', QUITA_RESERVA: 'fin de reserva' };
+    const fechaUlt = ultimo ? String(ultimo.fecha).slice(8, 10) + '/' + String(ultimo.fecha).slice(5, 7) : '';
+    const textoUltimo = ultimo ? recorta(`Último: ${TIPO[String(ultimo.tipo).toUpperCase()] || String(ultimo.tipo).toLowerCase()} ${fechaUlt}`, 24) : 'Aún sin apuntes';
 
     // Lo que dice cada planeta y sus satélites: [texto, adónde lleva ({ir, filtro, tipo} o {href}), tamaño, color].
     const datos = {
@@ -1403,7 +1320,7 @@
         .concat([[t7.visita ? `${Math.round(t7.pedido / t7.visita * 100)} % de las visitas piden` : 'Aún sin visitas', { ir: 'tienda' }],
           [totAp ? `Móvil ${Math.round(movil / totAp * 100)} %` : 'Enlaces para compartir', { ir: 'tienda' }]]) },
       movimientos: { dato: plural(movs.length, 'apunte', 'apuntes'), sats: [
-        ['Apuntar algo nuevo', { ir: 'apuntar' }], [plural(cuantos('VENTA'), 'venta', 'ventas'), { ir: 'movimientos', tipo: 'VENTA' }],
+        [textoUltimo, { ir: 'movimientos' }], ['Apuntar algo nuevo', { ir: 'apuntar' }], [plural(cuantos('VENTA'), 'venta', 'ventas'), { ir: 'movimientos', tipo: 'VENTA' }],
         [plural(cuantos('CONSIGNA'), 'entrega', 'entregas'), { ir: 'movimientos', tipo: 'CONSIGNA' }],
         [plural(cuantos('PAGO'), 'pago', 'pagos'), { ir: 'movimientos', tipo: 'PAGO' }]] },
     };
@@ -1668,6 +1585,9 @@
         !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto,
           'Hola ' + f.nombre + ', este es tu enlace de la tienda ZUBI: ' + suEnlace +
           '\nLos pedidos que lleguen desde él van a tu nombre y llevan tu comisión.'))}">Mandarle su enlace</a>` : '',
+        !f.propio && tel ? `<a class="btn" target="_blank" rel="noopener" href="${esc(Panel.enlaceWhatsApp(f.contacto,
+          'Hola ' + f.nombre + ', este es tu catálogo de vendedor: ' + enlaceCatalogo(f.id) +
+          '\nÁbrelo siempre desde aquí: cuando compartas una prenda, el enlace de la tienda lleva tu código y los pedidos que lleguen van a tu nombre.'))}">Mandarle su catálogo</a>` : '',
       ].join('');
       return `<div class="vend caja" style="--i:${Math.min(n, 10)}">
         <div class="cab"><h3>${esc(f.nombre)} <span class="suave">${esc(f.id)}${tel ? ' · ' + esc(f.contacto) : ''}</span></h3><div class="chips">${chips}</div></div>
@@ -2161,13 +2081,6 @@ te lo preparo y tú lo confirmas.</div>` : '';
     if (DATOS.hoja) { el('hoja-abrir').href = DATOS.hoja; el('hoja-abrir').hidden = false; }
     pintarGasto(DATOS.asistente);
     if (vistaActual && vistaActual !== 'mapa') pintarCabeza(vistaActual);
-    // Números en las pestañas: a cuántos amigos hay que cobrar y cuántas prendas llevan paradas.
-    const debiendo = S.cuentas.filter((c) => !c.propio && deudaDe(c.vendedor).debe > 0.004).length;
-    const paradas = S.fichas.reduce((a, f) => a + f.paradas, 0);
-    el('ins-cuentas').textContent = debiendo; el('ins-cuentas').hidden = !debiendo;
-    el('ins-cuentas').setAttribute('title', debiendo + (debiendo === 1 ? ' amigo te debe dinero' : ' amigos te deben dinero'));
-    el('ins-reparto').textContent = paradas; el('ins-reparto').hidden = !paradas;
-    el('ins-reparto').setAttribute('title', paradas + (paradas === 1 ? ' prenda parada' : ' prendas paradas') + ' en casa de tus amigos');
     setTimeout(marcarDesbordes, 0);
   }
   // Las tablas que no caben: sombra al borde derecho mientras quede algo a la derecha.
@@ -2184,7 +2097,6 @@ te lo preparo y tú lo confirmas.</div>` : '';
   const hashVista = () => { try { return String((window.location && window.location.hash) || '').slice(1); } catch (e) { return ''; } };
   function verVista(v) {
     if (VISTAS.indexOf(v) < 0) v = 'mapa';
-    document.querySelectorAll('#pestanas button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)));
     VISTAS.forEach((x) => { el('v-' + x).hidden = x !== v; });
     // El mapa ocupa la página entera; cada sección lleva arriba su planeta, sus cifras y «‹ Mapa».
     clase(document.body, 'en-mapa', v === 'mapa');
@@ -2202,23 +2114,10 @@ te lo preparo y tú lo confirmas.</div>` : '';
     else if (v === 'resumen' && S.calc) prepararRevelado();
     pref('panel_vista', v);   // al volver, la misma pestaña
     try { if (window.history && window.history.replaceState && hashVista() !== v) window.history.replaceState(null, '', '#' + v); } catch (e) { /* nada */ }
-    moverLuz(true);
     setTimeout(marcarDesbordes, 0);
   }
-  // La luz bajo la pestaña activa: se desliza hasta ella (y en el móvil, la pestaña se asoma).
-  function moverLuz(asomar) {
-    const luz = el('nav-luz');
-    if (!luz || !luz.style) return;
-    const b = [...document.querySelectorAll('#pestanas button')].find((x) => x.getAttribute && x.getAttribute('aria-selected') === 'true');
-    if (!b || !b.offsetWidth) return;
-    luz.style.width = b.offsetWidth + 'px';
-    luz.style.transform = `translateX(${b.offsetLeft}px)`;
-    clase(el('pestanas'), 'con-luz', true);
-    if (asomar && b.scrollIntoView) { try { b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: quieto() ? 'auto' : 'smooth' }); } catch (e) { /* nada */ } }
-  }
-
   // ---- El arranque: la primera vez tras la clave, el sistema se enciende ----
-  // Un barrido cruza la pantalla, las pestañas y las tarjetas entran en cascada, el anillo del
+  // Un barrido cruza la pantalla, las tarjetas entran en cascada, el anillo del
   // reactor se dibuja, las barras crecen y las cifras cuentan desde 0. Solo una vez por
   // entrada: el panel se repinta cada minuto y eso no debe repetirse.
   let arrancado = false, arrancando = false;
@@ -2227,16 +2126,14 @@ te lo preparo y tú lo confirmas.</div>` : '';
     arrancado = true;
     if (quieto()) return;
     const vista = VISTAS.map((x) => el('v-' + x)).find((s) => s && !s.hidden);
-    const nav = el('pestanas'), barrido = el('barrido');
+    const barrido = el('barrido');
     arrancando = true;
-    clase(nav, 'arranque', true);
     clase(vista, 'arranque', true);
     if (barrido) barrido.hidden = false;
     const r = el('v-resumen');
-    contarCifras(r.querySelectorAll ? r.querySelectorAll('.tiles [data-n], .ritmo [data-n]') : [], 350, 1400);
+    contarCifras(r.querySelectorAll ? r.querySelectorAll('.tiles [data-n]') : [], 350, 1400);
     setTimeout(() => {
       arrancando = false;
-      clase(nav, 'arranque', false);
       clase(vista, 'arranque', false);
       if (barrido) barrido.hidden = true;
     }, 2000);
@@ -2308,7 +2205,6 @@ te lo preparo y tú lo confirmas.</div>` : '';
   function mostrarPanel(si) {
     el('entrar').hidden = si;
     clase(document.body, 'dentro', si);   // dentro del panel no hay cabecera: se navega por el mapa
-    el('pestanas').hidden = !si;
     el('conexion').hidden = !si;
     el('rejilla').hidden = !si;
     el('j-abrir').hidden = !si;
@@ -2379,7 +2275,6 @@ te lo preparo y tú lo confirmas.</div>` : '';
   el('entrar').addEventListener('submit', (e) => { e.preventDefault(); entrar(el('clave').value); });
   el('salir').addEventListener('click', () => salir());
   el('refrescar').addEventListener('click', () => cargar());
-  document.querySelectorAll('#pestanas button').forEach((b) => b.addEventListener('click', () => verVista(b.dataset.vista)));
   document.querySelectorAll('.web-btn').forEach((b) => b.addEventListener('click', () => verWeb(b.dataset.web)));
   el('stock-q').addEventListener('input', () => S.calc && pintarStock());
   el('stock-f').addEventListener('change', () => S.calc && pintarStock());
@@ -2468,6 +2363,22 @@ te lo preparo y tú lo confirmas.</div>` : '';
     clearTimeout(apagarZona);
     apagarZona = setTimeout(() => activarZona(null), 700);
   });
+  // En pantallas táctiles (tabletas) no hay «pasar por encima»: el primer toque en un planeta enseña sus satélites y
+  // el segundo entra en su sección; tocar el cielo los esconde. (Se mira en pointerdown, antes del «ratón» que simula el
+  // navegador al tocar, que ya lo encendería.)
+  let toque = null;
+  el('v-mapa').addEventListener('pointerdown', (e) => {
+    const z = e.pointerType === 'touch' && e.target.closest ? e.target.closest('.mp-zona') : null;
+    toque = e.pointerType === 'touch' ? { zona: z, yaActiva: !!z && z === zonaActiva } : null;
+  });
+  el('v-mapa').addEventListener('click', (e) => {
+    const t = toque; toque = null;
+    if (!t) return;
+    const pl = e.target.closest && e.target.closest('.mp-pl');
+    if (!t.zona) { if (!pl && !(e.target.closest && e.target.closest('button, a'))) activarZona(null); return; }
+    const esPlaneta = pl && pl.parentNode === t.zona;
+    if (esPlaneta && !t.yaActiva) { if (e.preventDefault) e.preventDefault(); e.stopPropagation(); activarZona(t.zona); }
+  });
   el('v-mapa').addEventListener('focusin', (e) => { const z = e.target.closest && e.target.closest('.mp-zona'); activarZona(z || null); });
   // Detalle de las gráficas al pasar por encima.
   el('vistas').addEventListener('mousemove', (e) => {
@@ -2525,11 +2436,9 @@ te lo preparo y tú lo confirmas.</div>` : '';
       if (S.calc && !el('v-resumen').hidden && anchoVistas() !== anchoPintado) pintarResumen();
       if (S.calc && !el('v-stock').hidden && anchoVistas() !== anchoStock) pintarStockGraf();
       if (S.calc && !el('v-reparto').hidden && anchoVistas() !== anchoReparto) pintarReparto();
-      marcarDesbordes(); moverLuz();
+      marcarDesbordes();
     }, 200);
   });
-  // Cuando llegan las letras de verdad las pestañas cambian de ancho: la luz se recoloca.
-  try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moverLuz()); } catch (e) { /* nada */ }
 
   // Al momento: se pide a Google cada minuto mientras la página está a la vista, y al volver a ella.
   setInterval(() => { if (CLAVE && document.visibilityState !== 'hidden' && !pensando) cargar(); }, 60000);
